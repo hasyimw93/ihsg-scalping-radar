@@ -127,6 +127,49 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# 5. LIVE IHSG INDEX REFERENCE WIDGET
+@st.cache_data(ttl=30)
+def fetch_ihsg_data():
+    try:
+        ihsg = yf.Ticker("^JKSE")
+        hist = ihsg.history(period="1d", interval="5m")
+        if not hist.empty:
+            current_val = hist["Close"].iloc[-1]
+            prev_close = ihsg.history(period="5d").iloc[-2]["Close"] if len(ihsg.history(period="5d")) >= 2 else current_val
+            change = current_val - prev_close
+            change_pct = (change / prev_close) * 100
+            return hist, current_val, change, change_pct
+    except Exception:
+        pass
+    return pd.DataFrame(), 0, 0, 0
+
+with st.spinner("Memuat indeks acuan IHSG..."):
+    ihsg_hist, ihsg_price, ihsg_chg, ihsg_chg_pct = fetch_ihsg_data()
+
+if not ihsg_hist.empty:
+    ihsg_color = "#34d399" if ihsg_chg >= 0 else "#f87171"
+    st.markdown(f"""
+    <div style="background: #0d172d; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">📊 IHSG Benchmark Index (^JKSE)</span>
+            <div style="font-size: 18px; font-weight: 800; color: #ffffff;">{ihsg_price:,.2f} &nbsp;<span style="font-size: 13px; color: {ihsg_color};">{ihsg_chg:+,.2f} ({ihsg_chg_pct:+.2f}%)</span></div>
+        </div>
+        <div style="font-size: 11px; color: #60a5fa; font-weight: 600;">Intraday Macro Trend</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    fig_ihsg = go.Figure()
+    fig_ihsg.add_trace(go.Scatter(x=ihsg_hist.index, y=ihsg_hist["Close"], mode='lines', name='IHSG', line=dict(color='#38bdf8', width=2)))
+    fig_ihsg.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(13, 23, 45, 0.9)',
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=140,
+        xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.04)', color='#94a3b8'),
+        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.04)', color='#94a3b8')
+    )
+    st.plotly_chart(fig_ihsg, use_container_width=True)
+
 # INITIALIZE SESSION STATE
 if 'custom_watchlist' not in st.session_state:
     st.session_state.custom_watchlist = ["TEBE", "JPFA", "TLKM", "BBCA", "BMRI", "UNTR", "ASII", "AMRT", "CPIN", "ANTM"]
@@ -532,7 +575,6 @@ if selected_ticker and selected_row:
 </div>
 </div>"""
 
-        # RENDER DENGAN UNSAFE_ALLOW_HTML=TRUE
         st.markdown(full_orderbook_html, unsafe_allow_html=True)
         st.write("")
 
