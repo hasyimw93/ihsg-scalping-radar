@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (Responsive Fix untuk Mobile & Desktop)
+# 3. INJEKSI CUSTOM CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -117,7 +117,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-ajaib">Institutional Intelligence • Mobile-Optimized Orderbook • Execution Plan</div>
+            <div class="hero-subtitle-ajaib">Institutional Intelligence • Perfect Desktop Orderbook • Execution Plan</div>
         </div>
         <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
@@ -479,7 +479,7 @@ if selected_ticker and selected_row:
         </div>
         """, unsafe_allow_html=True)
 
-        # 📱 📖 MOBILE-RESPONSIVE ORDERBOOK MARKET DEPTH
+        # 🖥️ 📱 PERFECT RESPONSIVE ORDERBOOK (FULL WIDTH DESKTOP & MOBILE SAFE)
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(10)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
@@ -495,18 +495,17 @@ if selected_ticker and selected_row:
         sum_bid_freq = sum(bids_f)
         sum_ask_freq = sum(asks_f)
 
-        # Menggunakan HTML Table murni dengan styling min-width agar tidak patah di layar HP
         st.markdown("""
-        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px; overflow-x: auto;">
-            <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center; border-collapse: collapse; min-width: 320px;">
+        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px;">
+            <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center; border-collapse: collapse;">
                 <thead>
                     <tr style="color: #94a3b8; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08);">
-                        <th style="padding: 6px; text-align: left;">FREQ</th>
-                        <th style="padding: 6px; text-align: right;">LOT BID</th>
-                        <th style="padding: 6px; color: #f87171;">BID</th>
-                        <th style="padding: 6px; color: #34d399;">ASK</th>
-                        <th style="padding: 6px; text-align: left;">LOT ASK</th>
-                        <th style="padding: 6px; text-align: right;">FREQ</th>
+                        <th style="padding: 6px; width: 12%; text-align: left;">FREQ</th>
+                        <th style="padding: 6px; width: 23%; text-align: right;">LOT BID</th>
+                        <th style="padding: 6px; width: 15%; color: #f87171;">BID</th>
+                        <th style="padding: 6px; width: 15%; color: #34d399;">ASK</th>
+                        <th style="padding: 6px; width: 23%; text-align: left;">LOT ASK</th>
+                        <th style="padding: 6px; width: 12%; text-align: right;">FREQ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -516,12 +515,12 @@ if selected_ticker and selected_row:
             ask_c = "#34d399" if i < 2 else "#f87171"
             st.markdown(f"""
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
-                        <td style="padding: 5px; text-align: left; color: #94a3b8;">{bids_f[i]}</td>
-                        <td style="padding: 5px; text-align: right; font-weight: 500;">{bids_v[i]:,}</td>
-                        <td style="padding: 5px; color: #f87171; font-weight: 700;">Rp {bids_p[i]:,}</td>
-                        <td style="padding: 5px; color: {ask_c}; font-weight: 700;">Rp {asks_p[i]:,}</td>
-                        <td style="padding: 5px; text-align: left; font-weight: 500;">{asks_v[i]:,}</td>
-                        <td style="padding: 5px; text-align: right; color: #94a3b8;">{asks_f[i]}</td>
+                        <td style="padding: 6px; text-align: left; color: #94a3b8;">{bids_f[i]}</td>
+                        <td style="padding: 6px; text-align: right; font-weight: 500;">{bids_v[i]:,}</td>
+                        <td style="padding: 6px; color: #f87171; font-weight: 700;">Rp {bids_p[i]:,}</td>
+                        <td style="padding: 6px; color: {ask_c}; font-weight: 700;">Rp {asks_p[i]:,}</td>
+                        <td style="padding: 6px; text-align: left; font-weight: 500;">{asks_v[i]:,}</td>
+                        <td style="padding: 6px; text-align: right; color: #94a3b8;">{asks_f[i]}</td>
                     </tr>
             """, unsafe_allow_html=True)
 
