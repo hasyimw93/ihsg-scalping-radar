@@ -2,10 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import yfinance as yf
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(
-    page_title="IHSG Scalping Radar - Cyber Edition",
+    page_title="IHSG Scalping Radar - Live Data",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -49,19 +50,11 @@ st.markdown("""
         text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
     }
 
-    [data-testid="stVerticalBlock"] > div > div[data-testid="stVerticalBlock"] {
-        background: rgba(13, 6, 40, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 15px;
-        backdrop-filter: blur(10px);
-    }
-
     .metric-card {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 12px;
-        padding: 16px;
+        padding: 14px;
         text-align: center;
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         transition: transform 0.3s ease;
@@ -73,7 +66,7 @@ st.markdown("""
     }
 
     .metric-label {
-        font-size: 12px;
+        font-size: 11px;
         color: #b3a2c7;
         margin-bottom: 6px;
         text-transform: uppercase;
@@ -81,139 +74,224 @@ st.markdown("""
     }
 
     .metric-value {
-        font-size: 22px;
+        font-size: 18px;
         font-weight: 700;
         color: #ffffff;
     }
 
     .target-green { color: #00f0ff; text-shadow: 0 0 10px rgba(0,240,255,0.6); }
     .target-magenta { color: #ff2a85; text-shadow: 0 0 10px rgba(255,42,133,0.6); }
+    .target-gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
     .cut-loss-red { color: #ff5252; }
-
-    .stDataFrame {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .stSelectbox label {
-        color: #00f0ff !important;
-        font-size: 13px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. HEADER BANNER
+# 3. HEADER
 st.markdown("""
 <div class="main-header">
     <h1>⚡ IHSG High-Potential Scalping Radar</h1>
-    <p>Aplikasi Smart Screening & Execution Plan untuk Saham dengan Harga &lt; Rp 4.000</p>
+    <p>Aplikasi Smart Screening, Profit Target (+3% s/d Max ARA) & Execution Plan</p>
 </div>
 """, unsafe_allow_html=True)
 
-# 4. DATA RADAR SAHAM
-data_radar = {
-    "Ticker": ["ACES", "AKRA", "BBYB", "ERAA", "JARR", "JPFA", "TEBE", "RAAM", "TPIA", "BUMI"],
-    "Price": [338, 1475, 200, 600, 3620, 2110, 2570, 165, 1785, 181],
-    "Prediksi Potensi": ["🔥 HIGH POTENTIAL (+3%+)", "🔥 HIGH POTENTIAL (+3%+)", "🔥 HIGH POTENTIAL (+3%+)", 
-                        "🔥 HIGH POTENTIAL (+3%+)", "🔥 HIGH POTENTIAL (+3%+)", "🔥 HIGH POTENTIAL (+3%+)", 
-                        "🔥 HIGH POTENTIAL (+3%+)", "🔥 HIGH POTENTIAL (+3%+)", "🔥 HIGH POTENTIAL (+3%+)", 
-                        "⚡ MEDIUM POTENTIAL"],
-    "Vol Ratio": ["0.0x", "0.0x", "0.0x", "0.0x", "0.0x", "0.0x", "0.0x", "0.0x", "0.0x", "0.1x"],
-    "Target Min (+3%)": [348, 1519, 206, 618, 3729, 2173, 2647, 170, 1839, 186]
-}
-df_radar = pd.DataFrame(data_radar)
+# LIST TICKER REKOMENDASI DEFAULT
+TICKERS_RADAR = ["TEBE", "JPFA", "TLKM", "BBCA", "BMRI", "UNTR", "ASII", "JARR", "AMRT", "CPIN", "TPIA", "AKRA", "BRIS", "ERAA", "PGAS", "ANTM", "ACES", "BBYB", "BUMI", "RAAM"]
 
-# 5. LAYOUT UTAMA
-col_left, col_right = st.columns([1.1, 1.9], gap="medium")
+# FUNGSI HITUNG ARA
+def hitung_max_ara(price):
+    if price <= 200:
+        return 35.0
+    elif price <= 5000:
+        return 25.0
+    else:
+        return 20.0
+
+# FUNGSI FORMAT MARKET CAP
+def format_market_cap(mc):
+    if not mc or pd.isna(mc):
+        return "N/A"
+    if mc >= 1e12:
+        return f"Rp {mc / 1e12:.2f} T"
+    elif mc >= 1e9:
+        return f"Rp {mc / 1e9:.2f} B"
+    elif mc >= 1e6:
+        return f"Rp {mc / 1e6:.2f} M"
+    else:
+        return f"Rp {mc:,.0f}"
+
+# FUNGSI AMBIL SINGLE TICKER (UNTUK PENCARIAN DILUAR RADAR)
+def fetch_single_ticker_data(symbol):
+    try:
+        ticker_jk = f"{symbol.strip().upper()}.JK"
+        stock = yf.Ticker(ticker_jk)
+        hist = stock.history(period="1d")
+        if not hist.empty:
+            current_price = int(round(hist["Close"].iloc[-1]))
+            prev_close = int(round(hist["Open"].iloc[0]))
+            change_pct = ((current_price - prev_close) / prev_close) * 100
+            
+            mc_raw = stock.info.get('marketCap', None)
+            mc_fmt = format_market_cap(mc_raw)
+            potensi = "🔥 HIGH POTENTIAL" if change_pct >= 0 else "⚡ MEDIUM POTENTIAL"
+            
+            return {
+                "Ticker": symbol.strip().upper(),
+                "Price": current_price,
+                "Market Cap": mc_fmt,
+                "Change (%)": f"{change_pct:+.2f}%",
+                "Prediksi Potensi": potensi
+            }
+    except Exception:
+        return None
+    return None
+
+# FUNGSI AMBIL DATA BANYAK TICKER (UNTUK TABEL RADAR)
+@st.cache_data(ttl=60)
+def fetch_live_market_data(ticker_list):
+    results = []
+    for symbol in ticker_list:
+        data = fetch_single_ticker_data(symbol)
+        if data:
+            results.append(data)
+    return pd.DataFrame(results)
+
+with st.spinner("Mengambil data pasar live & Market Cap dari BEI..."):
+    df_master = fetch_live_market_data(TICKERS_RADAR)
+
+# 4. KONTROL FILTER & PENCARIAN SAHAM
+c_filter, c_search = st.columns([1.5, 1], gap="medium")
+
+with c_filter:
+    kategori_harga = st.selectbox(
+        "📌 Pilih Kategori Harga Saham:",
+        [
+            "Semua Saham",
+            "1. Di atas Rp 4.000",
+            "2. Rp 3.000 - Rp 4.000",
+            "3. Rp 2.000 - Rp 3.000",
+            "4. Rp 1.000 - Rp 2.000",
+            "5. Rp 500 - Rp 1.000",
+            "6. Rp 1 - Rp 500"
+        ],
+        index=3
+    )
+
+with c_search:
+    search_input = st.text_input(
+        "🔍 Cari Saham di luar Sinyal Rekomendasi:",
+        placeholder="Ketik kode ticker (contoh: UNVR, GOTO, BBRI)",
+        help="Ketik kode saham apa saja dari Bursa Efek Indonesia untuk dianalisis langsung"
+    ).strip().upper()
+
+# FILTERING DATA UNTUK TABEL RADAR
+if kategori_harga == "1. Di atas Rp 4.000":
+    df_filtered = df_master[df_master["Price"] > 4000].copy()
+elif kategori_harga == "2. Rp 3.000 - Rp 4.000":
+    df_filtered = df_master[(df_master["Price"] >= 3000) & (df_master["Price"] <= 4000)].copy()
+elif kategori_harga == "3. Rp 2.000 - Rp 3.000":
+    df_filtered = df_master[(df_master["Price"] >= 2000) & (df_master["Price"] < 3000)].copy()
+elif kategori_harga == "4. Rp 1.000 - Rp 2.000":
+    df_filtered = df_master[(df_master["Price"] >= 1000) & (df_master["Price"] < 2000)].copy()
+elif kategori_harga == "5. Rp 500 - Rp 1.000":
+    df_filtered = df_master[(df_master["Price"] >= 500) & (df_master["Price"] < 1000)].copy()
+elif kategori_harga == "6. Rp 1 - Rp 500":
+    df_filtered = df_master[(df_master["Price"] >= 1) & (df_master["Price"] < 500)].copy()
+else:
+    df_filtered = df_master.copy()
+
+if not df_filtered.empty:
+    df_filtered["Target Min (+3%)"] = (df_filtered["Price"] * 1.03).round().astype(int)
+    df_filtered["Max Potensi (%)"] = df_filtered["Price"].apply(lambda p: f"+{hitung_max_ara(p):.0f}% (ARA)")
+
+# 5. LAYOUT
+col_left, col_right = st.columns([1.4, 1.6], gap="medium")
+
+selected_row = None
+selected_ticker = None
 
 with col_left:
     st.subheader("🎯 Radar Saham Potensi Naik")
-    st.dataframe(df_radar, use_container_width=True, hide_index=False, height=420)
     
-    selected_ticker = st.selectbox("Pilih Saham untuk Detail Plan:", df_radar["Ticker"].tolist(), index=3)
+    if not df_filtered.empty:
+        # MENAMPILKAN MARKET CAP DI TABEL RADAR
+        st.dataframe(
+            df_filtered[["Ticker", "Price", "Market Cap", "Target Min (+3%)", "Max Potensi (%)", "Prediksi Potensi"]], 
+            use_container_width=True, 
+            hide_index=True, 
+            height=340
+        )
+        ticker_list_options = df_filtered["Ticker"].tolist()
+    else:
+        st.info("Tidak ada saham rekomendasi di rentang harga ini.")
+        ticker_list_options = []
 
-# 6. KALKULASI PERHITUNGAN DINAMIS BERDASARKAN TICKER TERPILIH
-selected_row = df_radar[df_radar["Ticker"] == selected_ticker].iloc[0]
-area_beli = int(selected_row["Price"])
-target_min = int(round(area_beli * 1.03))  # +3%
-target_max = int(round(area_beli * 1.05))  # +5%
-cut_loss = int(round(area_beli * 0.982))   # -1.8%
+    # Penanganan Pemilihan Saham (Manual Search vs Dropdown List)
+    if search_input:
+        st.caption(f"🔎 Menampilkan analisis langsung untuk pencarian: **{search_input}**")
+        custom_data = fetch_single_ticker_data(search_input)
+        if custom_data:
+            selected_ticker = search_input
+            selected_row = custom_data
+        else:
+            st.error(f"Ticker '{search_input}' tidak ditemukan di BEI. Pastikan kode ticker benar.")
+    else:
+        if ticker_list_options:
+            selected_ticker = st.selectbox("Pilih Saham untuk Detail Plan:", ticker_list_options, index=0)
+            selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-with col_right:
-    st.subheader(f"📊 Trading Plan: {selected_ticker}")
-    
-    # Grid 4 Metric Cards Dinamis
-    m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Area Beli</div>
-            <div class="metric-value">Rp {area_beli:,}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with m2:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Target Min (+3%)</div>
-            <div class="metric-value target-green">Rp {target_min:,}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with m3:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Target Max (+5%)</div>
-            <div class="metric-value target-magenta">Rp {target_max:,}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with m4:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Cut Loss</div>
-            <div class="metric-value cut-loss-red">Rp {cut_loss:,}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.write("") 
+# DISPLAY TRADING PLAN
+if selected_ticker and selected_row:
+    area_beli = int(selected_row["Price"])
+    market_cap_val = selected_row.get("Market Cap", "N/A")
+    target_min = int(round(area_beli * 1.03))
+    target_opt = int(round(area_beli * 1.05))
+    max_ara_pct = hitung_max_ara(area_beli)
+    harga_max_ara = int(round(area_beli * (1 + max_ara_pct / 100)))
+    cut_loss = int(round(area_beli * 0.982))
 
-    # 7. CHART PLOTLY DINAMIS SESUAI HARGA SAHAM
-    time_series = pd.date_range(start="2026-09-30 09:00", periods=50, freq="2min")
-    np.random.seed(sum(ord(c) for c in selected_ticker)) # Seed unik tiap saham
-    
-    # Generate simulasi pergerakan dari harga Area Beli
-    price_base = area_beli * 0.985
-    price_data = price_base + np.cumsum(np.random.randn(50) * (area_beli * 0.003))
-    price_data[30:] += (area_beli * 0.025)  # Jump breakout
-    vwap_data = price_data - (area_beli * 0.005)
+    with col_right:
+        st.subheader(f"📊 Trading Plan: {selected_ticker}")
+        st.caption(f"Market Capitalization: **{market_cap_val}**")
 
-    fig = go.Figure()
+        m1, m2, m3, m4, m5 = st.columns(5)
+        with m1:
+            st.markdown(f'<div class="metric-card"><div class="metric-label">Area Beli</div><div class="metric-value">Rp {area_beli:,}</div></div>', unsafe_allow_html=True)
+        with m2:
+            st.markdown(f'<div class="metric-card"><div class="metric-label">Target Min (+3%)</div><div class="metric-value target-green">Rp {target_min:,}</div></div>', unsafe_allow_html=True)
+        with m3:
+            st.markdown(f'<div class="metric-card"><div class="metric-label">Target 2 (+5%)</div><div class="metric-value target-magenta">Rp {target_opt:,}</div></div>', unsafe_allow_html=True)
+        with m4:
+            st.markdown(f'<div class="metric-card"><div class="metric-label">Max ARA (+{max_ara_pct:.0f}%)</div><div class="metric-value target-gold">Rp {harga_max_ara:,}</div></div>', unsafe_allow_html=True)
+        with m5:
+            st.markdown(f'<div class="metric-card"><div class="metric-label">Cut Loss (-1.8%)</div><div class="metric-value cut-loss-red">Rp {cut_loss:,}</div></div>', unsafe_allow_html=True)
+        
+        st.write("") 
 
-    # Candle / Line Price
-    fig.add_trace(go.Scatter(
-        x=time_series, y=price_data,
-        mode='lines', name='Price',
-        line=dict(color='#00f0ff', width=2)
-    ))
+        # FETCH INTRADAY CHART
+        try:
+            intraday = yf.Ticker(f"{selected_ticker}.JK").history(period="1d", interval="5m")
+            if not intraday.empty:
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#00f0ff', width=2)))
+                
+                # Garis VWAP Sederhana
+                vwap = (intraday["Volume"] * (intraday["High"] + intraday["Low"] + intraday["Close"]) / 3).cumsum() / intraday["Volume"].cumsum()
+                fig.add_trace(go.Scatter(x=intraday.index, y=vwap, mode='lines', name='VWAP', line=dict(color='#ff2a85', width=1.5, dash='dot')))
 
-    # VWAP Line
-    fig.add_trace(go.Scatter(
-        x=time_series, y=vwap_data,
-        mode='lines', name='VWAP',
-        line=dict(color='#ff2a85', width=1.5, dash='dot')
-    ))
+                fig.add_hline(y=target_min, line_dash="dash", line_color="#00f0ff", annotation_text=f"Target Min (+3%): {target_min}")
+                fig.add_hline(y=cut_loss, line_dash="dash", line_color="#ff5252", annotation_text=f"Cut Loss: {cut_loss}")
 
-    # Line Target & Cut Loss Dinamis
-    fig.add_hline(y=target_min, line_dash="dash", line_color="#00f0ff", annotation_text=f"Target (+3%): {target_min}", annotation_position="top right")
-    fig.add_hline(y=cut_loss, line_dash="dash", line_color="#ff5252", annotation_text=f"Cut Loss: {cut_loss}", annotation_position="bottom right")
-
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(13, 6, 40, 0.5)',
-        margin=dict(l=10, r=10, t=10, b=10),
-        height=330,
-        xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#b3a2c7'),
-        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#b3a2c7'),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="#ffffff"))
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+                fig.update_layout(
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(13, 6, 40, 0.5)',
+                    margin=dict(l=10, r=10, t=10, b=10),
+                    height=320,
+                    xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#b3a2c7'),
+                    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#b3a2c7'),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="#ffffff"))
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("Data grafik intraday tidak tersedia (pasar sedang tutup atau data belum diperbarui).")
+        except Exception:
+            st.warning("Gagal memuat grafik intraday.")
