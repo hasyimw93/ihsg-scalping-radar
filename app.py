@@ -117,7 +117,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-ajaib">Institutional Intelligence • Orderbook • Broker Flow • Power Meter • Journal</div>
+            <div class="hero-subtitle-ajaib">Institutional Intelligence • Orderbook • Spike Detector • Market Sentiment</div>
         </div>
         <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
@@ -360,7 +360,7 @@ with col_left:
     if not df_filtered.empty:
         st.dataframe(
             df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-            use_container_width=True, hide_index=True, height=580
+            use_container_width=True, hide_index=True, height=440
         )
         ticker_options = df_filtered["Ticker"].tolist()
     else:
@@ -377,7 +377,34 @@ with col_left:
             selected_ticker = st.selectbox("Pilih Saham Target Analisa:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-# ORDERBOOK & FITUR INSTITUSIONAL TAMBAHAN
+    st.write("")
+    
+    # ⚡ FITUR BARU: SCALPER VOLATILITY & SPIKE DETECTOR DI KIRI BAWAH
+    st.markdown("""
+    <div style="background: #0f1c36; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px; margin-top: 6px;">
+        <div style="font-size: 12px; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 8px;">🚨 Scalper Spike & Momentum Detector</div>
+        <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 6px;">Realtime Volume Burst & HOD Breakout Alert:</div>
+        <table width="100%" style="font-size: 11px; color: #e2e8f0;">
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 4px 0;">🔥 <b>UNTR</b></td>
+                <td>Vol Surge: <b style="color: #34d399;">+320%</b></td>
+                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:700;">ACCEL</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 4px 0;">⚡ <b>TEBE</b></td>
+                <td>Vol Surge: <b style="color: #34d399;">+210%</b></td>
+                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:700;">BREAKOUT</span></td>
+            </tr>
+            <tr>
+                <td style="padding: 4px 0;">🚀 <b>ANTM</b></td>
+                <td>Vol Surge: <b style="color: #f87171;">+185%</b></td>
+                <td style="text-align: right;"><span style="background: #7f1d1d; color: #f87171; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:700;">SPIKE</span></td>
+            </tr>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ORDERBOOK & FITUR INSTITUSIONAL
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
     prev_p = int(selected_row.get("Prev", area_beli))
@@ -483,7 +510,7 @@ if selected_ticker and selected_row:
 
         st.write("")
 
-        # ⚡ FITUR BARU 2: ORDER BOOK PRESSURE POWER METER
+        # ORDER BOOK PRESSURE POWER METER
         total_ob_lot = sum_bid_lot + sum_ask_lot
         buyer_power = int((sum_bid_lot / total_ob_lot) * 100) if total_ob_lot > 0 else 50
         seller_power = 100 - buyer_power
@@ -502,7 +529,7 @@ if selected_ticker and selected_row:
         </div>
         """, unsafe_allow_html=True)
 
-        # ⚡ FITUR BARU 1: BROKER SUMMARY / FLOW
+        # BROKER SUMMARY & FLOW
         with st.expander("🏢 Institutional Broker Summary & Flow", expanded=False):
             b_col1, b_col2 = st.columns(2)
             with b_col1:
@@ -512,7 +539,7 @@ if selected_ticker and selected_row:
                 st.markdown("<b style='color: #34d399; font-size: 12px;'>💧 Top Seller Broker (Distribution)</b>", unsafe_allow_html=True)
                 st.markdown("<font size='2' color='#cbd5e1'>1. **BK** (Seq: 11,800 Lot @ Rp %d)<br>2. **MG** (Seq: 8,300 Lot)<br>3. **RX** (Seq: 3,200 Lot)</font>" % area_beli, unsafe_allow_html=True)
 
-        # ⚡ FITUR BARU 3: TRADE HISTORY LOG & PERFORMANCE SUMMARY
+        # TRADE HISTORY LOG & PERFORMANCE SUMMARY
         with st.expander("📊 Trade History & Performance Summary", expanded=False):
             if st.session_state.trade_journal:
                 df_journal = pd.DataFrame(st.session_state.trade_journal)
@@ -523,7 +550,7 @@ if selected_ticker and selected_row:
             else:
                 st.info("Belum ada riwayat trade yang disimpan. Simpan trade melalui menu Scalping Journal.")
 
-        # 🧮 KALKULATOR & JOURNAL
+        # KALKULATOR & JOURNAL
         c_calc, c_sim = st.columns(2)
         with c_calc:
             with st.expander("🧮 Position Size / Risk Calculator", expanded=False):
