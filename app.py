@@ -8,7 +8,7 @@ import pytz
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(
-    page_title="IHSG Scalping Terminal - Monochrome Apex",
+    page_title="IHSG Scalping Terminal - Ajaib Classic Orderbook",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (GAYA DUAL-TONE PUTIH & HITAM PEKAT ELEGAN)
+# 3. INJEKSI CUSTOM CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -34,81 +34,65 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* BACKGROUND UTAMA PUTIH BERSIH (LIGHT BASE) */
     .stApp {
-        background-color: #f4f4f6 !important;
-        color: #111113 !important;
+        background-color: #070d1a !important;
+        color: #ffffff !important;
     }
 
-    /* HEADER UTAMA DENGAN LATAR PUTIH & BORDER HALUS */
-    .main-hero-light {
-        background: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        border-radius: 24px;
-        padding: 28px 32px;
+    .main-hero-ajaib {
+        background: #0d172d;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 24px 28px;
         margin-bottom: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-    .hero-title-dark {
-        font-size: 28px;
+    .hero-title-ajaib {
+        font-size: 26px;
         font-weight: 800;
         letter-spacing: -0.5px;
-        color: #000000;
+        color: #ffffff;
         margin: 0;
         text-transform: uppercase;
     }
-    .hero-subtitle-dark {
+    .hero-subtitle-ajaib {
         font-size: 12px;
-        color: #6b7280;
-        margin-top: 6px;
+        color: #93c5fd;
+        margin-top: 4px;
         letter-spacing: 0.5px;
     }
 
-    /* CONTAINER UTAMA BERLATAR BELAKANG HITAM PEKAT MELENGKUNG (KONTRAS TINGGI) */
     .dark-terminal-card {
-        background: #0a0a0c;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        padding: 24px;
+        background: #0b1325;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         color: #f3f4f6;
     }
 
-    /* TOP RUNNER BAR */
     .top-runner-bar {
-        background: #121216;
+        background: #0f1c36;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
-        padding: 10px 18px;
+        border-radius: 12px;
+        padding: 10px 16px;
         margin-bottom: 14px;
         font-size: 12px;
-        color: #d1d5db;
+        color: #cbd5e1;
     }
 
-    /* METRIC CARDS HITAM ELEGAN */
     .metric-card {
-        background: #121216;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 16px;
-        padding: 12px 10px;
+        background: #0f1c36;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 10px 8px;
         text-align: center;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
-    .metric-card:hover {
-        border-color: #ffffff;
-        transform: translateY(-2px);
-    }
-    .metric-label { font-size: 10px; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
-    .metric-value { font-size: 16px; font-weight: 700; color: #ffffff; }
+    .metric-label { font-size: 10px; color: #94a3b8; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-value { font-size: 15px; font-weight: 700; color: #ffffff; }
 
-    .target-green { color: #34d399; }
-    .target-white { color: #ffffff; }
-    .target-gold { color: #fbbf24; }
-    .cut-loss-red { color: #f87171; }
-
-    /* COMPACT WATCHLIST CHIPS */
     .wl-chip {
         padding: 6px 10px;
         border-radius: 10px;
@@ -118,57 +102,52 @@ st.markdown("""
         font-size: 11px;
         font-weight: 600;
         margin-bottom: 6px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.08);
     }
     .wl-green { background: #064e3b; border-color: #059669; color: #ecfdf5; }
     .wl-red { background: #7f1d1d; border-color: #dc2626; color: #fef2f2; }
-    .wl-white { background: #18181b; border-color: #3f3f46; color: #f4f4f5; }
+    .wl-white { background: #0f1c36; border-color: #3b82f6; color: #f4f4f5; }
 
-    /* GLOBAL STYLING INPUT & TOMBOL */
     .stButton > button {
-        background-color: #18181b !important;
+        background-color: #1d4ed8 !important;
         color: #ffffff !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         font-weight: 600 !important;
-        transition: all 0.25s ease !important;
     }
     .stButton > button:hover {
-        background-color: #27272a !important;
+        background-color: #2563eb !important;
         border-color: #ffffff !important;
-        transform: translateY(-2px);
     }
 
     div[data-baseweb="input"] {
-        background-color: #121216 !important;
-        border-radius: 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    }
-    div[data-baseweb="input"]:focus-within {
-        border-color: #ffffff !important;
+        background-color: #0f1c36 !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
     }
 
     .stExpander {
-        background-color: #121216 !important;
-        border-radius: 16px !important;
+        background-color: #0f1c36 !important;
+        border-radius: 14px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
     }
+    label { color: #cbd5e1 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA (TANPA TEKS ATAS)
+# 4. HEADER BANNER UTAMA
 st.markdown("""
-<div class="main-hero-light">
+<div class="main-hero-ajaib">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <div class="hero-title-dark">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-dark">High-Precision Market Intelligence • Orderbook Depth • AI Screener • Multi-Timeframe Analytics</div>
+            <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
+            <div class="hero-subtitle-ajaib">High-Precision Market Intelligence • Orderbook Classic Ajaib Layout</div>
         </div>
-        <div style="text-align: right; background: #f3f4f6; padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);">
-            <div style="font-size:9px; color:#4b5563; font-weight:700;">BURSA EFEK INDONESIA</div>
-            <div style="font-size:13px; font-weight:700; color:#059669;">● LIVE ACTIVE</div>
+        <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
+            <div style="font-size:12px; font-weight:700; color:#34d399;">● LIVE ACTIVE</div>
         </div>
     </div>
 </div>
@@ -300,24 +279,23 @@ def fetch_live_market_data(ticker_list):
         if data: results.append(data)
     return pd.DataFrame(results)
 
-# KONTTAINER UTAMA BERBALUT KARTU HITAM PEKAT DI BAWAH
+# KONTTAINER UTAMA
 st.markdown('<div class="dark-terminal-card">', unsafe_allow_html=True)
 
-# FETCH DATA MARKET LIVE
 with st.spinner("Sinkronisasi data pasar..."):
     df_master = fetch_live_market_data(st.session_state.custom_watchlist)
 
-# 5. TOP RUNNERS QUICK-BAR
+# TOP RUNNERS QUICK-BAR
 if not df_master.empty:
     top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
     bsjp_text = " | ".join([f"⚡ **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
-    st.markdown(f'<div class="top-runner-bar">🚀 <b>Apex Dual-Tone Screener (Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="top-runner-bar">🚀 <b>Apex Screener (Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
-# 6. COMPACT WATCHLIST MANAGEMENT
-with st.expander("📌 Custom Watchlist Management (Dual-Tone Minimalist)", expanded=True):
+# WATCHLIST MANAGEMENT
+with st.expander("📌 Custom Watchlist Management", expanded=False):
     col_input, col_btn = st.columns([3, 1], gap="small")
     with col_input:
-        new_ticker = st.text_input("Tambah Ticker Baru:", placeholder="Ketik kode saham (contoh: GOTO, BUKA, BBRI)").strip().upper()
+        new_ticker = st.text_input("Tambah Ticker Baru:", placeholder="Ketik kode saham (contoh: GOTO, BBRI)").strip().upper()
     with col_btn:
         st.write("")
         if st.button("➕ Tambah", use_container_width=True):
@@ -326,21 +304,15 @@ with st.expander("📌 Custom Watchlist Management (Dual-Tone Minimalist)", expa
                 st.rerun()
 
     st.markdown("---")
-    st.caption("Daftar Ticker Watchlist Aktif (Klik ✕ untuk menghapus):")
-    
     cols_chips = st.columns(5)
     tickers_to_remove = []
 
     for idx, t_code in enumerate(st.session_state.custom_watchlist):
         c_target = cols_chips[idx % 5]
-        
         row_match = df_master[df_master["Ticker"] == t_code] if not df_master.empty else pd.DataFrame()
-        if not row_match.empty:
-            raw_val = row_match.iloc[0]["Raw Change"]
-            pct_str = row_match.iloc[0]["Change (%)"]
-            live_price = row_match.iloc[0]["Price"]
-        else:
-            raw_val, pct_str, live_price = 0, "0.00%", 0
+        raw_val = row_match.iloc[0]["Raw Change"] if not row_match.empty else 0
+        pct_str = row_match.iloc[0]["Change (%)"] if not row_match.empty else "0.00%"
+        live_price = row_match.iloc[0]["Price"] if not row_match.empty else 0
 
         chip_class = "wl-green" if raw_val > 0 else ("wl-red" if raw_val < 0 else "wl-white")
         price_str = f"Rp {live_price:,}" if live_price > 0 else "N/A"
@@ -348,7 +320,7 @@ with st.expander("📌 Custom Watchlist Management (Dual-Tone Minimalist)", expa
         with c_target:
             st.markdown(f"""
             <div class="wl-chip {chip_class}">
-                <span><b>{t_code}</b> ({price_str} | {pct_str})</span>
+                <span><b>{t_code}</b> ({price_str})</span>
             </div>
             """, unsafe_allow_html=True)
             if st.button(f"✕ {t_code}", key=f"del_chip_{t_code}", use_container_width=True):
@@ -360,14 +332,13 @@ with st.expander("📌 Custom Watchlist Management (Dual-Tone Minimalist)", expa
                 st.session_state.custom_watchlist.remove(r_code)
         st.rerun()
 
-# 7. FILTER & PENCARIAN
+# FILTER & PENCARIAN
 c_filter, c_search = st.columns([1.5, 1], gap="medium")
 with c_filter:
     kategori_harga = st.selectbox("📌 Filter Rentang Harga:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
 with c_search:
-    search_input = st.text_input("🔍 Universal Search Ticker:", placeholder="Contoh: UNVR, ITMG").strip().upper()
+    search_input = st.text_input("🔍 Universal Search Ticker:", placeholder="Contoh: TEBE, BBCA").strip().upper()
 
-# FILTERING DATA
 df_filtered = df_master.copy() if not df_master.empty else pd.DataFrame()
 if not df_filtered.empty:
     if kategori_harga == "1. > Rp 4.000": df_filtered = df_filtered[df_filtered["Price"] > 4000]
@@ -377,10 +348,8 @@ if not df_filtered.empty:
     elif kategori_harga == "5. Rp 500 - Rp 1.000": df_filtered = df_filtered[(df_filtered["Price"] >= 500) & (df_filtered["Price"] < 1000)]
     elif kategori_harga == "6. Rp 1 - Rp 500": df_filtered = df_filtered[(df_filtered["Price"] >= 1) & (df_filtered["Price"] < 500)]
 
-    df_filtered["Target Min (+3%)"] = (df_filtered["Price"] * 1.03).round().astype(int)
-
-# 8. LAYOUT UTAMA
-col_left, col_right = st.columns([1.4, 1.6], gap="medium")
+# LAYOUT UTAMA
+col_left, col_right = st.columns([1.3, 1.7], gap="medium")
 
 selected_row = None
 selected_ticker = None
@@ -390,7 +359,7 @@ with col_left:
     if not df_filtered.empty:
         st.dataframe(
             df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-            use_container_width=True, hide_index=True, height=720
+            use_container_width=True, hide_index=True, height=650
         )
         ticker_options = df_filtered["Ticker"].tolist()
     else:
@@ -407,7 +376,7 @@ with col_left:
             selected_ticker = st.selectbox("Pilih Saham Target Analisa:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-# TRADING EXECUTION PLAN & ORDERBOOK
+# ORDERBOOK & ANALYTICS
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
     prev_p = int(selected_row.get("Prev", area_beli))
@@ -425,103 +394,121 @@ if selected_ticker and selected_row:
     cut_loss = int(round(area_beli * 0.982))
 
     with col_right:
-        st.subheader(f"📊 Apex Execution Plan: {selected_ticker}")
-        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | AI Status: **{selected_row.get('BSJP Status', 'N/A')}**")
-
-        # METRIC CARDS
-        m1, m2, m3, m4, m5 = st.columns(5)
-        with m1: st.markdown(f'<div class="metric-card"><div class="metric-label">AREA BELI</div><div class="metric-value">Rp {area_beli:,}</div></div>', unsafe_allow_html=True)
-        with m2: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+3%)</div><div class="metric-value target-green">Rp {target_min:,}</div></div>', unsafe_allow_html=True)
-        with m3: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+5%)</div><div class="metric-value target-white">Rp {target_opt:,}</div></div>', unsafe_allow_html=True)
-        with m4: st.markdown(f'<div class="metric-card"><div class="metric-label">ARA</div><div class="metric-value target-gold">Rp {ara_p:,}</div></div>', unsafe_allow_html=True)
-        with m5: st.markdown(f'<div class="metric-card"><div class="metric-label">CUT LOSS</div><div class="metric-value cut-loss-red">Rp {cut_loss:,}</div></div>', unsafe_allow_html=True)
+        c_head1, c_head2 = st.columns([1, 1])
+        with c_head1:
+            st.markdown("<h3 style='margin:0; font-size:20px;'>Orderbook</h3>", unsafe_allow_html=True)
+        with c_head2:
+            st.markdown("<div style='text-align: right; color: #60a5fa; font-size: 13px; font-weight: 600;'>Lihat Antrean Order</div>", unsafe_allow_html=True)
         
         st.write("")
 
-        # 📖 ORDERBOOK MARKET DEPTH
+        val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
+        st.markdown(f"""
+        <div style="background: #0f1c36; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px;">
+            <table width="100%" style="color: #cbd5e1;">
+                <tr>
+                    <td>Open: <b style="color: #34d399;">Rp {open_p:,}</b></td>
+                    <td>Prev: <b>Rp {prev_p:,}</b></td>
+                    <td>Lot: <b style="color: #f87171;">{tot_lot:,}</b></td>
+                </tr>
+                <tr>
+                    <td>High: <b style="color: #34d399;">Rp {high_p:,}</b></td>
+                    <td>ARA: <b>Rp {ara_p:,}</b></td>
+                    <td>Val: <b style="color: #f87171;">{val_str}</b></td>
+                </tr>
+                <tr>
+                    <td>Low: <b style="color: #f87171;">Rp {low_p:,}</b></td>
+                    <td>ARB: <b>Rp {arb_p:,}</b></td>
+                    <td>Avg: <b style="color: #f87171;">Rp {area_beli:,}</b></td>
+                </tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 📖 MENGGUNAKAN STREAMLIT COLUMNS UNTUK RENDER ORDERBOOK AMAN TANPA RAW HTML TEXT
         fraksi = hitung_fraksi_harga(area_beli)
-        bids_p = [area_beli - (i * fraksi) for i in range(5)]
-        asks_p = [area_beli + ((i + 1) * fraksi) for i in range(5)]
+        bids_p = [area_beli - (i * fraksi) for i in range(10)]
+        asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
         
         np.random.seed(area_beli % 1000)
-        bids_v = np.random.randint(2500, 45000, size=5)
-        asks_v = np.random.randint(2000, 38000, size=5)
-        bids_f = np.random.randint(60, 350, size=5)
-        asks_f = np.random.randint(50, 300, size=5)
+        bids_v = np.random.randint(5000, 85000, size=10)
+        asks_v = np.random.randint(4000, 75000, size=10)
+        bids_f = np.random.randint(40, 350, size=10)
+        asks_f = np.random.randint(35, 300, size=10)
         
         sum_bid_lot = sum(bids_v)
         sum_ask_lot = sum(asks_v)
         sum_bid_freq = sum(bids_f)
         sum_ask_freq = sum(asks_f)
-        val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
 
-        with st.expander(f"📖 Orderbook Market Depth: {selected_ticker}", expanded=True):
-            c1, c2, c3 = st.columns(3)
-            with c1: st.markdown(f"<font size='2' color='#9ca3af'>Open: <b>Rp {open_p:,}</b><br>High: <b>Rp {high_p:,}</b><br>Low: <b>Rp {low_p:,}</b></font>", unsafe_allow_html=True)
-            with c2: st.markdown(f"<font size='2' color='#9ca3af'>Prev: <b>Rp {prev_p:,}</b><br>ARA: <b>Rp {ara_p:,}</b><br>ARB: <b>Rp {arb_p:,}</b></font>", unsafe_allow_html=True)
-            with c3: st.markdown(f"<font size='2' color='#9ca3af'>Lot: <b>{tot_lot:,}</b><br>Val: <b>{val_str}</b><br>Avg: <b>Rp {area_beli:,}</b></font>", unsafe_allow_html=True)
-            
-            st.divider()
+        st.markdown("""
+        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px; font-size: 12px;">
+            <div style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between;">
+                <span style="width: 15%;">Freq</span>
+                <span style="width: 25%; text-align: right;">Lot</span>
+                <span style="width: 20%; text-align: center;">Bid</span>
+                <span style="width: 20%; text-align: center;">Ask</span>
+                <span style="width: 25%; text-align: left;">Lot</span>
+                <span style="width: 15%; text-align: right;">Freq</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-            ob_data = []
-            for i in range(5):
-                ob_data.append({
-                    "Freq (B)": bids_f[i],
-                    "Lot (B)": f"{bids_v[i]:,}",
-                    "Bid": f"Rp {bids_p[i]:,}",
-                    "Ask": f"Rp {asks_p[i]:,}",
-                    "Lot (A)": f"{asks_v[i]:,}",
-                    "Freq (A)": asks_f[i]
-                })
-            
-            df_ob = pd.DataFrame(ob_data)
-            
-            def highlight_bid_ask(s):
-                return ['color: #34d399; font-weight: bold;' if col == 'Bid' else ('color: #f87171; font-weight: bold;' if col == 'Ask' else '') for col in s.index]
+        for i in range(10):
+            ob_cols = st.columns([0.15, 0.25, 0.20, 0.20, 0.25, 0.15])
+            with ob_cols[0]:
+                st.markdown(f"<span style='color: #94a3b8; font-size: 11px;'>{bids_f[i]}</span>", unsafe_allow_html=True)
+            with ob_cols[1]:
+                st.markdown(f"<div style='text-align: right; color: #e2e8f0; font-weight: 500;'>{bids_v[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[2]:
+                st.markdown(f"<div style='text-align: center; color: #f87171; font-weight: 700;'>Rp {bids_p[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[3]:
+                ask_c = "#34d399" if i < 2 else "#f87171"
+                st.markdown(f"<div style='text-align: center; color: {ask_c}; font-weight: 700;'>Rp {asks_p[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[4]:
+                st.markdown(f"<div style='text-align: left; color: #e2e8f0; font-weight: 500;'>{asks_v[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[5]:
+                st.markdown(f"<div style='text-align: right; color: #94a3b8; font-size: 11px;'>{asks_f[i]}</div>", unsafe_allow_html=True)
 
-            st.dataframe(
-                df_ob.style.apply(highlight_bid_ask, axis=1),
-                use_container_width=True, 
-                hide_index=True
-            )
+        st.markdown(f"""
+        <div style="background: #070d1a; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; margin-top: 6px; display: flex; justify-content: space-between; font-weight: 700; font-size: 12px;">
+            <span style="color: #94a3b8; font-size: 11px;">{sum_bid_freq:,}</span>
+            <span style="color: #f87171;">{sum_bid_lot:,} Lot</span>
+            <span style="color: #ffffff;">Total</span>
+            <span style="color: #34d399;">{sum_ask_lot:,} Lot</span>
+            <span style="color: #94a3b8; font-size: 11px;">{sum_ask_freq:,}</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-            st.markdown(f"🟢 **Total Bid**: {sum_bid_lot:,} Lot ({sum_bid_freq} Freq) &nbsp;|&nbsp; 🔴 **Total Ask**: {sum_ask_lot:,} Lot ({sum_ask_freq} Freq)")
+        st.write("")
 
         # 🧮 KALKULATOR & JOURNAL
         c_calc, c_sim = st.columns(2)
         with c_calc:
             with st.expander("🧮 Position Size / Risk Calculator", expanded=False):
-                preset_modal = st.radio("Preset Modal:", ["Rp 5 Jt", "Rp 10 Jt", "Rp 25 Jt", "Custom"], index=1, horizontal=True)
-                if preset_modal == "Rp 5 Jt": modal = 5000000
-                elif preset_modal == "Rp 10 Jt": modal = 10000000
-                elif preset_modal == "Rp 25 Jt": modal = 25000000
-                else: modal = st.number_input("Modal Custom (Rp):", min_value=100000, value=10000000, step=500000)
-
+                modal = st.number_input("Modal (Rp):", min_value=100000, value=10000000, step=500000)
                 risk_p = st.slider("Maksimal Risiko (%):", 0.5, 5.0, 1.8, 0.1)
                 max_rugi = modal * (risk_p / 100)
                 rugi_lembar = area_beli - cut_loss
                 max_lot = int((max_rugi / rugi_lembar) // 100) if rugi_lembar > 0 else 0
-                st.info(f"👉 Entry Recommended: **{max_lot:,} Lot** (Total: **Rp {max_lot*100*area_beli:,.0f}**)")
+                st.info(f"👉 Rekomendasi Buy: **{max_lot:,} Lot**")
 
         with c_sim:
-            with st.expander("📝 Scalping Journal (Net P&L - Fee)", expanded=False):
+            with st.expander("📝 Scalping Journal", expanded=False):
                 entry_p = st.number_input("Entry Price:", value=area_beli)
                 exit_p = st.number_input("Exit Price:", value=target_min)
                 lot_cnt = st.number_input("Jumlah Lot:", value=max_lot if max_lot > 0 else 10)
                 
                 buy_val = entry_p * lot_cnt * 100
                 sell_val = exit_p * lot_cnt * 100
-                fee_buy = buy_val * 0.0015
-                fee_sell = sell_val * 0.0025
-                net_pnl = (sell_val - fee_sell) - (buy_val + fee_buy)
+                net_pnl = (sell_val * 0.9975) - (buy_val * 1.0015)
 
                 if st.button("💾 Simpan Trade"):
                     st.session_state.trade_journal.append({"Ticker": selected_ticker, "Net P&L": net_pnl})
-                    st.success(f"Disimpan! Net P&L: Rp {net_pnl:,.0f}")
+                    st.success(f"Disimpan! P&L: Rp {net_pnl:,.0f}")
 
-        # TIMEFRAME CONTROL & CHART
-        timeframe = st.radio("Pilih Timeframe Chart:", ["1m", "5m", "15m", "1d"], index=1, horizontal=True)
-
+        # INTRADAY CHART
+        timeframe = st.radio("Timeframe:", ["1m", "5m", "15m", "1d"], index=1, horizontal=True)
         try:
             tf_map = {"1m": ("1d", "1m"), "5m": ("1d", "5m"), "15m": ("5d", "15m"), "1d": ("1mo", "1d")}
             p, i = tf_map[timeframe]
@@ -530,27 +517,16 @@ if selected_ticker and selected_row:
             if not intraday.empty:
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#ffffff', width=2)))
-                
-                vwap = (intraday["Volume"] * (intraday["High"] + intraday["Low"] + intraday["Close"]) / 3).cumsum() / intraday["Volume"].cumsum()
-                fig.add_trace(go.Scatter(x=intraday.index, y=vwap, mode='lines', name='VWAP', line=dict(color='#34d399', width=1.5, dash='dot')))
-
-                fig.add_hline(y=target_min, line_dash="dash", line_color="#34d399", annotation_text=f"Target (+3%): {target_min}")
-                fig.add_hline(y=cut_loss, line_dash="dash", line_color="#f87171", annotation_text=f"Cut Loss: {cut_loss}")
-
                 fig.update_layout(
                     paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(18, 18, 22, 0.9)',
+                    plot_bgcolor='rgba(15, 28, 54, 0.9)',
                     margin=dict(l=10, r=10, t=10, b=10),
-                    height=280,
-                    xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#9ca3af'),
-                    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#9ca3af'),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="#ffffff"))
+                    height=250,
+                    xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.06)', color='#94a3b8'),
+                    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.06)', color='#94a3b8')
                 )
                 st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Data grafik tidak tersedia saat bursa tutup.")
         except Exception:
-            st.warning("Gagal memuat grafik intraday.")
+            pass
 
-# Tutup kontainer hitam terminal di bawah
 st.markdown('</div>', unsafe_allow_html=True)
