@@ -25,62 +25,58 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (NANO CYBERPUNK THEME)
+# 3. INJEKSI CUSTOM CSS (MINIMALIST ELEGANT THEME)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .stApp {
-        background-color: #050b14 !important;
-        color: #ffffff !important;
+        background-color: #0b0f19 !important;
+        color: #f8fafc !important;
     }
 
     .main-hero-nano {
-        background: linear-gradient(135deg, #0b1329 0%, #061e38 100%);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 20px;
-        padding: 24px 28px;
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 16px;
+        padding: 22px 26px;
         margin-bottom: 16px;
-        box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     .hero-title-nano {
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
+        font-size: 24px;
+        font-weight: 700;
         color: #ffffff;
         margin: 0;
         text-transform: uppercase;
-        background: linear-gradient(90deg, #38bdf8, #818cf8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.3px;
     }
     .hero-subtitle-nano {
         font-size: 12px;
-        color: #38bdf8;
+        color: #94a3b8;
         margin-top: 4px;
-        letter-spacing: 0.8px;
-        font-weight: 600;
+        letter-spacing: 1px;
+        font-weight: 500;
         text-transform: uppercase;
     }
 
     .dark-terminal-card {
-        background: #091122;
-        border: 1px solid rgba(56, 189, 248, 0.12);
-        border-radius: 20px;
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 16px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         color: #f3f4f6;
     }
 
     .top-runner-bar {
-        background: #0d1b33;
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 12px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 10px;
         padding: 10px 16px;
         margin-bottom: 14px;
         font-size: 12px;
@@ -88,45 +84,44 @@ st.markdown("""
     }
 
     .stButton > button {
-        background-color: #0284c7 !important;
+        background-color: #2563eb !important;
         color: #ffffff !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        border-radius: 8px !important;
+        border: none !important;
         font-weight: 600 !important;
     }
     .stButton > button:hover {
-        background-color: #0369a1 !important;
-        border-color: #38bdf8 !important;
+        background-color: #1d4ed8 !important;
     }
 
     div[data-baseweb="input"] {
-        background-color: #0d1b33 !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(56, 189, 248, 0.2) !important;
+        background-color: #1e293b !important;
+        border-radius: 8px !important;
+        border: 1px solid #334155 !important;
         color: white !important;
     }
 
     .stExpander {
-        background-color: #0d1b33 !important;
-        border-radius: 14px !important;
-        border: 1px solid rgba(56, 189, 248, 0.2) !important;
+        background-color: #1e293b !important;
+        border-radius: 12px !important;
+        border: 1px solid #334155 !important;
         color: #ffffff !important;
     }
     label { color: #cbd5e1 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA (NANO MACHINE ANALYTICS)
+# 4. HEADER BANNER UTAMA (MINIMALIS PUTIH ELEGANT)
 st.markdown("""
 <div class="main-hero-nano">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <div class="hero-title-nano">⚡ NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">NANO MACHINE ANALYTICS</div>
+            <div class="hero-title-nano">NANO IDX SCALPER</div>
+            <div class="hero-subtitle-nano">Analytics</div>
         </div>
-        <div style="text-align: right; background: #050b14; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.3);">
-            <div style="font-size:9px; color:#38bdf8; font-weight:700;">NANO CORE</div>
-            <div style="font-size:12px; font-weight:700; color:#34d399;">● SYNCHRONIZED</div>
+        <div style="text-align: right; background: #1e293b; padding: 6px 12px; border-radius: 8px; border: 1px solid #334155;">
+            <div style="font-size:9px; color:#94a3b8; font-weight:600;">NANO CORE</div>
+            <div style="font-size:11px; font-weight:600; color:#34d399;">● SYNCHRONIZED</div>
         </div>
     </div>
 </div>
@@ -198,7 +193,7 @@ def fetch_single_ticker_data(symbol):
             ma5 = hist_intra["Close"].rolling(5).mean().iloc[-1] if not hist_intra.empty and len(hist_intra) >= 5 else current_price
             
             if current_price >= hod and current_price > prev_close:
-                signal = "🔥 NANO BREAKOUT"
+                signal = "🔥 BREAKOUT"
             elif current_price > ma5:
                 signal = "🚀 BULLISH"
             else:
@@ -209,15 +204,15 @@ def fetch_single_ticker_data(symbol):
             
             avg_vol = hist_intra["Volume"].mean() if not hist_intra.empty else 1
             last_vol = hist_intra["Volume"].iloc[-1] if not hist_intra.empty else 0
-            vol_spike = "⚡ NANO SPIKE" if last_vol > (avg_vol * 1.8) else "NORMAL"
+            vol_spike = "⚡ SPIKE" if last_vol > (avg_vol * 1.8) else "NORMAL"
 
             bsjp_score = 0
             if change_pct > 0: bsjp_score += 25
             if current_price >= (hod * 0.98): bsjp_score += 25
-            if vol_spike == "⚡ NANO SPIKE": bsjp_score += 25
+            if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"⚡ NANO AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -266,7 +261,7 @@ main_tab1, main_tab2 = st.tabs(["⚡ Nano Scalping & Orderbook Terminal", "📑 
 
 with main_tab1:
     # GRAFIK IHSG REALTIME DI BAGIAN ATAS TERMINAL
-    st.markdown("<h4 style='margin-bottom: 4px; font-size: 15px; color: #38bdf8;'>📈 IHSG Real-Time Market Overview (^JKSE)</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='margin-bottom: 4px; font-size: 15px; color: #f8fafc;'>📈 IHSG Real-Time Market Overview (^JKSE)</h4>", unsafe_allow_html=True)
     try:
         ihsg_ticker = yf.Ticker("^JKSE")
         ihsg_hist = ihsg_ticker.history(period="1d", interval="5m")
@@ -283,14 +278,14 @@ with main_tab1:
                 st.metric(label="Perubahan Poin", value=f"{ihsg_change:+,.2f}", delta="Live Feed")
             
             fig_ihsg = go.Figure()
-            fig_ihsg.add_trace(go.Scatter(x=ihsg_hist.index, y=ihsg_hist["Close"], mode='lines', name='IHSG', line=dict(color='#38bdf8', width=2), fill='tozeroy', fillcolor='rgba(56, 189, 248, 0.08)'))
+            fig_ihsg.add_trace(go.Scatter(x=ihsg_hist.index, y=ihsg_hist["Close"], mode='lines', name='IHSG', line=dict(color='#60a5fa', width=2), fill='tozeroy', fillcolor='rgba(96, 165, 250, 0.05)'))
             fig_ihsg.update_layout(
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(13, 27, 51, 0.7)',
+                plot_bgcolor='rgba(15, 23, 42, 0.7)',
                 margin=dict(l=10, r=10, t=10, b=10),
                 height=180,
-                xaxis=dict(showgrid=True, gridcolor='rgba(56,189,248,0.1)', color='#94a3b8'),
-                yaxis=dict(showgrid=True, gridcolor='rgba(56,189,248,0.1)', color='#94a3b8')
+                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8'),
+                yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8')
             )
             st.plotly_chart(fig_ihsg, use_container_width=True)
     except Exception:
@@ -298,14 +293,14 @@ with main_tab1:
 
     st.markdown("---")
 
-    with st.spinner("Nano Machine menyinkronkan data pasar..."):
+    with st.spinner("Menyinkronkan data pasar..."):
         df_master = fetch_live_market_data(st.session_state.custom_watchlist)
 
     # TOP RUNNERS QUICK-BAR
     if not df_master.empty:
         top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
-        bsjp_text = " | ".join([f"⚡ **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
-        st.markdown(f'<div class="top-runner-bar">🧬 <b>Nano Radar (Top Signal)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+        bsjp_text = " | ".join([f"<b>{row['Ticker']}</b>: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
+        st.markdown(f'<div class="top-runner-bar">📊 <b>Top Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
     # WATCHLIST MANAGEMENT
     with st.expander("📌 Custom Watchlist Management", expanded=False):
@@ -331,13 +326,13 @@ with main_tab1:
             raw_val = row_match.iloc[0]["Raw Change"] if not row_match.empty else 0
             live_price = row_match.iloc[0]["Price"] if not row_match.empty else 0
             price_str = f"Rp {live_price:,}" if live_price > 0 else "N/A"
-            bg_color = "#064e3b" if raw_val > 0 else ("#7f1d1d" if raw_val < 0 else "#0d1b33")
+            bg_color = "#064e3b" if raw_val > 0 else ("#7f1d1d" if raw_val < 0 else "#1e293b")
             
             with c_target:
                 sub_c1, sub_c2 = st.columns([0.8, 0.2])
                 with sub_c1:
                     st.markdown(f"""
-    <div style="background: {bg_color}; border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 600; text-align: center; margin-bottom: 6px; color: #ffffff;">
+    <div style="background: {bg_color}; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; font-size: 11px; font-weight: 500; text-align: center; margin-bottom: 6px; color: #ffffff;">
         {t_code} ({price_str})
     </div>
     """, unsafe_allow_html=True)
@@ -368,7 +363,7 @@ with main_tab1:
         elif kategori_harga == "6. Rp 1 - Rp 500": df_filtered = df_filtered[(df_filtered["Price"] >= 1) & (df_filtered["Price"] < 500)]
 
     # LIVE RUNNING TRADE PANEL
-    st.markdown("<h4 style='margin-bottom: 8px; font-size: 15px; color: #38bdf8;'>⚡ Nano Running Trade (BEI Micro Tick Feed)</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='margin-bottom: 8px; font-size: 15px; color: #f8fafc;'>⚡ Running Trade (BEI Micro Tick Feed)</h4>", unsafe_allow_html=True)
     np.random.seed(int(datetime.now().second))
     rt_tickers = st.session_state.custom_watchlist if st.session_state.custom_watchlist else ["TEBE", "BBCA", "BMRI"]
     rt_data = []
@@ -382,12 +377,12 @@ with main_tab1:
         lot_item = np.random.randint(15, 850) * 5
         action_type = np.random.choice(["BUY (G)", "SELL (D)"], p=[0.55, 0.45])
         action_color = "#34d399" if "BUY" in action_type else "#f87171"
-        rt_data.append(f"<span style='color: #64748b;'>{current_time_str}</span> &nbsp;|&nbsp; <b style='color: #ffffff;'>{t_sim}</b> &nbsp;|&nbsp; <span style='color: {action_color}; font-weight:700;'>Rp {tick_p:,}</span> &nbsp;|&nbsp; <span style='color: #cbd5e1;'>{lot_item:,} Lot</span> &nbsp;|&nbsp; <span style='font-size:10px; color:#38bdf8;'>{action_type}</span>")
+        rt_data.append(f"<span style='color: #64748b;'>{current_time_str}</span> &nbsp;|&nbsp; <b style='color: #ffffff;'>{t_sim}</b> &nbsp;|&nbsp; <span style='color: {action_color}; font-weight:600;'>Rp {tick_p:,}</span> &nbsp;|&nbsp; <span style='color: #cbd5e1;'>{lot_item:,} Lot</span> &nbsp;|&nbsp; <span style='font-size:10px; color:#94a3b8;'>{action_type}</span>")
 
     rt_cols = st.columns(3)
     for idx, item_html in enumerate(rt_data):
         with rt_cols[idx % 3]:
-            st.markdown(f"<div style='background: #050b14; border: 1px solid rgba(56,189,248,0.15); border-radius: 8px; padding: 6px 10px; font-size: 11px; margin-bottom: 6px;'>{item_html}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background: #0b0f19; border: 1px solid #1e293b; border-radius: 8px; padding: 6px 10px; font-size: 11px; margin-bottom: 6px;'>{item_html}</div>", unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -398,7 +393,7 @@ with main_tab1:
     selected_ticker = None
 
     with col_left:
-        st.subheader("🎯 Nano Watchlist Radar & AI Matrix")
+        st.subheader("🎯 Watchlist Radar")
         if not df_filtered.empty:
             st.dataframe(
                 df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
@@ -421,26 +416,25 @@ with main_tab1:
 
         st.write("")
         
-        # NANO MACHINE MICRO-SCANNER
+        # MICRO-SCANNER
         st.markdown("""
-    <div style="background: #0d1b33; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px; padding: 14px; margin-top: 6px;">
-        <div style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 8px;">🧬 Nano AI Micro-Scanner (Active Detect)</div>
-        <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 6px;">Realtime Micro-Tick Volume Burst & Hidden Wall Detector:</div>
-        <table width="100%" style="font-size: 11px; color: #e2e8f0;">
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-top: 6px;">
+        <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">📊 Micro-Scanner (Active Detect)</div>
+        <table width="100%" style="font-size: 11px; color: #cbd5e1;">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 4px 0;">⚡ <b>UNTR</b></td>
-                <td>Nano Surge: <b style="color: #34d399;">+320%</b></td>
-                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:700;">ACCEL</span></td>
+                <td style="padding: 4px 0;"><b>UNTR</b></td>
+                <td>Surge: <b style="color: #34d399;">+320%</b></td>
+                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">ACCEL</span></td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 4px 0;">🧬 <b>TEBE</b></td>
-                <td>Nano Surge: <b style="color: #34d399;">+210%</b></td>
-                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:700;">BREAKOUT</span></td>
+                <td style="padding: 4px 0;"><b>TEBE</b></td>
+                <td>Surge: <b style="color: #34d399;">+210%</b></td>
+                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">BREAKOUT</span></td>
             </tr>
             <tr>
-                <td style="padding: 4px 0;">🚀 <b>ANTM</b></td>
-                <td>Nano Surge: <b style="color: #38bdf8;">+185%</b></td>
-                <td style="text-align: right;"><span style="background: #0c4a6e; color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:700;">MICRO-SPIKE</span></td>
+                <td style="padding: 4px 0;"><b>ANTM</b></td>
+                <td>Surge: <b style="color: #60a5fa;">+185%</b></td>
+                <td style="text-align: right;"><span style="background: #1e3a8a; color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">SPIKE</span></td>
             </tr>
         </table>
     </div>
@@ -463,23 +457,23 @@ with main_tab1:
             with c_head1:
                 st.markdown("<h3 style='margin:0; font-size:20px;'>Orderbook Matrix</h3>", unsafe_allow_html=True)
             with c_head2:
-                st.markdown("<div style='text-align: right; color: #38bdf8; font-size: 13px; font-weight: 600;'>Lihat Antrean Order</div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align: right; color: #94a3b8; font-size: 13px; font-weight: 500;'>Lihat Antrean Order</div>", unsafe_allow_html=True)
             
             st.write("")
 
             val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
             st.markdown(f"""
-    <div style="background: #0d1b33; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px;">
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px;">
         <table width="100%" style="color: #cbd5e1;">
             <tr>
                 <td>Open: <b style="color: #34d399;">Rp {open_p:,}</b></td>
                 <td>Prev: <b>Rp {prev_p:,}</b></td>
-                <td>Lot: <b style="color: #38bdf8;">{tot_lot:,}</b></td>
+                <td>Lot: <b style="color: #60a5fa;">{tot_lot:,}</b></td>
             </tr>
             <tr>
                 <td>High: <b style="color: #34d399;">Rp {high_p:,}</b></td>
                 <td>ARA: <b>Rp {ara_p:,}</b></td>
-                <td>Val: <b style="color: #38bdf8;">{val_str}</b></td>
+                <td>Val: <b style="color: #60a5fa;">{val_str}</b></td>
             </tr>
             <tr>
                 <td>Low: <b style="color: #f87171;">Rp {low_p:,}</b></td>
@@ -497,10 +491,10 @@ with main_tab1:
             cl_price = int(round(area_beli * 0.985))
 
             st.markdown(f"""
-    <div style="background: #0d1b33; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-        <div style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 8px;">🎯 Nano AI Execution Plan: {selected_ticker}</div>
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">🎯 Execution Plan: {selected_ticker}</div>
         <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
-            <tr style="background: #1e293b; color: #94a3b8; font-weight: 700;">
+            <tr style="background: #0f172a; color: #94a3b8; font-weight: 600;">
                 <td style="padding: 6px; border-radius: 6px 0 0 6px;">BUY ZONE</td>
                 <td style="padding: 6px;">TP 1 (+1.5%)</td>
                 <td style="padding: 6px;">TP 2 (+3%)</td>
@@ -508,11 +502,11 @@ with main_tab1:
                 <td style="padding: 6px; border-radius: 0 6px 6px 0;">CUT LOSS (-1.5%)</td>
             </tr>
             <tr>
-                <td style="padding: 8px 0; font-weight: 700; color: #34d399;">Rp {area_beli:,}</td>
+                <td style="padding: 8px 0; font-weight: 600; color: #34d399;">Rp {area_beli:,}</td>
                 <td style="padding: 8px 0; color: #6ee7b7;">Rp {tp_1:,}</td>
-                <td style="padding: 8px 0; color: #34d399; font-weight: 700;">Rp {tp_2:,}</td>
-                <td style="padding: 8px 0; color: #38bdf8;">Rp {tp_3:,}</td>
-                <td style="padding: 8px 0; font-weight: 700; color: #f87171;">Rp {cl_price:,}</td>
+                <td style="padding: 8px 0; color: #34d399; font-weight: 600;">Rp {tp_2:,}</td>
+                <td style="padding: 8px 0; color: #60a5fa;">Rp {tp_3:,}</td>
+                <td style="padding: 8px 0; font-weight: 600; color: #f87171;">Rp {cl_price:,}</td>
             </tr>
         </table>
     </div>
@@ -540,16 +534,16 @@ with main_tab1:
                 table_rows_html += f"""<tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
     <td style="padding: 7px 4px; text-align: left; color: #94a3b8; width: 12%; font-size: 11px;">{bids_f[i]}</td>
     <td style="padding: 7px 4px; text-align: right; font-weight: 500; width: 23%; font-size: 11px;">{bids_v[i]:,}</td>
-    <td style="padding: 7px 4px; color: #f87171; font-weight: 700; width: 15%; font-size: 11px;">Rp {bids_p[i]:,}</td>
-    <td style="padding: 7px 4px; color: {ask_c}; font-weight: 700; width: 15%; font-size: 11px;">Rp {asks_p[i]:,}</td>
+    <td style="padding: 7px 4px; color: #f87171; font-weight: 600; width: 15%; font-size: 11px;">Rp {bids_p[i]:,}</td>
+    <td style="padding: 7px 4px; color: {ask_c}; font-weight: 600; width: 15%; font-size: 11px;">Rp {asks_p[i]:,}</td>
     <td style="padding: 7px 4px; text-align: left; font-weight: 500; width: 23%; font-size: 11px;">{asks_v[i]:,}</td>
     <td style="padding: 7px 4px; text-align: right; color: #94a3b8; width: 12%; font-size: 11px;">{asks_f[i]}</td>
     </tr>"""
 
-            full_orderbook_html = f"""<div style="background: #050b14; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px; padding: 12px; width: 100%; overflow-x: auto;">
+            full_orderbook_html = f"""<div style="background: #0b0f19; border: 1px solid #334155; border-radius: 12px; padding: 12px; width: 100%; overflow-x: auto;">
     <table style="width: 100%; color: #e2e8f0; text-align: center; border-collapse: collapse; table-layout: fixed;">
     <thead>
-    <tr style="color: #38bdf8; font-weight: 700; border-bottom: 1px solid rgba(56,189,248,0.2); font-size: 10px;">
+    <tr style="color: #94a3b8; font-weight: 600; border-bottom: 1px solid #334155; font-size: 10px;">
     <th style="padding: 6px 4px; width: 12%; text-align: left;">FREQ</th>
     <th style="padding: 6px 4px; width: 23%; text-align: right;">LOT BID</th>
     <th style="padding: 6px 4px; width: 15%; color: #f87171;">BID</th>
@@ -562,7 +556,7 @@ with main_tab1:
     {table_rows_html}
     </tbody>
     </table>
-    <div style="border-top: 1px solid rgba(56,189,248,0.2); padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; padding-left: 4px; padding-right: 4px;">
+    <div style="border-top: 1px solid #334155; padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 600; font-size: 11px; padding-left: 4px; padding-right: 4px;">
     <span style="color: #94a3b8;">{sum_bid_freq:,}</span>
     <span style="color: #f87171;">{sum_bid_lot:,} Lot</span>
     <span style="color: #ffffff;">TOTAL</span>
@@ -580,13 +574,13 @@ with main_tab1:
             seller_power = 100 - buyer_power
 
             st.markdown(f"""
-    <div style="background: #0d1b33; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 14px;">
-        <div style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 6px;">⚡ Nano Power Meter (Buyer vs Seller Pressure)</div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 4px;">
-            <span style="color: #f87171;">BUYER POWER: {buyer_power}%</span>
-            <span style="color: #34d399;">SELLER POWER: {seller_power}%</span>
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+        <div style="font-size: 11px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">📊 Buyer vs Seller Pressure</div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px;">
+            <span style="color: #f87171;">BUYER: {buyer_power}%</span>
+            <span style="color: #34d399;">SELLER: {seller_power}%</span>
         </div>
-        <div style="background: #1e293b; border-radius: 6px; height: 10px; width: 100%; display: flex; overflow: hidden;">
+        <div style="background: #0f172a; border-radius: 6px; height: 8px; width: 100%; display: flex; overflow: hidden;">
             <div style="background: #f87171; width: {buyer_power}%; height: 100%;"></div>
             <div style="background: #34d399; width: {seller_power}%; height: 100%;"></div>
         </div>
@@ -612,7 +606,7 @@ with main_tab1:
                     st.markdown(f"Akumulasi Net P&L Anda: <b style='color: {color_pnl};'>Rp {total_net_pnl:,.0f}</b>", unsafe_allow_html=True)
                     st.dataframe(df_journal, use_container_width=True, hide_index=True)
                 else:
-                    st.info("Belum ada riwayat trade yang disimpan. Simpan trade melalui menu Scalping Journal.")
+                    st.info("Belum ada riwayat trade yang disimpan.")
 
             # KALKULATOR & JOURNAL
             c_calc, c_sim = st.columns(2)
@@ -648,14 +642,14 @@ with main_tab1:
                 
                 if not intraday.empty:
                     fig = go.Figure()
-                    fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#38bdf8', width=2)))
+                    fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#60a5fa', width=2)))
                     fig.update_layout(
                         paper_bgcolor='rgba(0,0,0,0)',
-                        plot_bgcolor='rgba(13, 27, 51, 0.9)',
+                        plot_bgcolor='rgba(15, 23, 42, 0.9)',
                         margin=dict(l=10, r=10, t=10, b=10),
                         height=250,
-                        xaxis=dict(showgrid=True, gridcolor='rgba(56,189,248,0.1)', color='#94a3b8'),
-                        yaxis=dict(showgrid=True, gridcolor='rgba(56,189,248,0.1)', color='#94a3b8')
+                        xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8'),
+                        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8')
                     )
                     st.plotly_chart(fig, use_container_width=True)
             except Exception:
@@ -663,7 +657,7 @@ with main_tab1:
 
 with main_tab2:
     st.markdown("### 📑 Right Issue & Corporate Action Module")
-    st.markdown("<p style='color: #94a3b8; font-size: 13px;'>Modul pemantauan HMETD (Hak Memesan Efek Terlebih Dahulu) dan kalkulator estimasi harga teoretis saham setelah aksi korporasi.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #94a3b8; font-size: 13px;'>Modul pemantauan HMETD dan kalkulator estimasi harga teoretis saham setelah aksi korporasi.</p>", unsafe_allow_html=True)
     
     col_ri1, col_ri2 = st.columns([1.2, 1], gap="medium")
     
@@ -697,8 +691,8 @@ with main_tab2:
         potensi_dilusi = ((stock_cum_price - harga_teoretis) / stock_cum_price) * 100
         
         st.markdown(f"""
-        <div style="background: #0d1b33; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 14px; margin-top: 10px;">
-            <div style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 6px;">Hasil Kalkulasi Teoretis:</div>
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-top: 10px;">
+            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Hasil Kalkulasi Teoretis:</div>
             <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Harga Teoretis Pasca RI: <b style="color: #34d399;">Rp {harga_teoretis:,.2f}</b></div>
             <div style="font-size: 13px; color: #cbd5e1;">Estimasi Dilusi Harga: <b style="color: #f87171;">{potensi_dilusi:.2f}%</b></div>
         </div>
