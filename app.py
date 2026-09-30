@@ -117,7 +117,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-ajaib">Institutional Intelligence • Perfect Desktop Orderbook • Execution Plan</div>
+            <div class="hero-subtitle-ajaib">Institutional Intelligence • Orderbook • Execution Plan • Spike Detector</div>
         </div>
         <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
@@ -379,7 +379,7 @@ with col_left:
 
     st.write("")
     
-    # SCALPER VOLATILITY & SPIKE DETECTOR
+    # SCALPER VOLATILITY & SPIKE DETECTOR DI KIRI BAWAH
     st.markdown("""
     <div style="background: #0f1c36; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px; margin-top: 6px;">
         <div style="font-size: 12px; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 8px;">🚨 Scalper Spike & Momentum Detector</div>
@@ -416,7 +416,9 @@ if selected_ticker and selected_row:
     tot_lot = int(selected_row.get("Total Lot", 15000))
     tot_val = int(selected_row.get("Total Val", 5000000000))
     
+    market_cap_val = selected_row.get("Market Cap", "N/A")
     target_min = int(round(area_beli * 1.03))
+    target_opt = int(round(area_beli * 1.05))
     cut_loss = int(round(area_beli * 0.982))
 
     with col_right:
@@ -451,7 +453,7 @@ if selected_ticker and selected_row:
         </div>
         """, unsafe_allow_html=True)
 
-        # TRADING EXECUTION PLAN
+        # ⚡ FITUR BARU: TRADING EXECUTION PLAN (Rencana Eksekusi Profesional)
         tp_1 = int(round(area_beli * 1.015))
         tp_2 = int(round(area_beli * 1.03))
         tp_3 = int(round(area_beli * 1.05))
@@ -479,7 +481,7 @@ if selected_ticker and selected_row:
         </div>
         """, unsafe_allow_html=True)
 
-        # 🖥️️ 📱 ORDERBOOK SEMPURNA (MERENDER KESELURUHAN TABEL SECARA VISUAL)
+        # 📖 ORDERBOOK MARKET DEPTH CLASSIC AJAIB
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(10)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
@@ -495,49 +497,45 @@ if selected_ticker and selected_row:
         sum_bid_freq = sum(bids_f)
         sum_ask_freq = sum(asks_f)
 
-        table_rows_html = ""
-        for i in range(10):
-            ask_c = "#34d399" if i < 2 else "#f87171"
-            table_rows_html += f"""
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
-                <td style="padding: 7px 4px; text-align: left; color: #94a3b8; width: 12%; font-size: 11px;">{bids_f[i]}</td>
-                <td style="padding: 7px 4px; text-align: right; font-weight: 500; width: 23%; font-size: 11px;">{bids_v[i]:,}</td>
-                <td style="padding: 7px 4px; color: #f87171; font-weight: 700; width: 15%; font-size: 11px;">Rp {bids_p[i]:,}</td>
-                <td style="padding: 7px 4px; color: {ask_c}; font-weight: 700; width: 15%; font-size: 11px;">Rp {asks_p[i]:,}</td>
-                <td style="padding: 7px 4px; text-align: left; font-weight: 500; width: 23%; font-size: 11px;">{asks_v[i]:,}</td>
-                <td style="padding: 7px 4px; text-align: right; color: #94a3b8; width: 12%; font-size: 11px;">{asks_f[i]}</td>
-            </tr>
-            """
-
-        full_orderbook_html = f"""
-        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px; width: 100%; overflow-x: auto;">
-            <table style="width: 100%; color: #e2e8f0; text-align: center; border-collapse: collapse; table-layout: fixed;">
-                <thead>
-                    <tr style="color: #94a3b8; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 10px;">
-                        <th style="padding: 6px 4px; width: 12%; text-align: left;">FREQ</th>
-                        <th style="padding: 6px 4px; width: 23%; text-align: right;">LOT BID</th>
-                        <th style="padding: 6px 4px; width: 15%; color: #f87171;">BID</th>
-                        <th style="padding: 6px 4px; width: 15%; color: #34d399;">ASK</th>
-                        <th style="padding: 6px 4px; width: 23%; text-align: left;">LOT ASK</th>
-                        <th style="padding: 6px 4px; width: 12%; text-align: right;">FREQ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {table_rows_html}
-                </tbody>
-            </table>
-            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; padding-left: 4px; padding-right: 4px;">
-                <span style="color: #94a3b8;">{sum_bid_freq:,}</span>
-                <span style="color: #f87171;">{sum_bid_lot:,} Lot</span>
-                <span style="color: #ffffff;">TOTAL</span>
-                <span style="color: #34d399;">{sum_ask_lot:,} Lot</span>
-                <span style="color: #94a3b8;">{sum_ask_freq:,}</span>
+        st.markdown("""
+        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px; font-size: 12px;">
+            <div style="color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between;">
+                <span style="width: 15%;">Freq</span>
+                <span style="width: 25%; text-align: right;">Lot</span>
+                <span style="width: 20%; text-align: center;">Bid</span>
+                <span style="width: 20%; text-align: center;">Ask</span>
+                <span style="width: 25%; text-align: left;">Lot</span>
+                <span style="width: 15%; text-align: right;">Freq</span>
             </div>
         </div>
-        """
+        """, unsafe_allow_html=True)
 
-        # RENDER DENGAN UNSAFE_ALLOW_HTML=TRUE AGAR TAMPIL SEBAGAI TABEL VISUAL
-        st.markdown(full_orderbook_html, unsafe_allow_html=True)
+        for i in range(10):
+            ob_cols = st.columns([0.15, 0.25, 0.20, 0.20, 0.25, 0.15])
+            with ob_cols[0]:
+                st.markdown(f"<span style='color: #94a3b8; font-size: 11px;'>{bids_f[i]}</span>", unsafe_allow_html=True)
+            with ob_cols[1]:
+                st.markdown(f"<div style='text-align: right; color: #e2e8f0; font-weight: 500;'>{bids_v[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[2]:
+                st.markdown(f"<div style='text-align: center; color: #f87171; font-weight: 700;'>Rp {bids_p[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[3]:
+                ask_c = "#34d399" if i < 2 else "#f87171"
+                st.markdown(f"<div style='text-align: center; color: {ask_c}; font-weight: 700;'>Rp {asks_p[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[4]:
+                st.markdown(f"<div style='text-align: left; color: #e2e8f0; font-weight: 500;'>{asks_v[i]:,}</div>", unsafe_allow_html=True)
+            with ob_cols[5]:
+                st.markdown(f"<div style='text-align: right; color: #94a3b8; font-size: 11px;'>{asks_f[i]}</div>", unsafe_allow_html=True)
+
+        st.markdown(f"""
+        <div style="background: #070d1a; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; margin-top: 6px; display: flex; justify-content: space-between; font-weight: 700; font-size: 12px;">
+            <span style="color: #94a3b8; font-size: 11px;">{sum_bid_freq:,}</span>
+            <span style="color: #f87171;">{sum_bid_lot:,} Lot</span>
+            <span style="color: #ffffff;">Total</span>
+            <span style="color: #34d399;">{sum_ask_lot:,} Lot</span>
+            <span style="color: #94a3b8; font-size: 11px;">{sum_ask_freq:,}</span>
+        </div>
+        """, unsafe_allow_html=True)
+
         st.write("")
 
         # ORDER BOOK PRESSURE POWER METER
@@ -564,10 +562,10 @@ if selected_ticker and selected_row:
             b_col1, b_col2 = st.columns(2)
             with b_col1:
                 st.markdown("<b style='color: #f87171; font-size: 12px;'>🔥 Top Buyer Broker (Accumulation)</b>", unsafe_allow_html=True)
-                st.markdown("<font size='2' color='#cbd5e1'>1. **YP** (Seq: 14,250 Lot)<br>2. **CC** (Seq: 9,120 Lot)<br>3. **PD** (Seq: 4,500 Lot)</font>", unsafe_allow_html=True)
+                st.markdown("<font size='2' color='#cbd5e1'>1. **YP** (Seq: 14,250 Lot @ Rp %d)<br>2. **CC** (Seq: 9,120 Lot)<br>3. **PD** (Seq: 4,500 Lot)</font>" % area_beli, unsafe_allow_html=True)
             with b_col2:
                 st.markdown("<b style='color: #34d399; font-size: 12px;'>💧 Top Seller Broker (Distribution)</b>", unsafe_allow_html=True)
-                st.markdown("<font size='2' color='#cbd5e1'>1. **BK** (Seq: 11,800 Lot)<br>2. **MG** (Seq: 8,300 Lot)<br>3. **RX** (Seq: 3,200 Lot)</font>", unsafe_allow_html=True)
+                st.markdown("<font size='2' color='#cbd5e1'>1. **BK** (Seq: 11,800 Lot @ Rp %d)<br>2. **MG** (Seq: 8,300 Lot)<br>3. **RX** (Seq: 3,200 Lot)</font>" % area_beli, unsafe_allow_html=True)
 
         # TRADE HISTORY LOG & PERFORMANCE SUMMARY
         with st.expander("📊 Trade History & Performance Summary", expanded=False):
