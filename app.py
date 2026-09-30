@@ -34,8 +34,8 @@ is_swing_active = st.session_state.active_tab == "🚀 Weekly Swing Signal"
 app_bg_color = "#000000" if is_swing_active else "#002347"
 card_bg_color = "#0f172a" if is_swing_active else "#002b5c"
 
-# 3. INJEKSI CUSTOM CSS DINAMIS
-st.markdown(f"""
+# 3. INJEKSI CUSTOM CSS DINAMIS (FIXED f-string braces)
+css_template = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
     
@@ -43,16 +43,15 @@ st.markdown(f"""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }}
 
-    /* LATAR BELAKANG UTAMA BERUBAH TOTAL MENJADI HITAM PREMIUM JIKA SWING AKTIF */
     .stApp {{
-        background-color: {app_bg_color} !important;
+        background-color: APP_BG !important;
         color: #f8fafc !important;
         transition: background-color 0.3s ease;
     }}
 
     .main-hero-nano {{
-        background: {card_bg_color};
-        border: 1px solid {"#334155" if is_swing_active else "#004080"};
+        background: CARD_BG;
+        border: 1px solid BORDER_COLOR;
         border-radius: 16px;
         padding: 22px 26px;
         margin-bottom: 16px;
@@ -76,8 +75,8 @@ st.markdown(f"""
     }
 
     .dark-terminal-card {{
-        background: {card_bg_color};
-        border: 1px solid {"#1e293b" if is_swing_active else "#003b75"};
+        background: CARD_BG;
+        border: 1px solid CARD_BORDER;
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 20px;
@@ -85,8 +84,8 @@ st.markdown(f"""
     }
 
     .top-runner-bar {{
-        background: {card_bg_color};
-        border: 1px solid {"#334155" if is_swing_active else "#0047ab"};
+        background: CARD_BG;
+        border: 1px solid BORDER_COLOR;
         border-radius: 10px;
         padding: 10px 16px;
         margin-bottom: 14px;
@@ -106,21 +105,28 @@ st.markdown(f"""
     }}
 
     div[data-baseweb="input"] {{
-        background-color: {card_bg_color} !important;
+        background-color: CARD_BG !important;
         border-radius: 8px !important;
-        border: 1px solid {"#334155" if is_swing_active else "#0047ab"} !important;
+        border: 1px solid BORDER_COLOR !important;
         color: white !important;
-    }
+    }}
 
     .stExpander {{
-        background-color: {card_bg_color} !important;
+        background-color: CARD_BG !important;
         border-radius: 12px !important;
-        border: 1px solid {"#334155" if is_swing_active else "#0047ab"} !important;
+        border: 1px solid BORDER_COLOR !important;
         color: #ffffff !important;
     }}
     label {{ color: #cbd5e1 !important; }}
 </style>
-""", unsafe_allow_html=True)
+"""
+
+final_css = css_template.replace("APP_BG", app_bg_color)\
+                        .replace("CARD_BG", card_bg_color)\
+                        .replace("BORDER_COLOR", "#334155" if is_swing_active else "#004080")\
+                        .replace("CARD_BORDER", "#1e293b" if is_swing_active else "#003b75")
+
+st.markdown(final_css, unsafe_allow_html=True)
 
 # 4. HEADER BANNER UTAMA
 st.markdown("""
