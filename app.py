@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (MINIMALIST ELEGANT THEME)
+# 3. INJEKSI CUSTOM CSS (AJAIB BLUE THEME)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
@@ -35,17 +35,17 @@ st.markdown("""
     }
 
     .stApp {
-        background-color: #0b0f19 !important;
+        background-color: #002347 !important;
         color: #f8fafc !important;
     }
 
     .main-hero-nano {
-        background: #111827;
-        border: 1px solid #1f2937;
+        background: #003366;
+        border: 1px solid #004080;
         border-radius: 16px;
         padding: 22px 26px;
         margin-bottom: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     }
     .hero-title-nano {
         font-size: 24px;
@@ -57,7 +57,7 @@ st.markdown("""
     }
     .hero-subtitle-nano {
         font-size: 12px;
-        color: #94a3b8;
+        color: #93c5fd;
         margin-top: 4px;
         letter-spacing: 1px;
         font-weight: 500;
@@ -65,8 +65,8 @@ st.markdown("""
     }
 
     .dark-terminal-card {
-        background: #0f172a;
-        border: 1px solid #1e293b;
+        background: #002b5c;
+        border: 1px solid #003b75;
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 20px;
@@ -74,8 +74,8 @@ st.markdown("""
     }
 
     .top-runner-bar {
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: #003366;
+        border: 1px solid #0047ab;
         border-radius: 10px;
         padding: 10px 16px;
         margin-bottom: 14px;
@@ -95,16 +95,16 @@ st.markdown("""
     }
 
     div[data-baseweb="input"] {
-        background-color: #1e293b !important;
+        background-color: #003366 !important;
         border-radius: 8px !important;
-        border: 1px solid #334155 !important;
+        border: 1px solid #0047ab !important;
         color: white !important;
     }
 
     .stExpander {
-        background-color: #1e293b !important;
+        background-color: #003366 !important;
         border-radius: 12px !important;
-        border: 1px solid #334155 !important;
+        border: 1px solid #0047ab !important;
         color: #ffffff !important;
     }
     label { color: #cbd5e1 !important; }
@@ -119,8 +119,8 @@ st.markdown("""
             <div class="hero-title-nano">NANO IDX SCALPER</div>
             <div class="hero-subtitle-nano">Analytics</div>
         </div>
-        <div style="text-align: right; background: #1e293b; padding: 6px 12px; border-radius: 8px; border: 1px solid #334155;">
-            <div style="font-size:9px; color:#94a3b8; font-weight:600;">NANO CORE</div>
+        <div style="text-align: right; background: #003366; padding: 6px 12px; border-radius: 8px; border: 1px solid #0047ab;">
+            <div style="font-size:9px; color:#93c5fd; font-weight:600;">NANO CORE</div>
             <div style="font-size:11px; font-weight:600; color:#34d399;">● SYNCHRONIZED</div>
         </div>
     </div>
@@ -281,11 +281,11 @@ with main_tab1:
             fig_ihsg.add_trace(go.Scatter(x=ihsg_hist.index, y=ihsg_hist["Close"], mode='lines', name='IHSG', line=dict(color='#60a5fa', width=2), fill='tozeroy', fillcolor='rgba(96, 165, 250, 0.05)'))
             fig_ihsg.update_layout(
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(15, 23, 42, 0.7)',
+                plot_bgcolor='rgba(0, 43, 92, 0.7)',
                 margin=dict(l=10, r=10, t=10, b=10),
                 height=180,
-                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8'),
-                yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8')
+                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd'),
+                yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd')
             )
             st.plotly_chart(fig_ihsg, use_container_width=True)
     except Exception:
@@ -326,13 +326,13 @@ with main_tab1:
             raw_val = row_match.iloc[0]["Raw Change"] if not row_match.empty else 0
             live_price = row_match.iloc[0]["Price"] if not row_match.empty else 0
             price_str = f"Rp {live_price:,}" if live_price > 0 else "N/A"
-            bg_color = "#064e3b" if raw_val > 0 else ("#7f1d1d" if raw_val < 0 else "#1e293b")
+            bg_color = "#064e3b" if raw_val > 0 else ("#7f1d1d" if raw_val < 0 else "#003366")
             
             with c_target:
                 sub_c1, sub_c2 = st.columns([0.8, 0.2])
                 with sub_c1:
                     st.markdown(f"""
-    <div style="background: {bg_color}; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; font-size: 11px; font-weight: 500; text-align: center; margin-bottom: 6px; color: #ffffff;">
+    <div style="background: {bg_color}; border: 1px solid #0047ab; border-radius: 6px; padding: 6px 10px; font-size: 11px; font-weight: 500; text-align: center; margin-bottom: 6px; color: #ffffff;">
         {t_code} ({price_str})
     </div>
     """, unsafe_allow_html=True)
@@ -377,12 +377,12 @@ with main_tab1:
         lot_item = np.random.randint(15, 850) * 5
         action_type = np.random.choice(["BUY (G)", "SELL (D)"], p=[0.55, 0.45])
         action_color = "#34d399" if "BUY" in action_type else "#f87171"
-        rt_data.append(f"<span style='color: #64748b;'>{current_time_str}</span> &nbsp;|&nbsp; <b style='color: #ffffff;'>{t_sim}</b> &nbsp;|&nbsp; <span style='color: {action_color}; font-weight:600;'>Rp {tick_p:,}</span> &nbsp;|&nbsp; <span style='color: #cbd5e1;'>{lot_item:,} Lot</span> &nbsp;|&nbsp; <span style='font-size:10px; color:#94a3b8;'>{action_type}</span>")
+        rt_data.append(f"<span style='color: #93c5fd;'>{current_time_str}</span> &nbsp;|&nbsp; <b style='color: #ffffff;'>{t_sim}</b> &nbsp;|&nbsp; <span style='color: {action_color}; font-weight:600;'>Rp {tick_p:,}</span> &nbsp;|&nbsp; <span style='color: #cbd5e1;'>{lot_item:,} Lot</span> &nbsp;|&nbsp; <span style='font-size:10px; color:#93c5fd;'>{action_type}</span>")
 
     rt_cols = st.columns(3)
     for idx, item_html in enumerate(rt_data):
         with rt_cols[idx % 3]:
-            st.markdown(f"<div style='background: #0b0f19; border: 1px solid #1e293b; border-radius: 8px; padding: 6px 10px; font-size: 11px; margin-bottom: 6px;'>{item_html}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background: #002347; border: 1px solid #003b75; border-radius: 8px; padding: 6px 10px; font-size: 11px; margin-bottom: 6px;'>{item_html}</div>", unsafe_allow_html=True)
 
     st.markdown("---")
 
@@ -418,7 +418,7 @@ with main_tab1:
         
         # MICRO-SCANNER
         st.markdown("""
-    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-top: 6px;">
+    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 6px;">
         <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">📊 Micro-Scanner (Active Detect)</div>
         <table width="100%" style="font-size: 11px; color: #cbd5e1;">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -434,7 +434,7 @@ with main_tab1:
             <tr>
                 <td style="padding: 4px 0;"><b>ANTM</b></td>
                 <td>Surge: <b style="color: #60a5fa;">+185%</b></td>
-                <td style="text-align: right;"><span style="background: #1e3a8a; color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">SPIKE</span></td>
+                <td style="text-align: right;"><span style="background: #002347; color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">SPIKE</span></td>
             </tr>
         </table>
     </div>
@@ -457,13 +457,13 @@ with main_tab1:
             with c_head1:
                 st.markdown("<h3 style='margin:0; font-size:20px;'>Orderbook Matrix</h3>", unsafe_allow_html=True)
             with c_head2:
-                st.markdown("<div style='text-align: right; color: #94a3b8; font-size: 13px; font-weight: 500;'>Lihat Antrean Order</div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align: right; color: #93c5fd; font-size: 13px; font-weight: 500;'>Lihat Antrean Order</div>", unsafe_allow_html=True)
             
             st.write("")
 
             val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
             st.markdown(f"""
-    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px;">
+    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px;">
         <table width="100%" style="color: #cbd5e1;">
             <tr>
                 <td>Open: <b style="color: #34d399;">Rp {open_p:,}</b></td>
@@ -491,10 +491,10 @@ with main_tab1:
             cl_price = int(round(area_beli * 0.985))
 
             st.markdown(f"""
-    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
         <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">🎯 Execution Plan: {selected_ticker}</div>
         <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
-            <tr style="background: #0f172a; color: #94a3b8; font-weight: 600;">
+            <tr style="background: #002347; color: #93c5fd; font-weight: 600;">
                 <td style="padding: 6px; border-radius: 6px 0 0 6px;">BUY ZONE</td>
                 <td style="padding: 6px;">TP 1 (+1.5%)</td>
                 <td style="padding: 6px;">TP 2 (+3%)</td>
@@ -532,18 +532,18 @@ with main_tab1:
             for i in range(10):
                 ask_c = "#34d399" if i < 2 else "#f87171"
                 table_rows_html += f"""<tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
-    <td style="padding: 7px 4px; text-align: left; color: #94a3b8; width: 12%; font-size: 11px;">{bids_f[i]}</td>
+    <td style="padding: 7px 4px; text-align: left; color: #93c5fd; width: 12%; font-size: 11px;">{bids_f[i]}</td>
     <td style="padding: 7px 4px; text-align: right; font-weight: 500; width: 23%; font-size: 11px;">{bids_v[i]:,}</td>
     <td style="padding: 7px 4px; color: #f87171; font-weight: 600; width: 15%; font-size: 11px;">Rp {bids_p[i]:,}</td>
     <td style="padding: 7px 4px; color: {ask_c}; font-weight: 600; width: 15%; font-size: 11px;">Rp {asks_p[i]:,}</td>
     <td style="padding: 7px 4px; text-align: left; font-weight: 500; width: 23%; font-size: 11px;">{asks_v[i]:,}</td>
-    <td style="padding: 7px 4px; text-align: right; color: #94a3b8; width: 12%; font-size: 11px;">{asks_f[i]}</td>
+    <td style="padding: 7px 4px; text-align: right; color: #93c5fd; width: 12%; font-size: 11px;">{asks_f[i]}</td>
     </tr>"""
 
-            full_orderbook_html = f"""<div style="background: #0b0f19; border: 1px solid #334155; border-radius: 12px; padding: 12px; width: 100%; overflow-x: auto;">
+            full_orderbook_html = f"""<div style="background: #002347; border: 1px solid #0047ab; border-radius: 12px; padding: 12px; width: 100%; overflow-x: auto;">
     <table style="width: 100%; color: #e2e8f0; text-align: center; border-collapse: collapse; table-layout: fixed;">
     <thead>
-    <tr style="color: #94a3b8; font-weight: 600; border-bottom: 1px solid #334155; font-size: 10px;">
+    <tr style="color: #93c5fd; font-weight: 600; border-bottom: 1px solid #0047ab; font-size: 10px;">
     <th style="padding: 6px 4px; width: 12%; text-align: left;">FREQ</th>
     <th style="padding: 6px 4px; width: 23%; text-align: right;">LOT BID</th>
     <th style="padding: 6px 4px; width: 15%; color: #f87171;">BID</th>
@@ -556,12 +556,12 @@ with main_tab1:
     {table_rows_html}
     </tbody>
     </table>
-    <div style="border-top: 1px solid #334155; padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 600; font-size: 11px; padding-left: 4px; padding-right: 4px;">
-    <span style="color: #94a3b8;">{sum_bid_freq:,}</span>
+    <div style="border-top: 1px solid #0047ab; padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 600; font-size: 11px; padding-left: 4px; padding-right: 4px;">
+    <span style="color: #93c5fd;">{sum_bid_freq:,}</span>
     <span style="color: #f87171;">{sum_bid_lot:,} Lot</span>
     <span style="color: #ffffff;">TOTAL</span>
     <span style="color: #34d399;">{sum_ask_lot:,} Lot</span>
-    <span style="color: #94a3b8;">{sum_ask_freq:,}</span>
+    <span style="color: #93c5fd;">{sum_ask_freq:,}</span>
     </div>
     </div>"""
 
@@ -574,13 +574,13 @@ with main_tab1:
             seller_power = 100 - buyer_power
 
             st.markdown(f"""
-    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 12px; margin-bottom: 14px;">
         <div style="font-size: 11px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">📊 Buyer vs Seller Pressure</div>
         <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px;">
             <span style="color: #f87171;">BUYER: {buyer_power}%</span>
             <span style="color: #34d399;">SELLER: {seller_power}%</span>
         </div>
-        <div style="background: #0f172a; border-radius: 6px; height: 8px; width: 100%; display: flex; overflow: hidden;">
+        <div style="background: #002347; border-radius: 6px; height: 8px; width: 100%; display: flex; overflow: hidden;">
             <div style="background: #f87171; width: {buyer_power}%; height: 100%;"></div>
             <div style="background: #34d399; width: {seller_power}%; height: 100%;"></div>
         </div>
@@ -645,11 +645,11 @@ with main_tab1:
                     fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#60a5fa', width=2)))
                     fig.update_layout(
                         paper_bgcolor='rgba(0,0,0,0)',
-                        plot_bgcolor='rgba(15, 23, 42, 0.9)',
+                        plot_bgcolor='rgba(0, 35, 71, 0.9)',
                         margin=dict(l=10, r=10, t=10, b=10),
                         height=250,
-                        xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8'),
-                        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#94a3b8')
+                        xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd'),
+                        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd')
                     )
                     st.plotly_chart(fig, use_container_width=True)
             except Exception:
@@ -657,7 +657,7 @@ with main_tab1:
 
 with main_tab2:
     st.markdown("### 📑 Right Issue & Corporate Action Module")
-    st.markdown("<p style='color: #94a3b8; font-size: 13px;'>Modul pemantauan HMETD dan kalkulator estimasi harga teoretis saham setelah aksi korporasi.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Modul pemantauan HMETD dan kalkulator estimasi harga teoretis saham setelah aksi korporasi.</p>", unsafe_allow_html=True)
     
     col_ri1, col_ri2 = st.columns([1.2, 1], gap="medium")
     
@@ -691,7 +691,7 @@ with main_tab2:
         potensi_dilusi = ((stock_cum_price - harga_teoretis) / stock_cum_price) * 100
         
         st.markdown(f"""
-        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-top: 10px;">
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
             <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Hasil Kalkulasi Teoretis:</div>
             <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Harga Teoretis Pasca RI: <b style="color: #34d399;">Rp {harga_teoretis:,.2f}</b></div>
             <div style="font-size: 13px; color: #cbd5e1;">Estimasi Dilusi Harga: <b style="color: #f87171;">{potensi_dilusi:.2f}%</b></div>
