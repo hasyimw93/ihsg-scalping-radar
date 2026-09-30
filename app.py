@@ -8,7 +8,7 @@ import pytz
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(
-    page_title="Nano IDX Scalper - AI Micro-Tick Engine",
+    page_title="Nano Machine Analytics",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -40,7 +40,7 @@ st.markdown("""
     }
 
     .main-hero-nano {
-        background: linear-gradient(135sdeg, #0b1329 0%, #061e38 100%);
+        background: linear-gradient(135deg, #0b1329 0%, #061e38 100%);
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 20px;
         padding: 24px 28px;
@@ -64,6 +64,7 @@ st.markdown("""
         margin-top: 4px;
         letter-spacing: 0.8px;
         font-weight: 600;
+        text-transform: uppercase;
     }
 
     .dark-terminal-card {
@@ -115,13 +116,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA (NANO THEME)
+# 4. HEADER BANNER UTAMA (NANO MACHINE ANALYTICS)
 st.markdown("""
 <div class="main-hero-nano">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">⚡ NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">NANO MACHINE AI MICRO-TICK ENGINE • QUANTUM EXECUTION MATRIX</div>
+            <div class="hero-subtitle-nano">NANO MACHINE ANALYTICS</div>
         </div>
         <div style="text-align: right; background: #050b14; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.3);">
             <div style="font-size:9px; color:#38bdf8; font-weight:700;">NANO CORE</div>
@@ -264,6 +265,39 @@ st.markdown('<div class="dark-terminal-card">', unsafe_allow_html=True)
 main_tab1, main_tab2 = st.tabs(["⚡ Nano Scalping & Orderbook Terminal", "📑 Right Issue & Corporate Action Module"])
 
 with main_tab1:
+    # GRAFIK IHSG REALTIME DI BAGIAN ATAS TERMINAL
+    st.markdown("<h4 style='margin-bottom: 4px; font-size: 15px; color: #38bdf8;'>📈 IHSG Real-Time Market Overview (^JKSE)</h4>", unsafe_allow_html=True)
+    try:
+        ihsg_ticker = yf.Ticker("^JKSE")
+        ihsg_hist = ihsg_ticker.history(period="1d", interval="5m")
+        if not ihsg_hist.empty:
+            ihsg_current = ihsg_hist["Close"].iloc[-1]
+            ihsg_prev = ihsg_ticker.history(period="5d", interval="1d")["Close"].iloc[-2] if len(ihsg_ticker.history(period="5d", interval="1d")) >= 2 else ihsg_hist["Open"].iloc[0]
+            ihsg_change = ihsg_current - ihsg_prev
+            ihsg_pct = (ihsg_change / ihsg_prev) * 100
+            
+            col_ihsg1, col_ihsg2, col_ihsg3 = st.columns([1, 1, 2])
+            with col_ihsg1:
+                st.metric(label="IHSG Index", value=f"{ihsg_current:,.2f}", delta=f"{ihsg_pct:+.2f}%")
+            with col_ihsg2:
+                st.metric(label="Perubahan Poin", value=f"{ihsg_change:+,.2f}", delta="Live Feed")
+            
+            fig_ihsg = go.Figure()
+            fig_ihsg.add_trace(go.Scatter(x=ihsg_hist.index, y=ihsg_hist["Close"], mode='lines', name='IHSG', line=dict(color='#38bdf8', width=2), fill='tozeroy', fillcolor='rgba(56, 189, 248, 0.08)'))
+            fig_ihsg.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(13, 27, 51, 0.7)',
+                margin=dict(l=10, r=10, t=10, b=10),
+                height=180,
+                xaxis=dict(showgrid=True, gridcolor='rgba(56,189,248,0.1)', color='#94a3b8'),
+                yaxis=dict(showgrid=True, gridcolor='rgba(56,189,248,0.1)', color='#94a3b8')
+            )
+            st.plotly_chart(fig_ihsg, use_container_width=True)
+    except Exception:
+        st.info("Memuat data grafik IHSG...")
+
+    st.markdown("---")
+
     with st.spinner("Nano Machine menyinkronkan data pasar..."):
         df_master = fetch_live_market_data(st.session_state.custom_watchlist)
 
@@ -423,9 +457,6 @@ with main_tab1:
         arb_p = int(selected_row.get("ARB", area_beli * 0.93))
         tot_lot = int(selected_row.get("Total Lot", 15000))
         tot_val = int(selected_row.get("Total Val", 5000000000))
-        
-        target_min = int(round(area_beli * 1.03))
-        cut_loss = int(round(area_beli * 0.982))
 
         with col_right:
             c_head1, c_head2 = st.columns([1, 1])
@@ -487,7 +518,7 @@ with main_tab1:
     </div>
     """, unsafe_allow_html=True)
 
-            # 🖥 📱 ORDERBOOK SEMPURNA
+            # ORDERBOOK SEMPURNA
             fraksi = hitung_fraksi_harga(area_beli)
             bids_p = [area_beli - (i * fraksi) for i in range(10)]
             asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
@@ -543,7 +574,7 @@ with main_tab1:
             st.markdown(full_orderbook_html, unsafe_allow_html=True)
             st.write("")
 
-            # ORDER BOOK PRESSURE POWER METER
+            # POWER METER
             total_ob_lot = sum_bid_lot + sum_ask_lot
             buyer_power = int((sum_bid_lot / total_ob_lot) * 100) if total_ob_lot > 0 else 50
             seller_power = 100 - buyer_power
