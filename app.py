@@ -158,12 +158,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA (GAYA LIGHT MODE BERSIH DI ATAS)
+# 4. HEADER BANNER UTAMA (TANPA TEKS ATAS)
 st.markdown("""
 <div class="main-hero-light">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <div style="font-size:10px; color:#4b5563; text-transform:uppercase; letter-spacing:2px; margin-bottom:2px; font-weight:700;">APEX DUAL-TONE • MONOCHROME TERMINAL</div>
             <div class="hero-title-dark">IHSG SCALPING DIMENSION</div>
             <div class="hero-subtitle-dark">High-Precision Market Intelligence • Orderbook Depth • AI Screener • Multi-Timeframe Analytics</div>
         </div>
@@ -301,7 +300,7 @@ def fetch_live_market_data(ticker_list):
         if data: results.append(data)
     return pd.DataFrame(results)
 
-# KONTTAINER UTAMA BERBALUT KARTU HITAM PEKAT DI BAWAH (MENYERUPAI REFERENSI)
+# KONTTAINER UTAMA BERBALUT KARTU HITAM PEKAT DI BAWAH
 st.markdown('<div class="dark-terminal-card">', unsafe_allow_html=True)
 
 # FETCH DATA MARKET LIVE
@@ -387,7 +386,7 @@ selected_row = None
 selected_ticker = None
 
 with col_left:
-    st.subheader("🎯 Watchlist Radar & AI Skenario")
+    st.subheader("🎯 Watchlist Radar & BSJP Skenario")
     if not df_filtered.empty:
         st.dataframe(
             df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
@@ -408,7 +407,7 @@ with col_left:
             selected_ticker = st.selectbox("Pilih Saham Target Analisa:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-# TRADING EXECUTION PLAN & COLORED COMPACT ORDERBOOK (5 LEVELS)
+# TRADING EXECUTION PLAN & ORDERBOOK
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
     prev_p = int(selected_row.get("Prev", area_beli))
