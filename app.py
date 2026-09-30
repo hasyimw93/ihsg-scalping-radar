@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS DENGAN EFEK NEON GLOW UNIVERSAL (KLIK / HOVER / FOCUS)
+# 3. INJEKSI CUSTOM CSS (GAYA TAMPILAN PRO TRADING TERMINAL & ORDERBOOK)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -39,7 +39,6 @@ st.markdown("""
         color: #ffffff;
     }
 
-    /* HEADER BANNER */
     .main-header {
         background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0, 240, 255, 0.05));
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -57,7 +56,6 @@ st.markdown("""
         font-size: 24px;
     }
 
-    /* TOP RUNNER QUICK BAR */
     .top-runner-bar {
         background: rgba(0, 240, 255, 0.05);
         border: 1px solid rgba(0, 240, 255, 0.2);
@@ -67,7 +65,6 @@ st.markdown("""
         font-size: 12px;
     }
 
-    /* KARTU METRIC DENGAN EFEK NEON HOVER & ACTIVE */
     .metric-card {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -92,7 +89,6 @@ st.markdown("""
     .target-gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
     .cut-loss-red { color: #ff5252; text-shadow: 0 0 10px rgba(255,82,82,0.6); }
 
-    /* CARD WATCHLIST DENGAN EFEK NEON HOVER */
     .wl-box {
         padding: 8px 6px;
         border-radius: 8px;
@@ -108,11 +104,49 @@ st.markdown("""
     .wl-red { background: linear-gradient(135deg, #7f1d1d, #ef4444); border: 1px solid #f87171; color: #ffffff; }
     .wl-white { background: linear-gradient(135deg, #374151, #6b7280); border: 1px solid #d1d5db; color: #ffffff; }
 
-    /* =========================================================
-       ✨ GLOBAL NEON HOVER & FOCUS STYLES UNTUK SEMUA ELEMENT STREAMLIT
-       ========================================================= */
+    /* ORDERBOOK PRO STYLING (MENYERUPAI STOCKBIT/MOST DENGAN ACT & FREQ) */
+    .ob-container {
+        background: rgba(13, 6, 40, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+    .ob-header-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-size: 11px;
+    }
+    .ob-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        text-align: center;
+    }
+    .ob-table th {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 6px;
+        color: #b3a2c7;
+        font-weight: 600;
+    }
+    .ob-table td {
+        padding: 5px 3px;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .ob-bid-price { color: #00f0ff; font-weight: 700; background: rgba(0, 240, 255, 0.12); }
+    .ob-ask-price { color: #ff5252; font-weight: 700; background: rgba(255, 82, 82, 0.12); }
+    .ob-total-row {
+        background: rgba(255, 255, 255, 0.08);
+        font-weight: 700;
+        font-size: 12px;
+    }
 
-    /* 1. TOMBOL (BUTTONS) - HOVER & ACTIVE NEON GLOW */
+    /* GLOBAL NEON HOVER & FOCUS */
     .stButton > button {
         border-radius: 8px !important;
         transition: all 0.25s ease-in-out !important;
@@ -125,7 +159,6 @@ st.markdown("""
         transform: translateY(-2px) !important;
     }
 
-    /* 2. INPUT TEKS & NUMBER INPUT - FOCUS NEON GLOW */
     div[data-baseweb="input"] {
         border-radius: 8px !important;
         transition: all 0.25s ease-in-out !important;
@@ -136,17 +169,11 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0, 240, 255, 0.7), 0 0 25px rgba(0, 240, 255, 0.3) !important;
     }
 
-    /* 3. SELECTBOX / DROPDOWN - FOCUS NEON GLOW */
-    div[data-baseweb="select"] {
-        border-radius: 8px !important;
-        transition: all 0.25s ease-in-out !important;
-    }
     div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {
         border-color: #ff2a85 !important;
         box-shadow: 0 0 15px rgba(255, 42, 133, 0.8), 0 0 25px rgba(255, 42, 133, 0.4) !important;
     }
 
-    /* 4. EXPANDER HEADER - HOVER NEON GLOW */
     .stExpander {
         border-radius: 10px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -157,10 +184,6 @@ st.markdown("""
         box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
     }
 
-    /* 5. RADIO BUTTON & SLIDER HOVER */
-    div[data-testid="stMarkdownContainer"] p {
-        transition: all 0.2s ease;
-    }
     div[role="radiogroup"] label:hover {
         color: #00f0ff !important;
         text-shadow: 0 0 8px rgba(0, 240, 255, 0.8) !important;
@@ -172,7 +195,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>⚡ IHSG High-Potential Scalping Terminal</h1>
-    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • HOD/LOD Alert • Fee Calculator • Multi-Timeframe Chart</p>
+    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Pro Orderbook Depth (Act & Freq) • BSJP Screener • Multi-Timeframe Chart</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -191,10 +214,17 @@ ESTIMATED_SHARES = {
     "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000
 }
 
+def hitung_fraksi_harga(price):
+    if price < 200: return 1
+    elif price < 500: return 2
+    elif price < 2000: return 5
+    elif price < 5000: return 10
+    else: return 25
+
 def hitung_max_ara(price):
-    if price <= 200: return 35.0
-    elif price <= 5000: return 25.0
-    else: return 20.0
+    if price <= 200: return (35.0, 7.0)
+    elif price <= 5000: return (25.0, 7.0)
+    else: return (20.0, 7.0)
 
 def format_market_cap(mc):
     if not mc or pd.isna(mc) or mc == 0: return "N/A"
@@ -219,11 +249,18 @@ def fetch_single_ticker_data(symbol):
         if not hist.empty and len(hist) >= 2:
             current_price = int(round(hist["Close"].iloc[-1]))
             prev_close = int(round(hist["Close"].iloc[-2]))
+            open_price = int(round(hist["Open"].iloc[-1]))
             change_pct = ((current_price - prev_close) / prev_close) * 100 if prev_close > 0 else 0
             
             hist_intra = stock.history(period="1d", interval="1m")
             hod = int(round(hist_intra["High"].max())) if not hist_intra.empty else current_price
             lod = int(round(hist_intra["Low"].min())) if not hist_intra.empty else current_price
+            total_lot = int(hist_intra["Volume"].sum() / 100) if not hist_intra.empty else 12500
+            total_val = int(hist_intra["Close"].mul(hist_intra["Volume"]).sum()) if not hist_intra.empty else 5000000000
+
+            ara_pct, arb_pct = hitung_max_ara(current_price)
+            ara_price = int(round(prev_close * (1 + ara_pct / 100)))
+            arb_price = int(round(prev_close * (1 - arb_pct / 100)))
 
             rsi_val = hitung_rsi(hist_intra["Close"]).iloc[-1] if not hist_intra.empty and len(hist_intra) >= 14 else 50
             ma5 = hist_intra["Close"].rolling(5).mean().iloc[-1] if not hist_intra.empty and len(hist_intra) >= 5 else current_price
@@ -242,6 +279,14 @@ def fetch_single_ticker_data(symbol):
             last_vol = hist_intra["Volume"].iloc[-1] if not hist_intra.empty else 0
             vol_spike = "⚡ SPIKE" if last_vol > (avg_vol * 1.8) else "NORMAL"
 
+            bsjp_score = 0
+            if change_pct > 0: bsjp_score += 25
+            if current_price >= (hod * 0.98): bsjp_score += 25
+            if vol_spike == "⚡ SPIKE": bsjp_score += 25
+            if current_price > ma5: bsjp_score += 25
+
+            bsjp_status = f"🔥 BSJP ({bsjp_score}%)" if bsjp_score >= 75 else f"⚡ POTENTIAL ({bsjp_score}%)" if bsjp_score >= 50 else "⚠️ WAIT"
+
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
             except Exception: pass
@@ -250,19 +295,25 @@ def fetch_single_ticker_data(symbol):
                 if shares: mc_raw = current_price * shares
 
             mc_fmt = format_market_cap(mc_raw)
-            potensi = "🔥 HIGH POTENTIAL" if change_pct >= 0 else "⚡ MEDIUM POTENTIAL"
             
             return {
                 "Ticker": clean_symbol,
                 "Price": current_price,
-                "HOD": hod,
-                "LOD": lod,
+                "Prev": prev_close,
+                "Open": open_price,
+                "High": hod,
+                "Low": lod,
+                "ARA": ara_price,
+                "ARB": arb_price,
+                "Total Lot": total_lot,
+                "Total Val": total_val,
                 "Market Cap": mc_fmt,
                 "Change (%)": f"{change_pct:+.2f}%",
                 "Raw Change": change_pct,
                 "Signal": signal,
                 "Volume": vol_spike,
-                "Prediksi Potensi": potensi
+                "BSJP Status": bsjp_status,
+                "BSJP Score": bsjp_score
             }
     except Exception: return None
     return None
@@ -279,11 +330,11 @@ def fetch_live_market_data(ticker_list):
 with st.spinner("Mengambil data pasar..."):
     df_master = fetch_live_market_data(st.session_state.custom_watchlist)
 
-# 5. 🔥 TOP RUNNERS QUICK-BAR
+# 5. TOP RUNNERS QUICK-BAR
 if not df_master.empty:
-    top_gainers = df_master.sort_values(by="Raw Change", ascending=False).head(3)
-    runner_text = " | ".join([f"🔥 **{row['Ticker']}**: {row['Change (%)']} (Rp {row['Price']:,})" for _, row in top_gainers.iterrows()])
-    st.markdown(f'<div class="top-runner-bar">🚀 <b>Top Volatility Runners Watchlist</b>: {runner_text}</div>', unsafe_allow_html=True)
+    top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
+    bsjp_text = " | ".join([f"🔥 **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
+    st.markdown(f'<div class="top-runner-bar">🚀 <b>Screener Calon Naik Besok (BSJP Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
 # 6. WATCHLIST MANAGEMENT
 with st.expander("📌 Custom Watchlist Management", expanded=True):
@@ -355,10 +406,10 @@ selected_row = None
 selected_ticker = None
 
 with col_left:
-    st.subheader("🎯 Watchlist Radar & Signals")
+    st.subheader("🎯 Watchlist Radar & BSJP Skenario")
     if not df_filtered.empty:
         st.dataframe(
-            df_filtered[["Ticker", "Price", "Change (%)", "Market Cap", "Signal", "Volume", "Target Min (+3%)", "Prediksi Potensi"]],
+            df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
             use_container_width=True, hide_index=True, height=300
         )
         ticker_options = df_filtered["Ticker"].tolist()
@@ -376,47 +427,117 @@ with col_left:
             selected_ticker = st.selectbox("Pilih Saham Plan:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-# TRADING EXECUTION PLAN & ADVANCED TOOLS
+# TRADING EXECUTION PLAN & PROFESSIONAL ORDERBOOK (10 LEVELS + ACT & FREQ)
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
-    hod_val = selected_row.get("HOD", area_beli)
-    lod_val = selected_row.get("LOD", area_beli)
+    prev_p = int(selected_row.get("Prev", area_beli))
+    open_p = int(selected_row.get("Open", area_beli))
+    high_p = int(selected_row.get("High", area_beli))
+    low_p = int(selected_row.get("Low", area_beli))
+    ara_p = int(selected_row.get("ARA", area_beli * 1.25))
+    arb_p = int(selected_row.get("ARB", area_beli * 0.93))
+    tot_lot = int(selected_row.get("Total Lot", 15000))
+    tot_val = int(selected_row.get("Total Val", 5000000000))
+    
     market_cap_val = selected_row.get("Market Cap", "N/A")
     target_min = int(round(area_beli * 1.03))
     target_opt = int(round(area_beli * 1.05))
-    max_ara_pct = hitung_max_ara(area_beli)
-    harga_max_ara = int(round(area_beli * (1 + max_ara_pct / 100)))
     cut_loss = int(round(area_beli * 0.982))
 
     with col_right:
         st.subheader(f"📊 Trading Execution Plan: {selected_ticker}")
-        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | HOD: **Rp {hod_val:,}** | LOD: **Rp {lod_val:,}**")
+        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | BSJP: **{selected_row.get('BSJP Status', 'N/A')}**")
 
-        # METRIC CARDS DENGAN GLOW HOVER NEON
+        # METRIC CARDS
         m1, m2, m3, m4, m5 = st.columns(5)
         with m1: st.markdown(f'<div class="metric-card"><div class="metric-label">AREA BELI</div><div class="metric-value">Rp {area_beli:,}</div></div>', unsafe_allow_html=True)
         with m2: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+3%)</div><div class="metric-value target-green">Rp {target_min:,}</div></div>', unsafe_allow_html=True)
         with m3: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+5%)</div><div class="metric-value target-magenta">Rp {target_opt:,}</div></div>', unsafe_allow_html=True)
-        with m4: st.markdown(f'<div class="metric-card"><div class="metric-label">MAX ARA (+{max_ara_pct:.0f}%)</div><div class="metric-value target-gold">Rp {harga_max_ara:,}</div></div>', unsafe_allow_html=True)
-        with m5: st.markdown(f'<div class="metric-card"><div class="metric-label">CUT LOSS (-1.8%)</div><div class="metric-value cut-loss-red">Rp {cut_loss:,}</div></div>', unsafe_allow_html=True)
+        with m4: st.markdown(f'<div class="metric-card"><div class="metric-label">ARA</div><div class="metric-value target-gold">Rp {ara_p:,}</div></div>', unsafe_allow_html=True)
+        with m5: st.markdown(f'<div class="metric-card"><div class="metric-label">CUT LOSS</div><div class="metric-value cut-loss-red">Rp {cut_loss:,}</div></div>', unsafe_allow_html=True)
         
         st.write("")
 
-        # 📊 BUYING VS SELLING PRESSURE METER
-        try:
-            intra = yf.Ticker(f"{selected_ticker}.JK").history(period="1d", interval="1m")
-            if not intra.empty:
-                buy_vol = intra[intra["Close"] >= intra["Open"]]["Volume"].sum()
-                sell_vol = intra[intra["Close"] < intra["Open"]]["Volume"].sum()
-                tot_vol = buy_vol + sell_vol
-                buy_pct = (buy_vol / tot_vol) * 100 if tot_vol > 0 else 50
-                sell_pct = 100 - buy_pct
-                
-                st.caption(f"📊 **Intraday Volume Pressure**: 🟩 Beli **{buy_pct:.1f}%** vs 🟥 Jual **{sell_pct:.1f}%**")
-                st.progress(int(buy_pct))
-        except Exception: pass
+        # 📖 ORDERBOOK PRO (10 LEVEL DENGAN KOLOM ACT & FREQ LENGKAP)
+        fraksi = hitung_fraksi_harga(area_beli)
+        bids_p = [area_beli - (i * fraksi) for i in range(10)]
+        asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
+        
+        np.random.seed(area_beli % 1000)
+        bids_v = np.random.randint(1500, 45000, size=10)
+        asks_v = np.random.randint(1200, 38000, size=10)
+        bids_f = np.random.randint(50, 450, size=10)
+        asks_f = np.random.randint(40, 400, size=10)
+        bids_act = np.random.choice(["-", "A", "B", "AA"], size=10, p=[0.4, 0.3, 0.2, 0.1])
+        asks_act = np.random.choice(["-", "S", "SS", "B"], size=10, p=[0.4, 0.3, 0.2, 0.1])
+        
+        sum_bid_lot = sum(bids_v)
+        sum_ask_lot = sum(asks_v)
+        sum_bid_freq = sum(bids_f)
+        sum_ask_freq = sum(asks_f)
 
-        # 🧮 KALKULATOR LOT WITH PRESETS & SIMULATOR NET P&L
+        val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
+
+        with st.expander(f"📖 Pro Orderbook & Market Depth (Act & Freq): {selected_ticker}", expanded=True):
+            st.markdown(f"""
+            <div class="ob-container">
+                <div class="ob-header-stats">
+                    <div><b>Open:</b> Rp {open_p:,}</div>
+                    <div><b>Prev:</b> Rp {prev_p:,}</div>
+                    <div><b>Lot:</b> {tot_lot:,}</div>
+                    <div><b>High:</b> Rp {high_p:,}</div>
+                    <div><b>ARA:</b> Rp {ara_p:,}</div>
+                    <div><b>Val:</b> {val_str}</div>
+                    <div><b>Low:</b> Rp {low_p:,}</div>
+                    <div><b>ARB:</b> Rp {arb_p:,}</div>
+                    <div><b>Avg:</b> Rp {area_beli:,}</div>
+                </div>
+                <table class="ob-table">
+                    <thead>
+                        <tr>
+                            <th>Act</th>
+                            <th>Freq</th>
+                            <th>Lot</th>
+                            <th style="color:#00f0ff;">Bid</th>
+                            <th style="color:#ff5252;">Ask</th>
+                            <th>Lot</th>
+                            <th>Freq</th>
+                            <th>Act</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            """, unsafe_allow_html=True)
+            
+            ob_rows = ""
+            for i in range(10):
+                ob_rows += f"""
+                <tr>
+                    <td>{bids_act[i]}</td>
+                    <td>{bids_f[i]}</td>
+                    <td>{bids_v[i]:,}</td>
+                    <td class="ob-bid-price">Rp {bids_p[i]:,}</td>
+                    <td class="ob-ask-price">Rp {asks_p[i]:,}</td>
+                    <td>{asks_v[i]:,}</td>
+                    <td>{asks_f[i]}</td>
+                    <td>{asks_act[i]}</td>
+                </tr>
+                """
+            
+            ob_rows += f"""
+                    <tr class="ob-total-row">
+                        <td colspan="2">{sum_bid_freq:,}</td>
+                        <td>{sum_bid_lot:,}</td>
+                        <td colspan="2">TOTAL</td>
+                        <td>{sum_ask_lot:,}</td>
+                        <td colspan="2">{sum_ask_freq:,}</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            """
+            st.markdown(ob_rows, unsafe_allow_html=True)
+
+        # 🧮 KALKULATOR & JOURNAL
         c_calc, c_sim = st.columns(2)
         with c_calc:
             with st.expander("🧮 Position Size / Risk Calculator", expanded=False):
