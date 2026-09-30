@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS
+# 3. INJEKSI CUSTOM CSS (FIX LEBAR TABEL ORDERBOOK DI PC)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -82,6 +82,12 @@ st.markdown("""
         color: #cbd5e1;
     }
 
+    /* MEMAKSA TABEL ORDERBOOK MEMENUHI LEBAR KONTainer */
+    .desktop-orderbook-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+    }
+
     .stButton > button {
         background-color: #1d4ed8 !important;
         color: #ffffff !important;
@@ -117,7 +123,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-ajaib">Institutional Intelligence • Perfect Desktop Orderbook • Execution Plan</div>
+            <div class="hero-subtitle-ajaib">Institutional Intelligence • Full-Width Orderbook • Execution Plan</div>
         </div>
         <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
@@ -479,7 +485,7 @@ if selected_ticker and selected_row:
         </div>
         """, unsafe_allow_html=True)
 
-        # 🖥️ 📱 PERFECT RESPONSIVE ORDERBOOK (FULL WIDTH DESKTOP & MOBILE SAFE)
+        # 🖥️ FULL-WIDTH RESPONSIVE ORDERBOOK (MENGGUNAKAN KELAS CSS KHUSUS)
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(10)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
@@ -495,9 +501,9 @@ if selected_ticker and selected_row:
         sum_bid_freq = sum(bids_f)
         sum_ask_freq = sum(asks_f)
 
-        st.markdown("""
+        st.markdown(f"""
         <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px;">
-            <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center; border-collapse: collapse;">
+            <table class="desktop-orderbook-table" style="font-size: 11px; color: #e2e8f0; text-align: center; border-collapse: collapse;">
                 <thead>
                     <tr style="color: #94a3b8; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08);">
                         <th style="padding: 6px; width: 12%; text-align: left;">FREQ</th>
