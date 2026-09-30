@@ -97,6 +97,30 @@ st.markdown("""
 # LIST TICKER REKOMENDASI DEFAULT
 TICKERS_RADAR = ["TEBE", "JPFA", "TLKM", "BBCA", "BMRI", "UNTR", "ASII", "JARR", "AMRT", "CPIN", "TPIA", "AKRA", "BRIS", "ERAA", "PGAS", "ANTM", "ACES", "BBYB", "BUMI", "RAAM"]
 
+# KAMUS SHARES OUTSTANDING (KAPITALISASI STABIL JIKA API DI-BLOCK CLOUD)
+ESTIMATED_SHARES = {
+    "TEBE": 1285000000,
+    "JPFA": 11726575001,
+    "TLKM": 99062216600,
+    "CPIN": 16398000000,
+    "BBCA": 123275000000,
+    "BMRI": 93333333333,
+    "UNTR": 3730135123,
+    "ASII": 40483553140,
+    "JARR": 12000000000,
+    "AMRT": 41524500000,
+    "TPIA": 86522000000,
+    "AKRA": 20073000000,
+    "BRIS": 46128000000,
+    "ERAA": 15920000000,
+    "PGAS": 24241000000,
+    "ANTM": 24030000000,
+    "ACES": 17150000000,
+    "BBYB": 13320000000,
+    "BUMI": 371000000000,
+    "RAAM": 8500000000
+}
+
 # FUNGSI HITUNG ARA
 def hitung_max_ara(price):
     if price <= 200:
@@ -119,10 +143,11 @@ def format_market_cap(mc):
     else:
         return f"Rp {mc:,.0f}"
 
-# FUNGSI AMBIL SINGLE TICKER (DIPERBARUI DENGAN FAST_INFO AGAR AMAN DI CLOUD)
+# FUNGSI AMBIL DATA TICKER DENGAN FALLBACK AMAN CLOUD
 def fetch_single_ticker_data(symbol):
     try:
-        ticker_jk = f"{symbol.strip().upper()}.JK"
+        clean_symbol = symbol.strip().upper()
+        ticker_jk = f"{clean_symbol}.JK"
         stock = yf.Ticker(ticker_jk)
         hist = stock.history(period="1d")
         
@@ -131,24 +156,23 @@ def fetch_single_ticker_data(symbol):
             prev_close = int(round(hist["Open"].iloc[0]))
             change_pct = ((current_price - prev_close) / prev_close) * 100 if prev_close > 0 else 0
             
-            # PENGAMBILAN MARKET CAP TAHAN RATE-LIMIT CLOUD
+            # AMBIL MARKET CAP: JIKA FAST_INFO/INFO DI-BLOCK CLOUD, HITUNG DARI HARGA * SHARES
             mc_raw = None
             try:
-                mc_raw = stock.fast_info.get('market_cap', None)
+                mc_raw = stock.fast_info['market_cap']
             except Exception:
                 pass
             
-            if not mc_raw:
-                try:
-                    mc_raw = stock.info.get('marketCap', None)
-                except Exception:
-                    pass
+            if not mc_raw or np.isnan(mc_raw):
+                shares = ESTIMATED_SHARES.get(clean_symbol)
+                if shares:
+                    mc_raw = current_price * shares
 
             mc_fmt = format_market_cap(mc_raw)
             potensi = "🔥 HIGH POTENTIAL" if change_pct >= 0 else "⚡ MEDIUM POTENTIAL"
             
             return {
-                "Ticker": symbol.strip().upper(),
+                "Ticker": clean_symbol,
                 "Price": current_price,
                 "Market Cap": mc_fmt,
                 "Change (%)": f"{change_pct:+.2f}%",
@@ -226,7 +250,6 @@ with col_left:
     st.subheader("🎯 Radar Saham Potensi Naik")
     
     if not df_filtered.empty:
-        # MENAMPILKAN KEMBALI DESAIN TABEL CYBERPUNK ASLI
         st.dataframe(
             df_filtered[["Ticker", "Price", "Market Cap", "Target Min (+3%)", "Max Potensi (%)", "Prediksi Potensi"]], 
             use_container_width=True, 
