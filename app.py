@@ -29,63 +29,58 @@ if is_bursa_open:
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
 
-# TENTUKAN WARNA LATAR BELAKANG BERDASARKAN TAB AKTIF
-is_swing_active = st.session_state.active_tab == "🚀 Weekly Swing Signal"
-app_bg_color = "#000000" if is_swing_active else "#002347"
-card_bg_color = "#0f172a" if is_swing_active else "#002b5c"
-
-# 3. INJEKSI CUSTOM CSS DINAMIS (FIXED f-string braces)
-css_template = """
+# 3. INJEKSI CUSTOM CSS (BIRU KHAS AJAIB KONSISTEN & JUDUL LEBIH BESAR)
+st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     
-    html, body, [class*="css"] {{
+    html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
-    }}
+    }
 
-    .stApp {{
-        background-color: APP_BG !important;
+    /* LATAR BELAKANG UTAMA TETAP BIRU KHAS AJAIB */
+    .stApp {
+        background-color: #002347 !important;
         color: #f8fafc !important;
-        transition: background-color 0.3s ease;
-    }}
+    }
 
-    .main-hero-nano {{
-        background: CARD_BG;
-        border: 1px solid BORDER_COLOR;
+    .main-hero-nano {
+        background: #003366;
+        border: 1px solid #004080;
         border-radius: 16px;
-        padding: 22px 26px;
+        padding: 26px 30px;
         margin-bottom: 16px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
-    .hero-title-nano {{
-        font-size: 24px;
-        font-weight: 700;
+    .hero-title-nano {
+        font-size: 32px !important;
+        font-weight: 800 !important;
         color: #ffffff;
         margin: 0;
         text-transform: uppercase;
-        letter-spacing: -0.3px;
+        letter-spacing: -0.5px;
     }
-    .hero-subtitle-nano {{
-        font-size: 12px;
+    .hero-subtitle-nano {
+        font-size: 14px !important;
         color: #93c5fd;
-        margin-top: 4px;
-        letter-spacing: 1px;
-        font-weight: 500;
+        margin-top: 6px;
+        letter-spacing: 1.5px;
+        font-weight: 600;
         text-transform: uppercase;
     }
 
-    .dark-terminal-card {{
-        background: CARD_BG;
-        border: 1px solid CARD_BORDER;
+    .dark-terminal-card {
+        background: #002b5c;
+        border: 1px solid #003b75;
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 20px;
         color: #f3f4f6;
     }
 
-    .top-runner-bar {{
-        background: CARD_BG;
-        border: 1px solid BORDER_COLOR;
+    .top-runner-bar {
+        background: #003366;
+        border: 1px solid #0047ab;
         border-radius: 10px;
         padding: 10px 16px;
         margin-bottom: 14px;
@@ -93,52 +88,45 @@ css_template = """
         color: #cbd5e1;
     }
 
-    .stButton > button {{
+    .stButton > button {
         background-color: #2563eb !important;
         color: #ffffff !important;
         border-radius: 8px !important;
         border: none !important;
         font-weight: 600 !important;
-    }}
-    .stButton > button:hover {{
+    }
+    .stButton > button:hover {
         background-color: #1d4ed8 !important;
-    }}
+    }
 
-    div[data-baseweb="input"] {{
-        background-color: CARD_BG !important;
+    div[data-baseweb="input"] {
+        background-color: #003366 !important;
         border-radius: 8px !important;
-        border: 1px solid BORDER_COLOR !important;
+        border: 1px solid #0047ab !important;
         color: white !important;
-    }}
+    }
 
-    .stExpander {{
-        background-color: CARD_BG !important;
+    .stExpander {
+        background-color: #003366 !important;
         border-radius: 12px !important;
-        border: 1px solid BORDER_COLOR !important;
+        border: 1px solid #0047ab !important;
         color: #ffffff !important;
-    }}
-    label {{ color: #cbd5e1 !important; }}
+    }
+    label { color: #cbd5e1 !important; }
 </style>
-"""
+""", unsafe_allow_html=True)
 
-final_css = css_template.replace("APP_BG", app_bg_color)\
-                        .replace("CARD_BG", card_bg_color)\
-                        .replace("BORDER_COLOR", "#334155" if is_swing_active else "#004080")\
-                        .replace("CARD_BORDER", "#1e293b" if is_swing_active else "#003b75")
-
-st.markdown(final_css, unsafe_allow_html=True)
-
-# 4. HEADER BANNER UTAMA
+# 4. HEADER BANNER UTAMA (JUDUL DIPERBESAR & PROPORSIONAL)
 st.markdown("""
 <div class="main-hero-nano">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">Analytics</div>
+            <div class="hero-subtitle-nano">ANALYTICS TERMINAL</div>
         </div>
-        <div style="text-align: right; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-            <div style="font-size:9px; color:#93c5fd; font-weight:600;">NANO CORE</div>
-            <div style="font-size:11px; font-weight:600; color:#34d399;">● SYNCHRONIZED</div>
+        <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
+            <div style="font-size:10px; color:#93c5fd; font-weight:700;">NANO CORE</div>
+            <div style="font-size:12px; font-weight:700; color:#34d399;">● SYNCHRONIZED</div>
         </div>
     </div>
 </div>
@@ -252,7 +240,7 @@ def fetch_single_ticker_data(symbol):
             if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -765,7 +753,7 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
         
         st.markdown(f"""
-        <div style="background: #000000; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-top: 10px;">
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
             <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi:</div>
             <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
             <div style="font-size: 13px; color: #cbd5e1;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
