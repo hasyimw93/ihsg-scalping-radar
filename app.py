@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS
+# 3. INJEKSI CUSTOM CSS (WARNA HIJAU/MERAH NEON PADA ORDERBOOK & ELEMEN)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -148,7 +148,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>⚡ IHSG High-Potential Scalping Terminal</h1>
-    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Compact Clean Orderbook • BSJP Screener • Multi-Timeframe Chart</p>
+    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Colored Orderbook Depth • BSJP Screener • Multi-Timeframe Chart</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -379,7 +379,7 @@ with col_left:
             selected_ticker = st.selectbox("Pilih Saham Plan:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-# TRADING EXECUTION PLAN & COMPACT ORDERBOOK (5 LEVELS - FAST & CLEAN)
+# TRADING EXECUTION PLAN & COLORED COMPACT ORDERBOOK (5 LEVELS)
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
     prev_p = int(selected_row.get("Prev", area_beli))
@@ -410,7 +410,7 @@ if selected_ticker and selected_row:
         
         st.write("")
 
-        # 📖 COMPACT ORDERBOOK (5 LEVEL - RINGKAS & MUDAH DIMENGERTI)
+        # 📖 COLORED COMPACT ORDERBOOK (5 LEVEL DENGAN WARNA HIJAU/MERAH)
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(5)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(5)]
@@ -427,7 +427,7 @@ if selected_ticker and selected_row:
         sum_ask_freq = sum(asks_f)
         val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
 
-        with st.expander(f"📖 Compact Orderbook Depth: {selected_ticker}", expanded=True):
+        with st.expander(f"📖 Orderbook Market Depth: {selected_ticker}", expanded=True):
             # STATS RINGKAS
             c1, c2, c3 = st.columns(3)
             with c1: st.markdown(f"<font size='2'>Open: <b>Rp {open_p:,}</b><br>High: <b>Rp {high_p:,}</b><br>Low: <b>Rp {low_p:,}</b></font>", unsafe_allow_html=True)
@@ -436,20 +436,33 @@ if selected_ticker and selected_row:
             
             st.divider()
 
-            # TABEL ORDERBOOK NATIVE STREAMLIT (DIJAMIN MERENDER RAPI TANPA KODE HTML MENTAH)
+            # RENDER TABEL ORDERBOOK DENGAN WARNA (HIJAU UNTUK BID & MERAH UNTUK ASK)
             ob_data = []
             for i in range(5):
                 ob_data.append({
                     "Freq (B)": bids_f[i],
                     "Lot (B)": f"{bids_v[i]:,}",
-                    "Bid": f"Rp {bids_p[i]:,}",
-                    "Ask": f"Rp {asks_p[i]:,}",
+                    "🟢 Bid": f"Rp {bids_p[i]:,}",
+                    "🔴 Ask": f"Rp {asks_p[i]:,}",
                     "Lot (A)": f"{asks_v[i]:,}",
                     "Freq (A)": asks_f[i]
                 })
             
             df_ob = pd.DataFrame(ob_data)
-            st.dataframe(df_ob, use_container_width=True, hide_index=True)
+            
+            # Styling dataframe agar kolom Bid bernuansa hijau dan Ask bernuansa merah
+            def color_orderbook(val):
+                if isinstance(val, str) and "Rp" in val:
+                    if "Bid" in val or val.startswith("Rp"): # Cek konteks bid/ask
+                        pass
+                return ''
+
+            st.dataframe(
+                df_ob.style.applymap(lambda x: 'color: #00f0ff; font-weight: bold;' if str(x).startswith('Rp') and list(df_ob.columns)[df_ob.isin([x]).any()].any() == '🟢 Bid' else '', subset=['🟢 Bid'])
+                           .applymap(lambda x: 'color: #ff5252; font-weight: bold;', subset=['🔴 Ask']),
+                use_container_width=True, 
+                hide_index=True
+            )
 
             st.markdown(f"🟢 **Total Bid**: {sum_bid_lot:,} Lot ({sum_bid_freq} Freq) &nbsp;|&nbsp; 🔴 **Total Ask**: {sum_ask_lot:,} Lot ({sum_ask_freq} Freq)")
 
