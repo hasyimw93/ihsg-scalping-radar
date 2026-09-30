@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (AJAIB BLUE THEME + DARK SWING TAB)
+# 3. INJEKSI CUSTOM CSS (AJAIB BLUE THEME + HITAM PEKAT PADA TAB SWING)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
@@ -73,10 +73,10 @@ st.markdown("""
         color: #f3f4f6;
     }
 
-    /* KONTTAINER KHUSUS TAB SWING AGAR LEBIH GELAP DAN KONTRAS */
+    /* LATAR BELAKANG HITAM PEKAT KHUSUS TAB SWING SIGNAL */
     .swing-tab-container {
-        background: #001224 !important;
-        border: 1px solid #002347 !important;
+        background: #000000 !important;
+        border: 1px solid #1e293b !important;
         border-radius: 14px;
         padding: 24px;
     }
@@ -659,7 +659,7 @@ with main_tab1:
                 pass
 
 with main_tab2:
-    # PEMBUNGKUS DENGAN LATAR BELAKANG LEBIH GELAP KHUSUS TAB SWING SIGNAL
+    # PEMBUNGKUS DENGAN LATAR BELAKANG HITAM PEKAT KHUSUS TAB SWING SIGNAL
     st.markdown('<div class="swing-tab-container">', unsafe_allow_html=True)
     
     st.markdown("### 🚀 Weekly Swing Signal & Bullish Watchlist")
@@ -749,7 +749,7 @@ with main_tab2:
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
         
         st.markdown(f"""
-        <div style="background: #002347; border: 1px solid #003b75; border-radius: 12px; padding: 14px; margin-top: 10px;">
+        <div style="background: #001224; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-top: 10px;">
             <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi:</div>
             <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
             <div style="font-size: 13px; color: #cbd5e1;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
