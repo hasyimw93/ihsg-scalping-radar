@@ -117,7 +117,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-ajaib">Institutional Intelligence • Orderbook • Spike Detector • Market Sentiment</div>
+            <div class="hero-subtitle-ajaib">Institutional Intelligence • Orderbook • Execution Plan • Spike Detector</div>
         </div>
         <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
@@ -379,7 +379,7 @@ with col_left:
 
     st.write("")
     
-    # ⚡ FITUR BARU: SCALPER VOLATILITY & SPIKE DETECTOR DI KIRI BAWAH
+    # SCALPER VOLATILITY & SPIKE DETECTOR DI KIRI BAWAH
     st.markdown("""
     <div style="background: #0f1c36; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px; margin-top: 6px;">
         <div style="font-size: 12px; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 8px;">🚨 Scalper Spike & Momentum Detector</div>
@@ -448,6 +448,34 @@ if selected_ticker and selected_row:
                     <td>Low: <b style="color: #f87171;">Rp {low_p:,}</b></td>
                     <td>ARB: <b>Rp {arb_p:,}</b></td>
                     <td>Avg: <b style="color: #f87171;">Rp {area_beli:,}</b></td>
+                </tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ⚡ FITUR BARU: TRADING EXECUTION PLAN (Rencana Eksekusi Profesional)
+        tp_1 = int(round(area_beli * 1.015))
+        tp_2 = int(round(area_beli * 1.03))
+        tp_3 = int(round(area_beli * 1.05))
+        cl_price = int(round(area_beli * 0.985))
+
+        st.markdown(f"""
+        <div style="background: #0f1c36; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: #60a5fa; text-transform: uppercase; margin-bottom: 8px;">🎯 Automated Trading Execution Plan: {selected_ticker}</div>
+            <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
+                <tr style="background: #1e293b; color: #94a3b8; font-weight: 700;">
+                    <td style="padding: 6px; border-radius: 6px 0 0 6px;">BUY ZONE</td>
+                    <td style="padding: 6px;">TP 1 (+1.5%)</td>
+                    <td style="padding: 6px;">TP 2 (+3%)</td>
+                    <td style="padding: 6px;">TP 3 (+5%)</td>
+                    <td style="padding: 6px; border-radius: 0 6px 6px 0;">CUT LOSS (-1.5%)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: 700; color: #34d399;">Rp {area_beli:,}</td>
+                    <td style="padding: 8px 0; color: #6ee7b7;">Rp {tp_1:,}</td>
+                    <td style="padding: 8px 0; color: #34d399; font-weight: 700;">Rp {tp_2:,}</td>
+                    <td style="padding: 8px 0; color: #93c5fd;">Rp {tp_3:,}</td>
+                    <td style="padding: 8px 0; font-weight: 700; color: #f87171;">Rp {cl_price:,}</td>
                 </tr>
             </table>
         </div>
@@ -557,14 +585,14 @@ if selected_ticker and selected_row:
                 modal = st.number_input("Modal (Rp):", min_value=100000, value=10000000, step=500000)
                 risk_p = st.slider("Maksimal Risiko (%):", 0.5, 5.0, 1.8, 0.1)
                 max_rugi = modal * (risk_p / 100)
-                rugi_lembar = area_beli - cut_loss
+                rugi_lembar = area_beli - cl_price
                 max_lot = int((max_rugi / rugi_lembar) // 100) if rugi_lembar > 0 else 0
                 st.info(f"👉 Rekomendasi Buy: **{max_lot:,} Lot**")
 
         with c_sim:
             with st.expander("📝 Scalping Journal", expanded=False):
                 entry_p = st.number_input("Entry Price:", value=area_beli)
-                exit_p = st.number_input("Exit Price:", value=target_min)
+                exit_p = st.number_input("Exit Price:", value=tp_2)
                 lot_cnt = st.number_input("Jumlah Lot:", value=max_lot if max_lot > 0 else 10)
                 
                 buy_val = entry_p * lot_cnt * 100
