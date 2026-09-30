@@ -29,7 +29,7 @@ if is_bursa_open:
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
 
-# 3. INJEKSI CUSTOM CSS (BIRU KHAS AJAIB KONSISTEN & JUDUL LEBIH BESAR)
+# 3. INJEKSI CUSTOM CSS (BIRU KHAS AJAIB KONSISTEN & JUDUL BESAR)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -38,7 +38,6 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* LATAR BELAKANG UTAMA TETAP BIRU KHAS AJAIB */
     .stApp {
         background-color: #002347 !important;
         color: #f8fafc !important;
@@ -116,7 +115,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA (JUDUL DIPERBESAR & PROPORSIONAL)
+# 4. HEADER BANNER UTAMA
 st.markdown("""
 <div class="main-hero-nano">
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -240,7 +239,7 @@ def fetch_single_ticker_data(symbol):
             if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -677,18 +676,21 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
             "Emiten": ["ADRO", "MDKA", "BBRI", "INKP", "UNTR"],
             "Setup": ["Breakout Resistance", "Pullback MA20", "Accumulation Phase", "Volume Surge", "Golden Cross"],
             "Buy Zone": ["Rp 2.450 - 2.500", "Rp 2.700 - 2.750", "Rp 4.900 - 5.000", "Rp 7.800 - 7.950", "Rp 26.500 - 27.000"],
-            "Target 1": ["Rp 2.650", "Rp 2.950", "Rp 5.250", "Rp 8.400", "Rp 28.500"],
-            "Stop Loss": ["Rp 2.380", "Rp 2.620", "Rp 4.800", "Rp 7.600", "Rp 25.800"],
+            "Target 1 (+3%)": ["Rp 2.575", "Rp 2.825", "Rp 5.150", "Rp 8.150", "Rp 27.800"],
+            "Target 2 (+6%)": ["Rp 2.650", "Rp 2.950", "Rp 5.300", "Rp 8.450", "Rp 28.600"],
+            "Target 3 (+10%)": ["Rp 2.750", "Rp 3.050", "Rp 5.500", "Rp 8.750", "Rp 29.500"],
+            "Stop Loss (-3%)": ["Rp 2.380", "Rp 2.620", "Rp 4.800", "Rp 7.600", "Rp 25.800"],
             "Target Waktu": ["1 - 2 Minggu", "2 - 3 Minggu", "1 - 3 Minggu", "3 - 5 Hari", "2 - 4 Minggu"],
             "RRR": ["1 : 2.5", "1 : 3.1", "1 : 2.2", "1 : 2.8", "1 : 2.6"]
         }
         df_swing = pd.DataFrame(swing_data)
         st.dataframe(df_swing, use_container_width=True, hide_index=True)
         
+        # FITUR KRUSIAL: ACTIVE SWING PORTFOLIO & CLOSE POSITION MANAGER
         st.markdown("#### 📝 Active Swing Trade Portfolio & Live P&L Tracker")
         if st.session_state.swing_journal:
             live_portfolio_rows = []
-            for item in st.session_state.swing_journal:
+            for i, item in enumerate(st.session_state.swing_journal):
                 sym = item["Emiten"]
                 entry_p = item["Entry"]
                 lot_cnt = item["Lot"]
@@ -707,6 +709,7 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
                 status_str = f"🟢 Cuan (+{diff_pct:.2f}%)" if diff_rp >= 0 else f"🔴 Minus ({diff_pct:.2f}%)"
                 
                 live_portfolio_rows.append({
+                    "Index": i,
                     "Emiten": sym,
                     "Entry (Rp)": f"Rp {entry_p:,}",
                     "Live Price (Rp)": f"Rp {live_p:,}",
@@ -717,7 +720,19 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
                 })
             
             df_live_sj = pd.DataFrame(live_portfolio_rows)
-            st.dataframe(df_live_sj, use_container_width=True, hide_index=True)
+            st.dataframe(df_live_sj.drop(columns=["Index"]), use_container_width=True, hide_index=True)
+            
+            # FITUR KRUSIAL: TOMBOL KELOLA / TUTUP POSISI (CLOSE / TAKE PROFIT)
+            st.markdown("<font size='2' color='#93c5fd'><b>Kelola Posisi (Take Profit / Tutup Posisi):</b></font>", unsafe_allow_html=True)
+            col_del_1, col_del_2 = st.columns([2, 1])
+            with col_del_1:
+                pos_to_close = st.selectbox("Pilih Posisi untuk Ditutup/Jual:", options=range(len(st.session_state.swing_journal)), format_func=lambda x: f"{st.session_state.swing_journal[x]['Emiten']} (Entry: Rp {st.session_state.swing_journal[x]['Entry']:,}, {st.session_state.swing_journal[x]['Lot']} Lot)")
+            with col_del_2:
+                st.write("")
+                if st.button("🗑️ Tutup / Jual Posisi", use_container_width=True):
+                    closed_item = st.session_state.swing_journal.pop(pos_to_close)
+                    st.success(f"Posisi {closed_item['Emiten']} berhasil ditutup/dijual!")
+                    st.rerun()
         else:
             st.info("Belum ada posisi swing aktif yang dicatat.")
 
@@ -740,8 +755,8 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
                 st.rerun()
 
     with col_ws2:
-        st.markdown("#### 🧮 Swing Trade Position Sizing")
-        st.markdown("<font size='2' color='#cbd5e1'>Kalkulator manajemen risiko khusus swing trading mingguan.</font>", unsafe_allow_html=True)
+        st.markdown("#### 🧮 Swing Trade Position Sizing & Multi-TP")
+        st.markdown("<font size='2' color='#cbd5e1'>Kalkulator manajemen risiko dan target profit bertahap.</font>", unsafe_allow_html=True)
         
         modal_swing = st.number_input("Total Modal Swing (Rp):", min_value=1000000, value=25000000, step=1000000)
         risk_pct_swing = st.slider("Risiko per Trade (% dari Modal):", 0.5, 5.0, 2.0, 0.5)
@@ -752,11 +767,21 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
         risk_per_share = entry_swing - sl_swing
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
         
+        # FITUR KRUSIAL: KALKULASI MULTI TAKE PROFIT (TP1, TP2, TP3)
+        tp1_calc = int(round(entry_swing * 1.03))
+        tp2_calc = int(round(entry_swing * 1.06))
+        tp3_calc = int(round(entry_swing * 1.10))
+        
         st.markdown(f"""
         <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
-            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi:</div>
-            <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
-            <div style="font-size: 13px; color: #cbd5e1;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
+            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi & Multi-TP:</div>
+            <div style="font-size: 13px; color: #ffffff; margin-bottom: 2px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
+            <div style="font-size: 13px; color: #ffffff; margin-bottom: 6px;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
+            <div style="font-size: 12px; color: #93c5fd; font-weight: 600; margin-bottom: 4px;">Target Profit Bertahap:</div>
+            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 1 (+3%): <b style="color: #34d399;">Rp {tp1_calc:,}</b> (Jual 30%)</div>
+            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 2 (+6%): <b style="color: #34d399;">Rp {tp2_calc:,}</b> (Jual 40%)</div>
+            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 3 (+10%): <b style="color: #60a5fa;">Rp {tp3_calc:,}</b> (Trailing Stop Sisa)</div>
         </div>
         """, unsafe_allow_html=True)
 
