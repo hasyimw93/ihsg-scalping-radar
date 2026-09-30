@@ -134,6 +134,12 @@ if 'custom_watchlist' not in st.session_state:
 if 'trade_journal' not in st.session_state:
     st.session_state.trade_journal = []
 
+if 'swing_journal' not in st.session_state:
+    st.session_state.swing_journal = [
+        {"Emiten": "ADRO", "Entry": 2480, "Lot": 50, "Target Waktu": "1 - 2 Minggu", "Status": "Active 🟢"},
+        {"Emiten": "MDKA", "Entry": 2720, "Lot": 40, "Target Waktu": "2 - 3 Minggu", "Status": "Active 🟢"}
+    ]
+
 ESTIMATED_SHARES = {
     "TEBE": 1285000000, "JPFA": 11726575001, "TLKM": 99062216600, "CPIN": 16398000000,
     "BBCA": 123275000000, "BMRI": 93333333333, "UNTR": 3730135123, "ASII": 40483553140,
@@ -679,6 +685,33 @@ with main_tab2:
         df_swing = pd.DataFrame(swing_data)
         st.dataframe(df_swing, use_container_width=True, hide_index=True)
         
+        # FITUR TAMBAHAN: SWING TRADE ACTIVE PORTFOLIO TRACKER
+        st.markdown("#### 📝 Active Swing Trade Portfolio & Journal")
+        if st.session_state.swing_journal:
+            df_sj = pd.DataFrame(st.session_state.swing_journal)
+            st.dataframe(df_sj, use_container_width=True, hide_index=True)
+        else:
+            st.info("Belum ada posisi swing aktif yang dicatat.")
+
+        with st.form("add_swing_pos"):
+            st.markdown("<b>Tambah Posisi Swing Baru:</b>", unsafe_allow_html=True)
+            f_emiten = st.text_input("Kode Emiten:", placeholder="Contoh: ADRO").strip().upper()
+            f_entry = st.number_input("Harga Entry Aktual (Rp):", min_value=50, value=2500, step=25)
+            f_lot = st.number_input("Jumlah Lot:", min_value=1, value=25, step=5)
+            f_waktu = st.selectbox("Target Waktu Hold:", ["3 - 5 Hari", "1 - 2 Minggu", "2 - 3 Minggu", "1 Bulan+"])
+            
+            submit_swing = st.form_submit_button("➕ Masukkan ke Portofolio Swing")
+            if submit_swing and f_emiten:
+                st.session_state.swing_journal.append({
+                    "Emiten": f_emiten,
+                    "Entry": f_entry,
+                    "Lot": f_lot,
+                    "Target Waktu": f_waktu,
+                    "Status": "Active 🟢"
+                })
+                st.success(f"Posisi {f_emiten} berhasil ditambahkan!")
+                st.rerun()
+
     with col_ws2:
         st.markdown("#### 🧮 Swing Trade Position Sizing")
         st.markdown("<font size='2' color='#cbd5e1'>Kalkulator manajemen risiko khusus swing trading mingguan.</font>", unsafe_allow_html=True)
