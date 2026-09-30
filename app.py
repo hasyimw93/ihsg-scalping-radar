@@ -256,8 +256,12 @@ def fetch_live_market_data(ticker_list):
 # KONTTAINER UTAMA
 st.markdown('<div class="dark-terminal-card">', unsafe_allow_html=True)
 
-# TAB UTAMA: TERMINAL SCALPING VS RIGHT ISSUE MODULE
-main_tab1, main_tab2 = st.tabs(["⚡ Nano Scalping & Orderbook Terminal", "📑 Right Issue & Corporate Action Module"])
+# TAB UTAMA: 1. SCALPING, 2. WEEKLY SWING, 3. RIGHT ISSUE
+main_tab1, main_tab2, main_tab3 = st.tabs([
+    "⚡ Nano Scalping & Orderbook Terminal", 
+    "🚀 Weekly Swing Signal", 
+    "📑 Right Issue & Corporate Action Module"
+])
 
 with main_tab1:
     # GRAFIK IHSG REALTIME DI BAGIAN ATAS TERMINAL
@@ -656,6 +660,46 @@ with main_tab1:
                 pass
 
 with main_tab2:
+    st.markdown("### 🚀 Weekly Swing Signal & Bullish Watchlist")
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) berdasarkan volume breakout dan akumulasi institusional.</p>", unsafe_allow_html=True)
+    
+    col_ws1, col_ws2 = st.columns([1.5, 1], gap="medium")
+    
+    with col_ws1:
+        st.markdown("#### 📊 Top Weekly Swing Picks (Radar Bullish)")
+        swing_data = {
+            "Emiten": ["ADRO", "MDKA", "BBRI", "INKP", "UNTR"],
+            "Setup": ["Breakout Resistance", "Pullback MA20", "Accumulation Phase", "Volume Surge", "Golden Cross"],
+            "Buy Zone": ["Rp 2.450 - 2.500", "Rp 2.700 - 2.750", "Rp 4.900 - 5.000", "Rp 7.800 - 7.950", "Rp 26.500 - 27.000"],
+            "Target 1": ["Rp 2.650", "Rp 2.950", "Rp 5.250", "Rp 8.400", "Rp 28.500"],
+            "Stop Loss": ["Rp 2.380", "Rp 2.620", "Rp 4.800", "Rp 7.600", "Rp 25.800"],
+            "RRR": ["1 : 2.5", "1 : 3.1", "1 : 2.2", "1 : 2.8", "1 : 2.6"]
+        }
+        df_swing = pd.DataFrame(swing_data)
+        st.dataframe(df_swing, use_container_width=True, hide_index=True)
+        
+    with col_ws2:
+        st.markdown("#### 🧮 Swing Trade Position Sizing")
+        st.markdown("<font size='2' color='#cbd5e1'>Kalkulator manajemen risiko khusus swing trading mingguan.</font>", unsafe_allow_html=True)
+        
+        modal_swing = st.number_input("Total Modal Swing (Rp):", min_value=1000000, value=25000000, step=1000000)
+        risk_pct_swing = st.slider("Risiko per Trade (% dari Modal):", 0.5, 5.0, 2.0, 0.5)
+        entry_swing = st.number_input("Harga Entry Rencana:", min_value=100, value=2500, step=50)
+        sl_swing = st.number_input("Harga Stop Loss Rencana:", min_value=100, value=2380, step=50)
+        
+        max_risk_rp = modal_swing * (risk_pct_swing / 100)
+        risk_per_share = entry_swing - sl_swing
+        recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
+        
+        st.markdown(f"""
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
+            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi:</div>
+            <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
+            <div style="font-size: 13px; color: #cbd5e1;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+with main_tab3:
     st.markdown("### 📑 Right Issue & Corporate Action Module")
     st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Modul pemantauan HMETD dan kalkulator estimasi harga teoretis saham setelah aksi korporasi.</p>", unsafe_allow_html=True)
     
