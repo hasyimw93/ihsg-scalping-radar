@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (AJAIB BLUE THEME)
+# 3. INJEKSI CUSTOM CSS (AJAIB BLUE THEME + DARK SWING TAB)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
@@ -71,6 +71,14 @@ st.markdown("""
         padding: 20px;
         margin-bottom: 20px;
         color: #f3f4f6;
+    }
+
+    /* KONTTAINER KHUSUS TAB SWING AGAR LEBIH GELAP */
+    .swing-tab-container {
+        background: #00172e !important;
+        border: 1px solid #002b5c !important;
+        border-radius: 14px;
+        padding: 20px;
     }
 
     .top-runner-bar {
@@ -136,8 +144,8 @@ if 'trade_journal' not in st.session_state:
 
 if 'swing_journal' not in st.session_state:
     st.session_state.swing_journal = [
-        {"Emiten": "ADRO", "Entry": 2480, "Lot": 50, "Target Waktu": "1 - 2 Minggu", "Status": "Active 🟢"},
-        {"Emiten": "MDKA", "Entry": 2720, "Lot": 40, "Target Waktu": "2 - 3 Minggu", "Status": "Active 🟢"}
+        {"Emiten": "ADRO", "Entry": 2480, "Lot": 50, "Target Waktu": "1 - 2 Minggu"},
+        {"Emiten": "MDKA", "Entry": 2720, "Lot": 40, "Target Waktu": "2 - 3 Minggu"}
     ]
 
 ESTIMATED_SHARES = {
@@ -218,7 +226,7 @@ def fetch_single_ticker_data(symbol):
             if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -666,8 +674,11 @@ with main_tab1:
                 pass
 
 with main_tab2:
+    # PEMBUNGKUS DENGAN LATAR BELAKANG LEBIH GELAP KHUSUS TAB SWING SIGNAL
+    st.markdown('<div class="swing-tab-container">', unsafe_allow_html=True)
+    
     st.markdown("### 🚀 Weekly Swing Signal & Bullish Watchlist")
-    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) lengkap dengan estimasi target waktu hold posisi.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) lengkap dengan pelacakan P&L portofolio secara real-time.</p>", unsafe_allow_html=True)
     
     col_ws1, col_ws2 = st.columns([1.5, 1], gap="medium")
     
@@ -685,11 +696,41 @@ with main_tab2:
         df_swing = pd.DataFrame(swing_data)
         st.dataframe(df_swing, use_container_width=True, hide_index=True)
         
-        # FITUR TAMBAHAN: SWING TRADE ACTIVE PORTFOLIO TRACKER
-        st.markdown("#### 📝 Active Swing Trade Portfolio & Journal")
+        # LIVE PORTFOLIO P&L TRACKER
+        st.markdown("#### 📝 Active Swing Trade Portfolio & Live P&L Tracker")
         if st.session_state.swing_journal:
-            df_sj = pd.DataFrame(st.session_state.swing_journal)
-            st.dataframe(df_sj, use_container_width=True, hide_index=True)
+            live_portfolio_rows = []
+            for item in st.session_state.swing_journal:
+                sym = item["Emiten"]
+                entry_p = item["Entry"]
+                lot_cnt = item["Lot"]
+                waktu_hold = item["Target Waktu"]
+                
+                # Fetch live price
+                live_p = entry_p # fallback
+                try:
+                    t_data = yf.Ticker(f"{sym}.JK").history(period="1d", interval="1m")
+                    if not t_data.empty:
+                        live_p = int(round(t_data["Close"].iloc[-1]))
+                except Exception:
+                    pass
+                
+                diff_rp = (live_p - entry_p) * lot_cnt * 100
+                diff_pct = ((live_p - entry_p) / entry_p) * 100 if entry_p > 0 else 0
+                status_str = f"🟢 Cuan (+{diff_pct:.2f}%)" if diff_rp >= 0 else f"🔴 Minus ({diff_pct:.2f}%)"
+                
+                live_portfolio_rows.append({
+                    "Emiten": sym,
+                    "Entry (Rp)": f"Rp {entry_p:,}",
+                    "Live Price (Rp)": f"Rp {live_p:,}",
+                    "Lot": lot_cnt,
+                    "Floating P&L": f"Rp {diff_rp:,.0f} ({diff_pct:+.2f}%)",
+                    "Target Waktu": waktu_hold,
+                    "Status": status_str
+                })
+            
+            df_live_sj = pd.DataFrame(live_portfolio_rows)
+            st.dataframe(df_live_sj, use_container_width=True, hide_index=True)
         else:
             st.info("Belum ada posisi swing aktif yang dicatat.")
 
@@ -706,8 +747,7 @@ with main_tab2:
                     "Emiten": f_emiten,
                     "Entry": f_entry,
                     "Lot": f_lot,
-                    "Target Waktu": f_waktu,
-                    "Status": "Active 🟢"
+                    "Target Waktu": f_waktu
                 })
                 st.success(f"Posisi {f_emiten} berhasil ditambahkan!")
                 st.rerun()
@@ -726,12 +766,14 @@ with main_tab2:
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
         
         st.markdown(f"""
-        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
+        <div style="background: #002347; border: 1px solid #003b75; border-radius: 12px; padding: 14px; margin-top: 10px;">
             <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi:</div>
             <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
             <div style="font-size: 13px; color: #cbd5e1;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
         </div>
         """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)  # Tutup swing-tab-container
 
 with main_tab3:
     st.markdown("### 📑 Right Issue & Corporate Action Module")
