@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS
+# 3. INJEKSI CUSTOM CSS (KARTU WATCHLIST DIPERKECIL & RAPI)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -89,16 +89,18 @@ st.markdown("""
     .target-gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
     .cut-loss-red { color: #ff5252; text-shadow: 0 0 10px rgba(255,82,82,0.6); }
 
+    /* KARTU WATCHLIST DIPERKECIL & RINGKAS */
     .wl-box {
-        padding: 8px 6px;
-        border-radius: 8px;
+        padding: 4px 6px;
+        border-radius: 6px;
         text-align: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         transition: all 0.2s ease;
+        margin-bottom: 4px;
     }
     .wl-box:hover {
         transform: translateY(-2px);
-        box-shadow: 0 0 18px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.4) !important;
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4) !important;
     }
     .wl-green { background: linear-gradient(135deg, #0e5038, #10b981); border: 1px solid #34d399; color: #ffffff; }
     .wl-red { background: linear-gradient(135deg, #7f1d1d, #ef4444); border: 1px solid #f87171; color: #ffffff; }
@@ -148,7 +150,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>⚡ IHSG High-Potential Scalping Terminal</h1>
-    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Colored Orderbook Depth • BSJP Screener • Multi-Timeframe Chart</p>
+    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Compact Watchlist Grid • BSJP Screener • Multi-Timeframe Chart</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -267,7 +269,7 @@ def fetch_single_ticker_data(symbol):
                 "BSJP Status": bsjp_status,
                 "BSJP Score": bsjp_score
             }
-    except Exception: return None
+    except Exception: None
     return None
 
 @st.cache_data(ttl=15)
@@ -288,20 +290,20 @@ if not df_master.empty:
     bsjp_text = " | ".join([f"🔥 **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
     st.markdown(f'<div class="top-runner-bar">🚀 <b>Screener Calon Naik Besok (BSJP Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
-# 6. WATCHLIST MANAGEMENT
+# 6. WATCHLIST MANAGEMENT (TANPA TOMBOL SILANG & LEBIH RINGKAS)
 with st.expander("📌 Custom Watchlist Management", expanded=True):
-    col_w_add, col_w_list = st.columns([1, 2.5], gap="medium")
+    col_w_add, col_w_list = st.columns([1, 3], gap="medium")
     
     with col_w_add:
         new_ticker = st.text_input("Tambah Saham:", placeholder="Contoh: GOTO, BUKA").strip().upper()
-        if st.button("➕ Tambahkan", use_container_width=True):
+        if st.button("➕ Tambahkan Ticker", use_container_width=True):
             if new_ticker and new_ticker not in st.session_state.custom_watchlist:
                 st.session_state.custom_watchlist.append(new_ticker)
                 st.rerun()
 
     with col_w_list:
+        st.caption("Daftar Ticker Watchlist Aktif (Klik/Pilih di bawah untuk analisa):")
         cols_tags = st.columns(5)
-        tickers_to_remove = []
         
         for idx, t_code in enumerate(st.session_state.custom_watchlist):
             c_target = cols_tags[idx % 5]
@@ -320,17 +322,11 @@ with st.expander("📌 Custom Watchlist Management", expanded=True):
             with c_target:
                 st.markdown(f"""
                 <div class="wl-box {card_class}">
-                    <div style="font-size:12px; font-weight:700;">{t_code}</div>
-                    <div style="font-size:10px;">{price_str} ({pct_str})</div>
+                    <div style="font-size:11px; font-weight:700; line-height:1.2;">{t_code}</div>
+                    <div style="font-size:9px; line-height:1.1;">{price_str}</div>
+                    <div style="font-size:8px; opacity:0.9;">{pct_str}</div>
                 </div>
                 """, unsafe_allow_html=True)
-                if st.button(f"✕ Hapus", key=f"del_{t_code}", use_container_width=True):
-                    tickers_to_remove.append(t_code)
-
-        if tickers_to_remove:
-            for r_code in tickers_to_remove:
-                st.session_state.custom_watchlist.remove(r_code)
-            st.rerun()
 
 # 7. FILTER & PENCARIAN
 c_filter, c_search = st.columns([1.5, 1], gap="medium")
@@ -351,7 +347,7 @@ if not df_filtered.empty:
 
     df_filtered["Target Min (+3%)"] = (df_filtered["Price"] * 1.03).round().astype(int)
 
-# 8. LAYOUT UTAMA
+# 8. LAYOUT UTAMA (KIRI & KANAN SEJAJAR SEMPURNA SAMPAI BAWAH)
 col_left, col_right = st.columns([1.4, 1.6], gap="medium")
 
 selected_row = None
@@ -362,7 +358,7 @@ with col_left:
     if not df_filtered.empty:
         st.dataframe(
             df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-            use_container_width=True, hide_index=True, height=300
+            use_container_width=True, hide_index=True, height=720
         )
         ticker_options = df_filtered["Ticker"].tolist()
     else:
@@ -448,7 +444,6 @@ if selected_ticker and selected_row:
             
             df_ob = pd.DataFrame(ob_data)
             
-            # Styling aman tanpa error
             def highlight_bid_ask(s):
                 return ['color: #00f0ff; font-weight: bold;' if col == 'Bid' else ('color: #ff5252; font-weight: bold;' if col == 'Ask' else '') for col in s.index]
 
