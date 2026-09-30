@@ -111,7 +111,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA (MINIMALIS PUTIH ELEGANT)
+# 4. HEADER BANNER UTAMA
 st.markdown("""
 <div class="main-hero-nano">
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -661,7 +661,7 @@ with main_tab1:
 
 with main_tab2:
     st.markdown("### 🚀 Weekly Swing Signal & Bullish Watchlist")
-    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) berdasarkan volume breakout dan akumulasi institusional.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) lengkap dengan estimasi target waktu hold posisi.</p>", unsafe_allow_html=True)
     
     col_ws1, col_ws2 = st.columns([1.5, 1], gap="medium")
     
@@ -673,6 +673,7 @@ with main_tab2:
             "Buy Zone": ["Rp 2.450 - 2.500", "Rp 2.700 - 2.750", "Rp 4.900 - 5.000", "Rp 7.800 - 7.950", "Rp 26.500 - 27.000"],
             "Target 1": ["Rp 2.650", "Rp 2.950", "Rp 5.250", "Rp 8.400", "Rp 28.500"],
             "Stop Loss": ["Rp 2.380", "Rp 2.620", "Rp 4.800", "Rp 7.600", "Rp 25.800"],
+            "Target Waktu": ["1 - 2 Minggu", "2 - 3 Minggu", "1 - 3 Minggu", "3 - 5 Hari", "2 - 4 Minggu"],
             "RRR": ["1 : 2.5", "1 : 3.1", "1 : 2.2", "1 : 2.8", "1 : 2.6"]
         }
         df_swing = pd.DataFrame(swing_data)
