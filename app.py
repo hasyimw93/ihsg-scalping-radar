@@ -25,29 +25,40 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (AJAIB BLUE THEME + HITAM PEKAT PADA TAB SWING)
-st.markdown("""
+# INISIALISASI SESSION STATE UNTUK NAVIGASI TAB AKTIF
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
+
+# TENTUKAN WARNA LATAR BELAKANG BERDASARKAN TAB AKTIF
+is_swing_active = st.session_state.active_tab == "🚀 Weekly Swing Signal"
+app_bg_color = "#000000" if is_swing_active else "#002347"
+card_bg_color = "#0f172a" if is_swing_active else "#002b5c"
+
+# 3. INJEKSI CUSTOM CSS DINAMIS
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
     
-    html, body, [class*="css"] {
+    html, body, [class*="css"] {{
         font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    }}
 
-    .stApp {
-        background-color: #002347 !important;
+    /* LATAR BELAKANG UTAMA BERUBAH TOTAL MENJADI HITAM PREMIUM JIKA SWING AKTIF */
+    .stApp {{
+        background-color: {app_bg_color} !important;
         color: #f8fafc !important;
-    }
+        transition: background-color 0.3s ease;
+    }}
 
-    .main-hero-nano {
-        background: #003366;
-        border: 1px solid #004080;
+    .main-hero-nano {{
+        background: {card_bg_color};
+        border: 1px solid {"#334155" if is_swing_active else "#004080"};
         border-radius: 16px;
         padding: 22px 26px;
         margin-bottom: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
-    .hero-title-nano {
+    .hero-title-nano {{
         font-size: 24px;
         font-weight: 700;
         color: #ffffff;
@@ -55,7 +66,7 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: -0.3px;
     }
-    .hero-subtitle-nano {
+    .hero-subtitle-nano {{
         font-size: 12px;
         color: #93c5fd;
         margin-top: 4px;
@@ -64,26 +75,18 @@ st.markdown("""
         text-transform: uppercase;
     }
 
-    .dark-terminal-card {
-        background: #002b5c;
-        border: 1px solid #003b75;
+    .dark-terminal-card {{
+        background: {card_bg_color};
+        border: 1px solid {"#1e293b" if is_swing_active else "#003b75"};
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 20px;
         color: #f3f4f6;
     }
 
-    /* LATAR BELAKANG HITAM PEKAT KHUSUS TAB SWING SIGNAL */
-    .swing-tab-container {
-        background: #000000 !important;
-        border: 1px solid #1e293b !important;
-        border-radius: 14px;
-        padding: 24px;
-    }
-
-    .top-runner-bar {
-        background: #003366;
-        border: 1px solid #0047ab;
+    .top-runner-bar {{
+        background: {card_bg_color};
+        border: 1px solid {"#334155" if is_swing_active else "#0047ab"};
         border-radius: 10px;
         padding: 10px 16px;
         margin-bottom: 14px;
@@ -91,31 +94,31 @@ st.markdown("""
         color: #cbd5e1;
     }
 
-    .stButton > button {
+    .stButton > button {{
         background-color: #2563eb !important;
         color: #ffffff !important;
         border-radius: 8px !important;
         border: none !important;
         font-weight: 600 !important;
-    }
-    .stButton > button:hover {
+    }}
+    .stButton > button:hover {{
         background-color: #1d4ed8 !important;
-    }
+    }}
 
-    div[data-baseweb="input"] {
-        background-color: #003366 !important;
+    div[data-baseweb="input"] {{
+        background-color: {card_bg_color} !important;
         border-radius: 8px !important;
-        border: 1px solid #0047ab !important;
+        border: 1px solid {"#334155" if is_swing_active else "#0047ab"} !important;
         color: white !important;
     }
 
-    .stExpander {
-        background-color: #003366 !important;
+    .stExpander {{
+        background-color: {card_bg_color} !important;
         border-radius: 12px !important;
-        border: 1px solid #0047ab !important;
+        border: 1px solid {"#334155" if is_swing_active else "#0047ab"} !important;
         color: #ffffff !important;
-    }
-    label { color: #cbd5e1 !important; }
+    }}
+    label {{ color: #cbd5e1 !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -127,13 +130,30 @@ st.markdown("""
             <div class="hero-title-nano">NANO IDX SCALPER</div>
             <div class="hero-subtitle-nano">Analytics</div>
         </div>
-        <div style="text-align: right; background: #003366; padding: 6px 12px; border-radius: 8px; border: 1px solid #0047ab;">
+        <div style="text-align: right; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#93c5fd; font-weight:600;">NANO CORE</div>
             <div style="font-size:11px; font-weight:600; color:#34d399;">● SYNCHRONIZED</div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# CUSTOM NAVIGASI TAB KONTROL TOMBOL
+tab_col1, tab_col2, tab_col3 = st.columns(3)
+with tab_col1:
+    if st.button("⚡ Nano Scalping Terminal", use_container_width=True):
+        st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
+        st.rerun()
+with tab_col2:
+    if st.button("🚀 Weekly Swing Signal", use_container_width=True):
+        st.session_state.active_tab = "🚀 Weekly Swing Signal"
+        st.rerun()
+with tab_col3:
+    if st.button("📑 Right Issue & Corporate Action", use_container_width=True):
+        st.session_state.active_tab = "📑 Right Issue & Corporate Action Module"
+        st.rerun()
+
+st.write("")
 
 # INITIALIZE SESSION STATE
 if 'custom_watchlist' not in st.session_state:
@@ -267,17 +287,10 @@ def fetch_live_market_data(ticker_list):
         if data: results.append(data)
     return pd.DataFrame(results)
 
-# KONTTAINER UTAMA
+# KONTTAINER UTAMA APLIKASI BERDASARKAN TAB AKTIF
 st.markdown('<div class="dark-terminal-card">', unsafe_allow_html=True)
 
-# TAB UTAMA: 1. SCALPING, 2. WEEKLY SWING, 3. RIGHT ISSUE
-main_tab1, main_tab2, main_tab3 = st.tabs([
-    "⚡ Nano Scalping & Orderbook Terminal", 
-    "🚀 Weekly Swing Signal", 
-    "📑 Right Issue & Corporate Action Module"
-])
-
-with main_tab1:
+if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
     st.markdown("<h4 style='margin-bottom: 4px; font-size: 15px; color: #f8fafc;'>📈 IHSG Real-Time Market Overview (^JKSE)</h4>", unsafe_allow_html=True)
     try:
         ihsg_ticker = yf.Ticker("^JKSE")
@@ -658,10 +671,7 @@ with main_tab1:
             except Exception:
                 pass
 
-with main_tab2:
-    # PEMBUNGKUS DENGAN LATAR BELAKANG HITAM PEKAT KHUSUS TAB SWING SIGNAL
-    st.markdown('<div class="swing-tab-container">', unsafe_allow_html=True)
-    
+elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
     st.markdown("### 🚀 Weekly Swing Signal & Bullish Watchlist")
     st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) lengkap dengan pelacakan P&L portofolio secara real-time.</p>", unsafe_allow_html=True)
     
@@ -749,16 +759,14 @@ with main_tab2:
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
         
         st.markdown(f"""
-        <div style="background: #001224; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-top: 10px;">
+        <div style="background: #000000; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-top: 10px;">
             <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Rekomendasi Alokasi:</div>
             <div style="font-size: 14px; color: #ffffff; margin-bottom: 4px;">Maksimal Risiko: <b style="color: #f87171;">Rp {max_risk_rp:,.0f}</b></div>
             <div style="font-size: 13px; color: #cbd5e1;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)  # Tutup swing-tab-container
-
-with main_tab3:
+elif st.session_state.active_tab == "📑 Right Issue & Corporate Action Module":
     st.markdown("### 📑 Right Issue & Corporate Action Module")
     st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Modul pemantauan HMETD dan kalkulator estimasi harga teoretis saham setelah aksi korporasi.</p>", unsafe_allow_html=True)
     
