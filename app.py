@@ -73,12 +73,12 @@ st.markdown("""
         color: #f3f4f6;
     }
 
-    /* KONTTAINER KHUSUS TAB SWING AGAR LEBIH GELAP */
+    /* KONTTAINER KHUSUS TAB SWING AGAR LEBIH GELAP DAN KONTRAS */
     .swing-tab-container {
-        background: #00172e !important;
-        border: 1px solid #002b5c !important;
+        background: #001224 !important;
+        border: 1px solid #002347 !important;
         border-radius: 14px;
-        padding: 20px;
+        padding: 24px;
     }
 
     .top-runner-bar {
@@ -226,7 +226,7 @@ def fetch_single_ticker_data(symbol):
             if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙️ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -278,7 +278,6 @@ main_tab1, main_tab2, main_tab3 = st.tabs([
 ])
 
 with main_tab1:
-    # GRAFIK IHSG REALTIME DI BAGIAN ATAS TERMINAL
     st.markdown("<h4 style='margin-bottom: 4px; font-size: 15px; color: #f8fafc;'>📈 IHSG Real-Time Market Overview (^JKSE)</h4>", unsafe_allow_html=True)
     try:
         ihsg_ticker = yf.Ticker("^JKSE")
@@ -314,13 +313,11 @@ with main_tab1:
     with st.spinner("Menyinkronkan data pasar..."):
         df_master = fetch_live_market_data(st.session_state.custom_watchlist)
 
-    # TOP RUNNERS QUICK-BAR
     if not df_master.empty:
         top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
         bsjp_text = " | ".join([f"<b>{row['Ticker']}</b>: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
         st.markdown(f'<div class="top-runner-bar">📊 <b>Top Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
-    # WATCHLIST MANAGEMENT
     with st.expander("📌 Custom Watchlist Management", expanded=False):
         col_input, col_btn = st.columns([3, 1], gap="small")
         with col_input:
@@ -364,7 +361,6 @@ with main_tab1:
                     st.session_state.custom_watchlist.remove(r_code)
             st.rerun()
 
-    # FILTER & PENCARIAN
     c_filter, c_search = st.columns([1.5, 1], gap="medium")
     with c_filter:
         kategori_harga = st.selectbox("📌 Filter Rentang Harga:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
@@ -380,7 +376,6 @@ with main_tab1:
         elif kategori_harga == "5. Rp 500 - Rp 1.000": df_filtered = df_filtered[(df_filtered["Price"] >= 500) & (df_filtered["Price"] < 1000)]
         elif kategori_harga == "6. Rp 1 - Rp 500": df_filtered = df_filtered[(df_filtered["Price"] >= 1) & (df_filtered["Price"] < 500)]
 
-    # LIVE RUNNING TRADE PANEL
     st.markdown("<h4 style='margin-bottom: 8px; font-size: 15px; color: #f8fafc;'>⚡ Running Trade (BEI Micro Tick Feed)</h4>", unsafe_allow_html=True)
     np.random.seed(int(datetime.now().second))
     rt_tickers = st.session_state.custom_watchlist if st.session_state.custom_watchlist else ["TEBE", "BBCA", "BMRI"]
@@ -404,7 +399,6 @@ with main_tab1:
 
     st.markdown("---")
 
-    # LAYOUT UTAMA (WATCHLIST & ORDERBOOK)
     col_left, col_right = st.columns([1.3, 1.7], gap="medium")
 
     selected_row = None
@@ -434,7 +428,6 @@ with main_tab1:
 
         st.write("")
         
-        # MICRO-SCANNER
         st.markdown("""
     <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 6px;">
         <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">📊 Micro-Scanner (Active Detect)</div>
@@ -458,7 +451,6 @@ with main_tab1:
     </div>
     """, unsafe_allow_html=True)
 
-    # ORDERBOOK & FITUR INSTITUSIONAL
     if selected_ticker and selected_row:
         area_beli = int(selected_row["Price"])
         prev_p = int(selected_row.get("Prev", area_beli))
@@ -502,7 +494,6 @@ with main_tab1:
     </div>
     """, unsafe_allow_html=True)
 
-            # TRADING EXECUTION PLAN
             tp_1 = int(round(area_beli * 1.015))
             tp_2 = int(round(area_beli * 1.03))
             tp_3 = int(round(area_beli * 1.05))
@@ -530,7 +521,6 @@ with main_tab1:
     </div>
     """, unsafe_allow_html=True)
 
-            # ORDERBOOK SEMPURNA
             fraksi = hitung_fraksi_harga(area_beli)
             bids_p = [area_beli - (i * fraksi) for i in range(10)]
             asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
@@ -586,7 +576,6 @@ with main_tab1:
             st.markdown(full_orderbook_html, unsafe_allow_html=True)
             st.write("")
 
-            # POWER METER
             total_ob_lot = sum_bid_lot + sum_ask_lot
             buyer_power = int((sum_bid_lot / total_ob_lot) * 100) if total_ob_lot > 0 else 50
             seller_power = 100 - buyer_power
@@ -605,7 +594,6 @@ with main_tab1:
     </div>
     """, unsafe_allow_html=True)
 
-            # BROKER SUMMARY & FLOW
             with st.expander("🏢 Institutional Broker Summary & Flow", expanded=False):
                 b_col1, b_col2 = st.columns(2)
                 with b_col1:
@@ -615,7 +603,6 @@ with main_tab1:
                     st.markdown("<b style='color: #34d399; font-size: 12px;'>💧 Top Seller Broker (Distribution)</b>", unsafe_allow_html=True)
                     st.markdown("<font size='2' color='#cbd5e1'>1. **BK** (Seq: 11,800 Lot)<br>2. **MG** (Seq: 8,300 Lot)<br>3. **RX** (Seq: 3,200 Lot)</font>", unsafe_allow_html=True)
 
-            # TRADE HISTORY LOG & PERFORMANCE SUMMARY
             with st.expander("📊 Trade History & Performance Summary", expanded=False):
                 if st.session_state.trade_journal:
                     df_journal = pd.DataFrame(st.session_state.trade_journal)
@@ -626,7 +613,6 @@ with main_tab1:
                 else:
                     st.info("Belum ada riwayat trade yang disimpan.")
 
-            # KALKULATOR & JOURNAL
             c_calc, c_sim = st.columns(2)
             with c_calc:
                 with st.expander("🧮 Position Size / Risk Calculator", expanded=False):
@@ -651,7 +637,6 @@ with main_tab1:
                         st.session_state.trade_journal.append({"Ticker": selected_ticker, "Net P&L": net_pnl})
                         st.success(f"Disimpan! P&L: Rp {net_pnl:,.0f}")
 
-            # INTRADAY CHART
             timeframe = st.radio("Timeframe:", ["1m", "5m", "15m", "1d"], index=1, horizontal=True)
             try:
                 tf_map = {"1m": ("1d", "1m"), "5m": ("1d", "5m"), "15m": ("5d", "15m"), "1d": ("1mo", "1d")}
@@ -696,7 +681,6 @@ with main_tab2:
         df_swing = pd.DataFrame(swing_data)
         st.dataframe(df_swing, use_container_width=True, hide_index=True)
         
-        # LIVE PORTFOLIO P&L TRACKER
         st.markdown("#### 📝 Active Swing Trade Portfolio & Live P&L Tracker")
         if st.session_state.swing_journal:
             live_portfolio_rows = []
@@ -706,8 +690,7 @@ with main_tab2:
                 lot_cnt = item["Lot"]
                 waktu_hold = item["Target Waktu"]
                 
-                # Fetch live price
-                live_p = entry_p # fallback
+                live_p = entry_p 
                 try:
                     t_data = yf.Ticker(f"{sym}.JK").history(period="1d", interval="1m")
                     if not t_data.empty:
