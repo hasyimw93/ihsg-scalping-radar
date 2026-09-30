@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS
+# 3. INJEKSI CUSTOM CSS DENGAN EFEK NEON GLOW UNIVERSAL (KLIK / HOVER / FOCUS)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -39,62 +39,132 @@ st.markdown("""
         color: #ffffff;
     }
 
+    /* HEADER BANNER */
     .main-header {
         background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0, 240, 255, 0.05));
         border: 1px solid rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(12px);
         border-radius: 16px;
-        padding: 20px 28px;
-        margin-bottom: 15px;
+        padding: 16px 24px;
+        margin-bottom: 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    
     .main-header h1 {
         color: #ffffff;
         font-weight: 700;
         letter-spacing: 1px;
         margin: 0;
-        font-size: 26px;
+        font-size: 24px;
     }
 
+    /* TOP RUNNER QUICK BAR */
     .top-runner-bar {
         background: rgba(0, 240, 255, 0.05);
         border: 1px solid rgba(0, 240, 255, 0.2);
         border-radius: 10px;
-        padding: 10px 16px;
-        margin-bottom: 15px;
-        font-size: 13px;
+        padding: 8px 14px;
+        margin-bottom: 12px;
+        font-size: 12px;
     }
 
+    /* KARTU METRIC DENGAN EFEK NEON HOVER & ACTIVE */
     .metric-card {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 12px;
-        padding: 10px;
+        padding: 12px 8px;
         text-align: center;
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        cursor: pointer;
+    }
+    .metric-card:hover, .metric-card:active {
+        transform: translateY(-4px) scale(1.02);
+        border-color: #00f0ff !important;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.7), 0 0 40px rgba(0, 240, 255, 0.3) !important;
     }
 
-    .metric-label { font-size: 10px; color: #b3a2c7; margin-bottom: 4px; text-transform: uppercase; }
-    .metric-value { font-size: 16px; font-weight: 700; color: #ffffff; }
+    .metric-label { font-size: 10px; color: #b3a2c7; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-value { font-size: 17px; font-weight: 700; color: #ffffff; }
 
     .target-green { color: #00f0ff; text-shadow: 0 0 10px rgba(0,240,255,0.6); }
     .target-magenta { color: #ff2a85; text-shadow: 0 0 10px rgba(255,42,133,0.6); }
     .target-gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
-    .cut-loss-red { color: #ff5252; }
+    .cut-loss-red { color: #ff5252; text-shadow: 0 0 10px rgba(255,82,82,0.6); }
 
-    /* CARD WATCHLIST RIKAS */
+    /* CARD WATCHLIST DENGAN EFEK NEON HOVER */
     .wl-box {
-        position: relative;
-        padding: 10px 8px;
-        border-radius: 10px;
+        padding: 8px 6px;
+        border-radius: 8px;
         text-align: center;
-        margin-bottom: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        transition: all 0.2s ease;
+    }
+    .wl-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 18px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.4) !important;
     }
     .wl-green { background: linear-gradient(135deg, #0e5038, #10b981); border: 1px solid #34d399; color: #ffffff; }
     .wl-red { background: linear-gradient(135deg, #7f1d1d, #ef4444); border: 1px solid #f87171; color: #ffffff; }
     .wl-white { background: linear-gradient(135deg, #374151, #6b7280); border: 1px solid #d1d5db; color: #ffffff; }
+
+    /* =========================================================
+       ✨ GLOBAL NEON HOVER & FOCUS STYLES UNTUK SEMUA ELEMENT STREAMLIT
+       ========================================================= */
+
+    /* 1. TOMBOL (BUTTONS) - HOVER & ACTIVE NEON GLOW */
+    .stButton > button {
+        border-radius: 8px !important;
+        transition: all 0.25s ease-in-out !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+    }
+    .stButton > button:hover, .stButton > button:focus, .stButton > button:active {
+        border-color: #00f0ff !important;
+        color: #00f0ff !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.4) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* 2. INPUT TEKS & NUMBER INPUT - FOCUS NEON GLOW */
+    div[data-baseweb="input"] {
+        border-radius: 8px !important;
+        transition: all 0.25s ease-in-out !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    div[data-baseweb="input"]:focus-within, div[data-baseweb="input"]:hover {
+        border-color: #00f0ff !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.7), 0 0 25px rgba(0, 240, 255, 0.3) !important;
+    }
+
+    /* 3. SELECTBOX / DROPDOWN - FOCUS NEON GLOW */
+    div[data-baseweb="select"] {
+        border-radius: 8px !important;
+        transition: all 0.25s ease-in-out !important;
+    }
+    div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {
+        border-color: #ff2a85 !important;
+        box-shadow: 0 0 15px rgba(255, 42, 133, 0.8), 0 0 25px rgba(255, 42, 133, 0.4) !important;
+    }
+
+    /* 4. EXPANDER HEADER - HOVER NEON GLOW */
+    .stExpander {
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease !important;
+    }
+    .stExpander:hover {
+        border-color: #00f0ff !important;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
+    }
+
+    /* 5. RADIO BUTTON & SLIDER HOVER */
+    div[data-testid="stMarkdownContainer"] p {
+        transition: all 0.2s ease;
+    }
+    div[role="radiogroup"] label:hover {
+        color: #00f0ff !important;
+        text-shadow: 0 0 8px rgba(0, 240, 255, 0.8) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -102,7 +172,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>⚡ IHSG High-Potential Scalping Terminal</h1>
-    <p style="color:#00f0ff; margin:0; font-size:13px;">Live Real-Time Market • Orderbook Pressure • Trading Journal • Multi-Timeframe Chart</p>
+    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • HOD/LOD Alert • Fee Calculator • Multi-Timeframe Chart</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -151,13 +221,22 @@ def fetch_single_ticker_data(symbol):
             prev_close = int(round(hist["Close"].iloc[-2]))
             change_pct = ((current_price - prev_close) / prev_close) * 100 if prev_close > 0 else 0
             
-            hist_intra = stock.history(period="5d", interval="15m")
+            hist_intra = stock.history(period="1d", interval="1m")
+            hod = int(round(hist_intra["High"].max())) if not hist_intra.empty else current_price
+            lod = int(round(hist_intra["Low"].min())) if not hist_intra.empty else current_price
+
             rsi_val = hitung_rsi(hist_intra["Close"]).iloc[-1] if not hist_intra.empty and len(hist_intra) >= 14 else 50
             ma5 = hist_intra["Close"].rolling(5).mean().iloc[-1] if not hist_intra.empty and len(hist_intra) >= 5 else current_price
             
-            signal = "🚀 BULLISH" if current_price > ma5 else "🔻 BEARISH"
-            if rsi_val > 70: signal += " (OVERBOUGHT)"
-            elif rsi_val < 30: signal += " (OVERSOLD)"
+            if current_price >= hod and current_price > prev_close:
+                signal = "🔥 BREAKOUT HOD"
+            elif current_price > ma5:
+                signal = "🚀 BULLISH"
+            else:
+                signal = "🔻 BEARISH"
+                
+            if rsi_val > 70: signal += " (OB)"
+            elif rsi_val < 30: signal += " (OS)"
             
             avg_vol = hist_intra["Volume"].mean() if not hist_intra.empty else 1
             last_vol = hist_intra["Volume"].iloc[-1] if not hist_intra.empty else 0
@@ -176,6 +255,8 @@ def fetch_single_ticker_data(symbol):
             return {
                 "Ticker": clean_symbol,
                 "Price": current_price,
+                "HOD": hod,
+                "LOD": lod,
                 "Market Cap": mc_fmt,
                 "Change (%)": f"{change_pct:+.2f}%",
                 "Raw Change": change_pct,
@@ -204,7 +285,7 @@ if not df_master.empty:
     runner_text = " | ".join([f"🔥 **{row['Ticker']}**: {row['Change (%)']} (Rp {row['Price']:,})" for _, row in top_gainers.iterrows()])
     st.markdown(f'<div class="top-runner-bar">🚀 <b>Top Volatility Runners Watchlist</b>: {runner_text}</div>', unsafe_allow_html=True)
 
-# 6. WATCHLIST MANAGEMENT (RINGKAS & KOMPAK)
+# 6. WATCHLIST MANAGEMENT
 with st.expander("📌 Custom Watchlist Management", expanded=True):
     col_w_add, col_w_list = st.columns([1, 2.5], gap="medium")
     
@@ -222,7 +303,6 @@ with st.expander("📌 Custom Watchlist Management", expanded=True):
         for idx, t_code in enumerate(st.session_state.custom_watchlist):
             c_target = cols_tags[idx % 5]
             
-            # AMBIL DETAIL DARI DF_MASTER
             row_match = df_master[df_master["Ticker"] == t_code] if not df_master.empty else pd.DataFrame()
             if not row_match.empty:
                 raw_val = row_match.iloc[0]["Raw Change"]
@@ -237,8 +317,8 @@ with st.expander("📌 Custom Watchlist Management", expanded=True):
             with c_target:
                 st.markdown(f"""
                 <div class="wl-box {card_class}">
-                    <div style="font-size:13px; font-weight:700;">{t_code}</div>
-                    <div style="font-size:11px;">{price_str} ({pct_str})</div>
+                    <div style="font-size:12px; font-weight:700;">{t_code}</div>
+                    <div style="font-size:10px;">{price_str} ({pct_str})</div>
                 </div>
                 """, unsafe_allow_html=True)
                 if st.button(f"✕ Hapus", key=f"del_{t_code}", use_container_width=True):
@@ -299,6 +379,8 @@ with col_left:
 # TRADING EXECUTION PLAN & ADVANCED TOOLS
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
+    hod_val = selected_row.get("HOD", area_beli)
+    lod_val = selected_row.get("LOD", area_beli)
     market_cap_val = selected_row.get("Market Cap", "N/A")
     target_min = int(round(area_beli * 1.03))
     target_opt = int(round(area_beli * 1.05))
@@ -308,8 +390,9 @@ if selected_ticker and selected_row:
 
     with col_right:
         st.subheader(f"📊 Trading Execution Plan: {selected_ticker}")
-        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | Vol: **{selected_row.get('Volume', 'NORMAL')}**")
+        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | HOD: **Rp {hod_val:,}** | LOD: **Rp {lod_val:,}**")
 
+        # METRIC CARDS DENGAN GLOW HOVER NEON
         m1, m2, m3, m4, m5 = st.columns(5)
         with m1: st.markdown(f'<div class="metric-card"><div class="metric-label">AREA BELI</div><div class="metric-value">Rp {area_beli:,}</div></div>', unsafe_allow_html=True)
         with m2: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+3%)</div><div class="metric-value target-green">Rp {target_min:,}</div></div>', unsafe_allow_html=True)
@@ -319,7 +402,7 @@ if selected_ticker and selected_row:
         
         st.write("")
 
-        # 📊 BUYING VS SELLING PRESSURE METER (INTRADAY CANDLE ANALYSIS)
+        # 📊 BUYING VS SELLING PRESSURE METER
         try:
             intra = yf.Ticker(f"{selected_ticker}.JK").history(period="1d", interval="1m")
             if not intra.empty:
@@ -329,15 +412,20 @@ if selected_ticker and selected_row:
                 buy_pct = (buy_vol / tot_vol) * 100 if tot_vol > 0 else 50
                 sell_pct = 100 - buy_pct
                 
-                st.caption(f"📊 **Intraday Order Volume Pressure**: 🟩 Beli **{buy_pct:.1f}%** vs 🟥 Jual **{sell_pct:.1f}%**")
+                st.caption(f"📊 **Intraday Volume Pressure**: 🟩 Beli **{buy_pct:.1f}%** vs 🟥 Jual **{sell_pct:.1f}%**")
                 st.progress(int(buy_pct))
         except Exception: pass
 
-        # 🧮 KALKULATOR LOT & SIMULATOR JOURNAL
+        # 🧮 KALKULATOR LOT WITH PRESETS & SIMULATOR NET P&L
         c_calc, c_sim = st.columns(2)
         with c_calc:
             with st.expander("🧮 Position Size / Risk Calculator", expanded=False):
-                modal = st.number_input("Modal (Rp):", min_value=100000, value=10000000, step=500000)
+                preset_modal = st.radio("Preset Modal:", ["Rp 5 Jt", "Rp 10 Jt", "Rp 25 Jt", "Custom"], index=1, horizontal=True)
+                if preset_modal == "Rp 5 Jt": modal = 5000000
+                elif preset_modal == "Rp 10 Jt": modal = 10000000
+                elif preset_modal == "Rp 25 Jt": modal = 25000000
+                else: modal = st.number_input("Modal Custom (Rp):", min_value=100000, value=10000000, step=500000)
+
                 risk_p = st.slider("Maksimal Risiko (%):", 0.5, 5.0, 1.8, 0.1)
                 max_rugi = modal * (risk_p / 100)
                 rugi_lembar = area_beli - cut_loss
@@ -345,14 +433,20 @@ if selected_ticker and selected_row:
                 st.info(f"👉 Entry Recommended: **{max_lot:,} Lot** (Total: **Rp {max_lot*100*area_beli:,.0f}**)")
 
         with c_sim:
-            with st.expander("📝 Scalping Trading Journal (Simulator)", expanded=False):
+            with st.expander("📝 Scalping Journal (Net P&L - Broker Fee)", expanded=False):
                 entry_p = st.number_input("Entry Price:", value=area_beli)
                 exit_p = st.number_input("Exit Price:", value=target_min)
                 lot_cnt = st.number_input("Jumlah Lot:", value=max_lot if max_lot > 0 else 10)
+                
+                buy_val = entry_p * lot_cnt * 100
+                sell_val = exit_p * lot_cnt * 100
+                fee_buy = buy_val * 0.0015
+                fee_sell = sell_val * 0.0025
+                net_pnl = (sell_val - fee_sell) - (buy_val + fee_buy)
+
                 if st.button("💾 Simpan Trade"):
-                    pnl = (exit_p - entry_p) * lot_cnt * 100
-                    st.session_state.trade_journal.append({"Ticker": selected_ticker, "P&L": pnl})
-                    st.success(f"Disimpan! P&L: Rp {pnl:,.0f}")
+                    st.session_state.trade_journal.append({"Ticker": selected_ticker, "Net P&L": net_pnl})
+                    st.success(f"Disimpan! Net P&L (Setelah Fee): Rp {net_pnl:,.0f}")
 
         # TIMEFRAME CONTROL & CHART
         timeframe = st.radio("Pilih Timeframe Chart:", ["1m", "5m", "15m", "1d"], index=1, horizontal=True)
@@ -369,7 +463,7 @@ if selected_ticker and selected_row:
                 vwap = (intraday["Volume"] * (intraday["High"] + intraday["Low"] + intraday["Close"]) / 3).cumsum() / intraday["Volume"].cumsum()
                 fig.add_trace(go.Scatter(x=intraday.index, y=vwap, mode='lines', name='VWAP', line=dict(color='#ff2a85', width=1.5, dash='dot')))
 
-                fig.add_hline(y=target_min, line_dash="dash", line_color="#00f0ff", annotation_text=f"Target Min (+3%): {target_min}")
+                fig.add_hline(y=target_min, line_dash="dash", line_color="#00f0ff", annotation_text=f"Target (+3%): {target_min}")
                 fig.add_hline(y=cut_loss, line_dash="dash", line_color="#ff5252", annotation_text=f"Cut Loss: {cut_loss}")
 
                 fig.update_layout(
