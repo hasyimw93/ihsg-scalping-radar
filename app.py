@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (GAYA TAMPILAN PRO TRADING TERMINAL & ORDERBOOK)
+# 3. INJEKSI CUSTOM CSS (GAYA ORDERBOOK CLEAN MINIMALIS DENGAN DEPTH BAR)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -104,43 +104,43 @@ st.markdown("""
     .wl-red { background: linear-gradient(135deg, #7f1d1d, #ef4444); border: 1px solid #f87171; color: #ffffff; }
     .wl-white { background: linear-gradient(135deg, #374151, #6b7280); border: 1px solid #d1d5db; color: #ffffff; }
 
-    /* ORDERBOOK PRO STYLING (MENYERUPAI STOCKBIT/MOST DENGAN ACT & FREQ) */
-    .ob-container {
-        background: rgba(13, 6, 40, 0.85);
+    /* CLEAN ORDERBOOK LAYOUT DENGAN DEPTH BAR */
+    .ob-wrapper {
+        background: rgba(13, 6, 40, 0.9);
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 12px;
-        padding: 12px;
+        padding: 14px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
-    .ob-header-stats {
+    .ob-grid-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 8px;
         background: rgba(255, 255, 255, 0.04);
         padding: 10px;
         border-radius: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         font-size: 11px;
     }
-    .ob-table {
+    .ob-clean-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 11px;
         text-align: center;
     }
-    .ob-table th {
+    .ob-clean-table th {
         background: rgba(255, 255, 255, 0.08);
         padding: 6px;
         color: #b3a2c7;
         font-weight: 600;
     }
-    .ob-table td {
-        padding: 5px 3px;
+    .ob-clean-table td {
+        padding: 5px 4px;
         border-bottom: 1px solid rgba(255,255,255,0.03);
     }
-    .ob-bid-price { color: #00f0ff; font-weight: 700; background: rgba(0, 240, 255, 0.12); }
-    .ob-ask-price { color: #ff5252; font-weight: 700; background: rgba(255, 82, 82, 0.12); }
-    .ob-total-row {
+    .price-bid { color: #00f0ff; font-weight: 700; background: rgba(0, 240, 255, 0.12); border-radius: 4px; }
+    .price-ask { color: #ff5252; font-weight: 700; background: rgba(255, 82, 82, 0.12); border-radius: 4px; }
+    .total-row {
         background: rgba(255, 255, 255, 0.08);
         font-weight: 700;
         font-size: 12px;
@@ -195,7 +195,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>⚡ IHSG High-Potential Scalping Terminal</h1>
-    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Pro Orderbook Depth (Act & Freq) • BSJP Screener • Multi-Timeframe Chart</p>
+    <p style="color:#00f0ff; margin:0; font-size:12px;">Live Real-Time Market • Clean Orderbook Style • BSJP Screener • Multi-Timeframe Chart</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -285,7 +285,7 @@ def fetch_single_ticker_data(symbol):
             if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"🔥 BSJP ({bsjp_score}%)" if bsjp_score >= 75 else f"⚡ POTENTIAL ({bsjp_score}%)" if bsjp_score >= 50 else "⚠️ WAIT"
+            bsjp_status = f"🔥 BSJP ({bsjp_score}%)" if bsjp_score >= 75 else f"⚡ POTENTIAL ({bsjp_score}%)" if bsjp_score >= 50 else "⚠️️ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -427,7 +427,7 @@ with col_left:
             selected_ticker = st.selectbox("Pilih Saham Plan:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
-# TRADING EXECUTION PLAN & PROFESSIONAL ORDERBOOK (10 LEVELS + ACT & FREQ)
+# TRADING EXECUTION PLAN & CLEAN ORDERBOOK (DENGAN DEPTH BAR VISUAL)
 if selected_ticker and selected_row:
     area_beli = int(selected_row["Price"])
     prev_p = int(selected_row.get("Prev", area_beli))
@@ -458,19 +458,18 @@ if selected_ticker and selected_row:
         
         st.write("")
 
-        # 📖 ORDERBOOK PRO (10 LEVEL DENGAN KOLOM ACT & FREQ LENGKAP)
+        # 📖 CLEAN ORDERBOOK STYLE (DENGAN VISUALISASI DEPTH BAR)
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(10)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
         
         np.random.seed(area_beli % 1000)
-        bids_v = np.random.randint(1500, 45000, size=10)
-        asks_v = np.random.randint(1200, 38000, size=10)
-        bids_f = np.random.randint(50, 450, size=10)
-        asks_f = np.random.randint(40, 400, size=10)
-        bids_act = np.random.choice(["-", "A", "B", "AA"], size=10, p=[0.4, 0.3, 0.2, 0.1])
-        asks_act = np.random.choice(["-", "S", "SS", "B"], size=10, p=[0.4, 0.3, 0.2, 0.1])
+        bids_v = np.random.randint(1500, 75000, size=10)
+        asks_v = np.random.randint(1200, 68000, size=10)
+        bids_f = np.random.randint(50, 550, size=10)
+        asks_f = np.random.randint(40, 500, size=10)
         
+        max_v = max(max(bids_v), max(asks_v))
         sum_bid_lot = sum(bids_v)
         sum_ask_lot = sum(asks_v)
         sum_bid_freq = sum(bids_f)
@@ -478,10 +477,10 @@ if selected_ticker and selected_row:
 
         val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
 
-        with st.expander(f"📖 Pro Orderbook & Market Depth (Act & Freq): {selected_ticker}", expanded=True):
+        with st.expander(f"📖 Clean Orderbook Market Depth: {selected_ticker}", expanded=True):
             st.markdown(f"""
-            <div class="ob-container">
-                <div class="ob-header-stats">
+            <div class="ob-wrapper">
+                <div class="ob-grid-stats">
                     <div><b>Open:</b> Rp {open_p:,}</div>
                     <div><b>Prev:</b> Rp {prev_p:,}</div>
                     <div><b>Lot:</b> {tot_lot:,}</div>
@@ -492,17 +491,15 @@ if selected_ticker and selected_row:
                     <div><b>ARB:</b> Rp {arb_p:,}</div>
                     <div><b>Avg:</b> Rp {area_beli:,}</div>
                 </div>
-                <table class="ob-table">
+                <table class="ob-clean-table">
                     <thead>
                         <tr>
-                            <th>Act</th>
                             <th>Freq</th>
                             <th>Lot</th>
                             <th style="color:#00f0ff;">Bid</th>
                             <th style="color:#ff5252;">Ask</th>
                             <th>Lot</th>
                             <th>Freq</th>
-                            <th>Act</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -510,26 +507,28 @@ if selected_ticker and selected_row:
             
             ob_rows = ""
             for i in range(10):
+                # Hitung lebar bar visual depth (%)
+                bid_w = int((bids_v[i] / max_v) * 90)
+                ask_w = int((asks_v[i] / max_v) * 90)
+                
                 ob_rows += f"""
                 <tr>
-                    <td>{bids_act[i]}</td>
                     <td>{bids_f[i]}</td>
                     <td>{bids_v[i]:,}</td>
-                    <td class="ob-bid-price">Rp {bids_p[i]:,}</td>
-                    <td class="ob-ask-price">Rp {asks_p[i]:,}</td>
+                    <td class="price-bid" style="background: linear-gradient(90deg, rgba(0, 240, 255, {bids_v[i]/max_v*0.6}) {bid_w}%, rgba(0,240,255,0.08) {bid_w}%);">Rp {bids_p[i]:,}</td>
+                    <td class="price-ask" style="background: linear-gradient(270deg, rgba(255, 82, 82, {asks_v[i]/max_v*0.6}) {ask_w}%, rgba(255,82,82,0.08) {ask_w}%);">Rp {asks_p[i]:,}</td>
                     <td>{asks_v[i]:,}</td>
                     <td>{asks_f[i]}</td>
-                    <td>{asks_act[i]}</td>
                 </tr>
                 """
             
             ob_rows += f"""
-                    <tr class="ob-total-row">
-                        <td colspan="2">{sum_bid_freq:,}</td>
+                    <tr class="total-row">
+                        <td>{sum_bid_freq:,}</td>
                         <td>{sum_bid_lot:,}</td>
-                        <td colspan="2">TOTAL</td>
+                        <td colspan="2">Total</td>
                         <td>{sum_ask_lot:,}</td>
-                        <td colspan="2">{sum_ask_freq:,}</td>
+                        <td>{sum_ask_freq:,}</td>
                     </tr>
                 </tbody>
             </table>
