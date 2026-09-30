@@ -8,7 +8,7 @@ import pytz
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(
-    page_title="IHSG Scalping Terminal - Pro",
+    page_title="IHSG Scalping Terminal - Apex Monokrom",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -25,131 +25,141 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (COMPACT CHIP WATCHLIST)
+# 3. INJEKSI CUSTOM CSS (KONSEP FUTURISTIK HITAM PUTIH MINIMALIS)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
+    /* BACKGROUND UTAMA HITAM PEKAT TOTAL (BEBAS DARI WARNA UNGU) */
     .stApp {
-        background: linear-gradient(180deg, #0d0628 0%, #1a0b40 40%, #2a125c 70%, #4a228a 100%) !important;
-        color: #ffffff;
+        background-color: #000000 !important;
+        color: #f3f4f6 !important;
     }
 
-    .main-header {
-        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0, 240, 255, 0.05));
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(12px);
-        border-radius: 16px;
-        padding: 14px 20px;
-        margin-bottom: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    /* HEADER UTAMA FUTURISTIK HITAM-PUTIH */
+    .main-hero {
+        background: #0a0a0c;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 24px;
+        padding: 28px 32px;
+        margin-bottom: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
-    .main-header h1 {
+    .hero-title {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
         color: #ffffff;
-        font-weight: 700;
-        letter-spacing: 1px;
         margin: 0;
-        font-size: 22px;
+        text-transform: uppercase;
+    }
+    .hero-subtitle {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 6px;
+        letter-spacing: 0.5px;
     }
 
+    /* TOP RUNNER BAR */
     .top-runner-bar {
-        background: rgba(0, 240, 255, 0.05);
-        border: 1px solid rgba(0, 240, 255, 0.2);
-        border-radius: 8px;
-        padding: 6px 12px;
-        margin-bottom: 10px;
-        font-size: 11px;
+        background: #0a0a0c;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 10px 18px;
+        margin-bottom: 14px;
+        font-size: 12px;
+        color: #e5e7eb;
     }
 
+    /* METRIC CARDS MONOKROM */
     .metric-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
-        padding: 10px 8px;
+        background: #0a0a0c;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 12px 10px;
         text-align: center;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        transition: all 0.3s ease;
     }
-    .metric-card:hover, .metric-card:active {
-        transform: translateY(-4px) scale(1.02);
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.7), 0 0 40px rgba(0, 240, 255, 0.3) !important;
+    .metric-card:hover {
+        border-color: #ffffff;
+        transform: translateY(-2px);
     }
-
-    .metric-label { font-size: 10px; color: #b3a2c7; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-label { font-size: 10px; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
     .metric-value { font-size: 16px; font-weight: 700; color: #ffffff; }
 
-    .target-green { color: #00f0ff; text-shadow: 0 0 10px rgba(0,240,255,0.6); }
-    .target-magenta { color: #ff2a85; text-shadow: 0 0 10px rgba(255,42,133,0.6); }
-    .target-gold { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
-    .cut-loss-red { color: #ff5252; text-shadow: 0 0 10px rgba(255,82,82,0.6); }
+    .target-green { color: #34d399; }
+    .target-white { color: #ffffff; }
+    .target-gold { color: #fbbf24; }
+    .cut-loss-red { color: #f87171; }
 
-    /* COMPACT CHIP WATCHLIST (Setengah Ukuran) */
+    /* COMPACT WATCHLIST CHIPS */
     .wl-chip {
-        padding: 4px 8px;
-        border-radius: 6px;
+        padding: 6px 10px;
+        border-radius: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-size: 11px;
         font-weight: 600;
-        margin-bottom: 4px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        margin-bottom: 6px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-    .wl-green { background: linear-gradient(135deg, #0e5038, #10b981); border: 1px solid #34d399; color: #ffffff; }
-    .wl-red { background: linear-gradient(135deg, #7f1d1d, #ef4444); border: 1px solid #f87171; color: #ffffff; }
-    .wl-white { background: linear-gradient(135deg, #374151, #6b7280); border: 1px solid #d1d5db; color: #ffffff; }
+    .wl-green { background: #064e3b; border-color: #059669; color: #ecfdf5; }
+    .wl-red { background: #7f1d1d; border-color: #dc2626; color: #fef2f2; }
+    .wl-white { background: #18181b; border-color: #3f3f46; color: #f4f4f5; }
 
-    /* GLOBAL NEON HOVER & FOCUS */
+    /* GLOBAL STYLING INPUT & TOMBOL */
     .stButton > button {
-        border-radius: 8px !important;
-        transition: all 0.25s ease-in-out !important;
-        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        background-color: #18181b !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        font-weight: 600 !important;
+        transition: all 0.25s ease !important;
     }
-    .stButton > button:hover, .stButton > button:focus, .stButton > button:active {
-        border-color: #00f0ff !important;
-        color: #00f0ff !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.4) !important;
-        transform: translateY(-2px) !important;
+    .stButton > button:hover {
+        background-color: #27272a !important;
+        border-color: #ffffff !important;
+        transform: translateY(-2px);
     }
 
     div[data-baseweb="input"] {
-        border-radius: 8px !important;
-        transition: all 0.25s ease-in-out !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background-color: #0a0a0c !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
     }
-    div[data-baseweb="input"]:focus-within, div[data-baseweb="input"]:hover {
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.7), 0 0 25px rgba(0, 240, 255, 0.3) !important;
-    }
-
-    div[data-baseweb="select"]:hover, div[data-baseweb="select"]:focus-within {
-        border-color: #ff2a85 !important;
-        box-shadow: 0 0 15px rgba(255, 42, 133, 0.8), 0 0 25px rgba(255, 42, 133, 0.4) !important;
+    div[data-baseweb="input"]:focus-within {
+        border-color: #ffffff !important;
     }
 
     .stExpander {
-        border-radius: 10px !important;
+        background-color: #0a0a0c !important;
+        border-radius: 16px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        transition: all 0.3s ease !important;
-    }
-    .stExpander:hover {
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER
+# 4. HEADER BANNER UTAMA
 st.markdown("""
-<div class="main-header">
-    <h1>⚡ IHSG High-Potential Scalping Terminal</h1>
-    <p style="color:#00f0ff; margin:0; font-size:11px;">Live Real-Time Market • Compact Watchlist Chips • BSJP Screener • Multi-Timeframe Chart</p>
+<div class="main-hero">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <div style="font-size:10px; color:#9ca3af; text-transform:uppercase; letter-spacing:2px; margin-bottom:2px;">APEX MONOCHROME • FUTURISTIC TERMINAL</div>
+            <div class="hero-title">IHSG SCALPING DIMENSION</div>
+            <div class="hero-subtitle">High-Precision Market Intelligence • Orderbook Depth • AI Screener • Multi-Timeframe Analytics</div>
+        </div>
+        <div style="text-align: right; background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:9px; color:#9ca3af;">BURSA EFEK INDONESIA</div>
+            <div style="font-size:13px; font-weight:700; color:#34d399;">● LIVE ACTIVE</div>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -238,7 +248,7 @@ def fetch_single_ticker_data(symbol):
             if vol_spike == "⚡ SPIKE": bsjp_score += 25
             if current_price > ma5: bsjp_score += 25
 
-            bsjp_status = f"🔥 BSJP ({bsjp_score}%)" if bsjp_score >= 75 else f"⚡ POTENTIAL ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"🔥 AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚡ POTENTIAL ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -268,7 +278,7 @@ def fetch_single_ticker_data(symbol):
                 "BSJP Status": bsjp_status,
                 "BSJP Score": bsjp_score
             }
-    except Exception: return None
+    except Exception: None
     return None
 
 @st.cache_data(ttl=15)
@@ -280,31 +290,30 @@ def fetch_live_market_data(ticker_list):
     return pd.DataFrame(results)
 
 # FETCH DATA MARKET LIVE
-with st.spinner("Mengambil data pasar..."):
+with st.spinner("Sinkronisasi data pasar..."):
     df_master = fetch_live_market_data(st.session_state.custom_watchlist)
 
 # 5. TOP RUNNERS QUICK-BAR
 if not df_master.empty:
     top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
-    bsjp_text = " | ".join([f"🔥 **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
-    st.markdown(f'<div class="top-runner-bar">🚀 <b>Screener Calon Naik Besok (BSJP Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+    bsjp_text = " | ".join([f"⚡ **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
+    st.markdown(f'<div class="top-runner-bar">🚀 <b>Apex Monochrome Screener (Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
-# 6. COMPACT WATCHLIST MANAGEMENT (TAMBAH & HAPUS INTERAKTIF)
-with st.expander("📌 Custom Watchlist Management (Compact Chips)", expanded=True):
+# 6. COMPACT WATCHLIST MANAGEMENT
+with st.expander("📌 Custom Watchlist Management (Monochrome Minimalist)", expanded=True):
     col_input, col_btn = st.columns([3, 1], gap="small")
     with col_input:
         new_ticker = st.text_input("Tambah Ticker Baru:", placeholder="Ketik kode saham (contoh: GOTO, BUKA, BBRI)").strip().upper()
     with col_btn:
-        st.write("") # Spasi penyeimbang
+        st.write("")
         if st.button("➕ Tambah", use_container_width=True):
             if new_ticker and new_ticker not in st.session_state.custom_watchlist:
                 st.session_state.custom_watchlist.append(new_ticker)
                 st.rerun()
 
     st.markdown("---")
-    st.caption("Daftar Ticker Watchlist Aktif (Klik tombol ✕ untuk menghapus ticker):")
+    st.caption("Daftar Ticker Watchlist Aktif (Klik ✕ untuk menghapus):")
     
-    # Menampilkan chip watchlist dengan tombol hapus (diatur 5 kolom per baris)
     cols_chips = st.columns(5)
     tickers_to_remove = []
 
@@ -328,7 +337,7 @@ with st.expander("📌 Custom Watchlist Management (Compact Chips)", expanded=Tr
                 <span><b>{t_code}</b> ({price_str} | {pct_str})</span>
             </div>
             """, unsafe_allow_html=True)
-            if st.button(f"✕ Hapus {t_code}", key=f"del_chip_{t_code}", use_container_width=True):
+            if st.button(f"✕ {t_code}", key=f"del_chip_{t_code}", use_container_width=True):
                 tickers_to_remove.append(t_code)
 
     if tickers_to_remove:
@@ -340,9 +349,9 @@ with st.expander("📌 Custom Watchlist Management (Compact Chips)", expanded=Tr
 # 7. FILTER & PENCARIAN
 c_filter, c_search = st.columns([1.5, 1], gap="medium")
 with c_filter:
-    kategori_harga = st.selectbox("📌 Filter Harga:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
+    kategori_harga = st.selectbox("📌 Filter Rentang Harga:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
 with c_search:
-    search_input = st.text_input("🔍 Cari Ticker Universal:", placeholder="Contoh: UNVR, ITMG").strip().upper()
+    search_input = st.text_input("🔍 Universal Search Ticker:", placeholder="Contoh: UNVR, ITMG").strip().upper()
 
 # FILTERING DATA
 df_filtered = df_master.copy() if not df_master.empty else pd.DataFrame()
@@ -356,14 +365,14 @@ if not df_filtered.empty:
 
     df_filtered["Target Min (+3%)"] = (df_filtered["Price"] * 1.03).round().astype(int)
 
-# 8. LAYOUT UTAMA (KIRI & KANAN SEJAJAR SEMPURNA SAMPAI BAWAH)
+# 8. LAYOUT UTAMA
 col_left, col_right = st.columns([1.4, 1.6], gap="medium")
 
 selected_row = None
 selected_ticker = None
 
 with col_left:
-    st.subheader("🎯 Watchlist Radar & BSJP Skenario")
+    st.subheader("🎯 Watchlist Radar & AI Skenario")
     if not df_filtered.empty:
         st.dataframe(
             df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
@@ -381,7 +390,7 @@ with col_left:
             selected_row = custom_data
     else:
         if ticker_options:
-            selected_ticker = st.selectbox("Pilih Saham Plan:", ticker_options, index=0)
+            selected_ticker = st.selectbox("Pilih Saham Target Analisa:", ticker_options, index=0)
             selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
 # TRADING EXECUTION PLAN & COLORED COMPACT ORDERBOOK (5 LEVELS)
@@ -402,20 +411,20 @@ if selected_ticker and selected_row:
     cut_loss = int(round(area_beli * 0.982))
 
     with col_right:
-        st.subheader(f"📊 Trading Execution Plan: {selected_ticker}")
-        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | BSJP: **{selected_row.get('BSJP Status', 'N/A')}**")
+        st.subheader(f"📊 Apex Execution Plan: {selected_ticker}")
+        st.caption(f"Cap: **{market_cap_val}** | Signal: **{selected_row.get('Signal', 'N/A')}** | AI Status: **{selected_row.get('BSJP Status', 'N/A')}**")
 
         # METRIC CARDS
         m1, m2, m3, m4, m5 = st.columns(5)
         with m1: st.markdown(f'<div class="metric-card"><div class="metric-label">AREA BELI</div><div class="metric-value">Rp {area_beli:,}</div></div>', unsafe_allow_html=True)
         with m2: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+3%)</div><div class="metric-value target-green">Rp {target_min:,}</div></div>', unsafe_allow_html=True)
-        with m3: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+5%)</div><div class="metric-value target-magenta">Rp {target_opt:,}</div></div>', unsafe_allow_html=True)
+        with m3: st.markdown(f'<div class="metric-card"><div class="metric-label">TARGET (+5%)</div><div class="metric-value target-white">Rp {target_opt:,}</div></div>', unsafe_allow_html=True)
         with m4: st.markdown(f'<div class="metric-card"><div class="metric-label">ARA</div><div class="metric-value target-gold">Rp {ara_p:,}</div></div>', unsafe_allow_html=True)
         with m5: st.markdown(f'<div class="metric-card"><div class="metric-label">CUT LOSS</div><div class="metric-value cut-loss-red">Rp {cut_loss:,}</div></div>', unsafe_allow_html=True)
         
         st.write("")
 
-        # 📖 ORDERBOOK MARKET DEPTH (STYLING AMAN & BERSIH)
+        # 📖 ORDERBOOK MARKET DEPTH
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(5)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(5)]
@@ -434,9 +443,9 @@ if selected_ticker and selected_row:
 
         with st.expander(f"📖 Orderbook Market Depth: {selected_ticker}", expanded=True):
             c1, c2, c3 = st.columns(3)
-            with c1: st.markdown(f"<font size='2'>Open: <b>Rp {open_p:,}</b><br>High: <b>Rp {high_p:,}</b><br>Low: <b>Rp {low_p:,}</b></font>", unsafe_allow_html=True)
-            with c2: st.markdown(f"<font size='2'>Prev: <b>Rp {prev_p:,}</b><br>ARA: <b>Rp {ara_p:,}</b><br>ARB: <b>Rp {arb_p:,}</b></font>", unsafe_allow_html=True)
-            with c3: st.markdown(f"<font size='2'>Lot: <b>{tot_lot:,}</b><br>Val: <b>{val_str}</b><br>Avg: <b>Rp {area_beli:,}</b></font>", unsafe_allow_html=True)
+            with c1: st.markdown(f"<font size='2' color='#9ca3af'>Open: <b>Rp {open_p:,}</b><br>High: <b>Rp {high_p:,}</b><br>Low: <b>Rp {low_p:,}</b></font>", unsafe_allow_html=True)
+            with c2: st.markdown(f"<font size='2' color='#9ca3af'>Prev: <b>Rp {prev_p:,}</b><br>ARA: <b>Rp {ara_p:,}</b><br>ARB: <b>Rp {arb_p:,}</b></font>", unsafe_allow_html=True)
+            with c3: st.markdown(f"<font size='2' color='#9ca3af'>Lot: <b>{tot_lot:,}</b><br>Val: <b>{val_str}</b><br>Avg: <b>Rp {area_beli:,}</b></font>", unsafe_allow_html=True)
             
             st.divider()
 
@@ -454,7 +463,7 @@ if selected_ticker and selected_row:
             df_ob = pd.DataFrame(ob_data)
             
             def highlight_bid_ask(s):
-                return ['color: #00f0ff; font-weight: bold;' if col == 'Bid' else ('color: #ff5252; font-weight: bold;' if col == 'Ask' else '') for col in s.index]
+                return ['color: #34d399; font-weight: bold;' if col == 'Bid' else ('color: #f87171; font-weight: bold;' if col == 'Ask' else '') for col in s.index]
 
             st.dataframe(
                 df_ob.style.apply(highlight_bid_ask, axis=1),
@@ -481,7 +490,7 @@ if selected_ticker and selected_row:
                 st.info(f"👉 Entry Recommended: **{max_lot:,} Lot** (Total: **Rp {max_lot*100*area_beli:,.0f}**)")
 
         with c_sim:
-            with st.expander("📝 Scalping Journal (Net P&L - Broker Fee)", expanded=False):
+            with st.expander("📝 Scalping Journal (Net P&L - Fee)", expanded=False):
                 entry_p = st.number_input("Entry Price:", value=area_beli)
                 exit_p = st.number_input("Exit Price:", value=target_min)
                 lot_cnt = st.number_input("Jumlah Lot:", value=max_lot if max_lot > 0 else 10)
@@ -494,7 +503,7 @@ if selected_ticker and selected_row:
 
                 if st.button("💾 Simpan Trade"):
                     st.session_state.trade_journal.append({"Ticker": selected_ticker, "Net P&L": net_pnl})
-                    st.success(f"Disimpan! Net P&L (Setelah Fee): Rp {net_pnl:,.0f}")
+                    st.success(f"Disimpan! Net P&L: Rp {net_pnl:,.0f}")
 
         # TIMEFRAME CONTROL & CHART
         timeframe = st.radio("Pilih Timeframe Chart:", ["1m", "5m", "15m", "1d"], index=1, horizontal=True)
@@ -506,21 +515,21 @@ if selected_ticker and selected_row:
             
             if not intraday.empty:
                 fig = go.Figure()
-                fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#00f0ff', width=2)))
+                fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#ffffff', width=2)))
                 
                 vwap = (intraday["Volume"] * (intraday["High"] + intraday["Low"] + intraday["Close"]) / 3).cumsum() / intraday["Volume"].cumsum()
-                fig.add_trace(go.Scatter(x=intraday.index, y=vwap, mode='lines', name='VWAP', line=dict(color='#ff2a85', width=1.5, dash='dot')))
+                fig.add_trace(go.Scatter(x=intraday.index, y=vwap, mode='lines', name='VWAP', line=dict(color='#34d399', width=1.5, dash='dot')))
 
-                fig.add_hline(y=target_min, line_dash="dash", line_color="#00f0ff", annotation_text=f"Target (+3%): {target_min}")
-                fig.add_hline(y=cut_loss, line_dash="dash", line_color="#ff5252", annotation_text=f"Cut Loss: {cut_loss}")
+                fig.add_hline(y=target_min, line_dash="dash", line_color="#34d399", annotation_text=f"Target (+3%): {target_min}")
+                fig.add_hline(y=cut_loss, line_dash="dash", line_color="#f87171", annotation_text=f"Cut Loss: {cut_loss}")
 
                 fig.update_layout(
                     paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(13, 6, 40, 0.5)',
+                    plot_bgcolor='rgba(10, 10, 12, 0.9)',
                     margin=dict(l=10, r=10, t=10, b=10),
                     height=280,
-                    xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#b3a2c7'),
-                    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#b3a2c7'),
+                    xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#9ca3af'),
+                    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#9ca3af'),
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="#ffffff"))
                 )
                 st.plotly_chart(fig, use_container_width=True)
