@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (WARNA HIJAU/MERAH NEON PADA ORDERBOOK & ELEMEN)
+# 3. INJEKSI CUSTOM CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
@@ -410,7 +410,7 @@ if selected_ticker and selected_row:
         
         st.write("")
 
-        # 📖 COLORED COMPACT ORDERBOOK (5 LEVEL DENGAN WARNA HIJAU/MERAH)
+        # 📖 ORDERBOOK MARKET DEPTH (STYLING AMAN & BERSIH)
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(5)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(5)]
@@ -428,7 +428,6 @@ if selected_ticker and selected_row:
         val_str = f"{tot_val / 1e9:.2f}B" if tot_val >= 1e9 else f"{tot_val / 1e6:.2f}M"
 
         with st.expander(f"📖 Orderbook Market Depth: {selected_ticker}", expanded=True):
-            # STATS RINGKAS
             c1, c2, c3 = st.columns(3)
             with c1: st.markdown(f"<font size='2'>Open: <b>Rp {open_p:,}</b><br>High: <b>Rp {high_p:,}</b><br>Low: <b>Rp {low_p:,}</b></font>", unsafe_allow_html=True)
             with c2: st.markdown(f"<font size='2'>Prev: <b>Rp {prev_p:,}</b><br>ARA: <b>Rp {ara_p:,}</b><br>ARB: <b>Rp {arb_p:,}</b></font>", unsafe_allow_html=True)
@@ -436,30 +435,25 @@ if selected_ticker and selected_row:
             
             st.divider()
 
-            # RENDER TABEL ORDERBOOK DENGAN WARNA (HIJAU UNTUK BID & MERAH UNTUK ASK)
             ob_data = []
             for i in range(5):
                 ob_data.append({
                     "Freq (B)": bids_f[i],
                     "Lot (B)": f"{bids_v[i]:,}",
-                    "🟢 Bid": f"Rp {bids_p[i]:,}",
-                    "🔴 Ask": f"Rp {asks_p[i]:,}",
+                    "Bid": f"Rp {bids_p[i]:,}",
+                    "Ask": f"Rp {asks_p[i]:,}",
                     "Lot (A)": f"{asks_v[i]:,}",
                     "Freq (A)": asks_f[i]
                 })
             
             df_ob = pd.DataFrame(ob_data)
             
-            # Styling dataframe agar kolom Bid bernuansa hijau dan Ask bernuansa merah
-            def color_orderbook(val):
-                if isinstance(val, str) and "Rp" in val:
-                    if "Bid" in val or val.startswith("Rp"): # Cek konteks bid/ask
-                        pass
-                return ''
+            # Styling aman tanpa error
+            def highlight_bid_ask(s):
+                return ['color: #00f0ff; font-weight: bold;' if col == 'Bid' else ('color: #ff5252; font-weight: bold;' if col == 'Ask' else '') for col in s.index]
 
             st.dataframe(
-                df_ob.style.applymap(lambda x: 'color: #00f0ff; font-weight: bold;' if str(x).startswith('Rp') and list(df_ob.columns)[df_ob.isin([x]).any()].any() == '🟢 Bid' else '', subset=['🟢 Bid'])
-                           .applymap(lambda x: 'color: #ff5252; font-weight: bold;', subset=['🔴 Ask']),
+                df_ob.style.apply(highlight_bid_ask, axis=1),
                 use_container_width=True, 
                 hide_index=True
             )
