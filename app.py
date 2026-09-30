@@ -8,7 +8,7 @@ import pytz
 
 # 1. KONFIGURASI HALAMAN
 st.set_page_config(
-    page_title="IHSG Scalping Terminal - Apex Monokrom",
+    page_title="IHSG Scalping Terminal - Monochrome Apex",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (KONSEP FUTURISTIK HITAM PUTIH MINIMALIS)
+# 3. INJEKSI CUSTOM CSS (GAYA DUAL-TONE PUTIH & HITAM PEKAT ELEGAN)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -34,55 +34,66 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* BACKGROUND UTAMA HITAM PEKAT TOTAL (BEBAS DARI WARNA UNGU) */
+    /* BACKGROUND UTAMA PUTIH BERSIH (LIGHT BASE) */
     .stApp {
-        background-color: #000000 !important;
-        color: #f3f4f6 !important;
+        background-color: #f4f4f6 !important;
+        color: #111113 !important;
     }
 
-    /* HEADER UTAMA FUTURISTIK HITAM-PUTIH */
-    .main-hero {
-        background: #0a0a0c;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+    /* HEADER UTAMA DENGAN LATAR PUTIH & BORDER HALUS */
+    .main-hero-light {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
         border-radius: 24px;
         padding: 28px 32px;
         margin-bottom: 16px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     }
-    .hero-title {
+    .hero-title-dark {
         font-size: 28px;
         font-weight: 800;
         letter-spacing: -0.5px;
-        color: #ffffff;
+        color: #000000;
         margin: 0;
         text-transform: uppercase;
     }
-    .hero-subtitle {
+    .hero-subtitle-dark {
         font-size: 12px;
-        color: #9ca3af;
+        color: #6b7280;
         margin-top: 6px;
         letter-spacing: 0.5px;
     }
 
+    /* CONTAINER UTAMA BERLATAR BELAKANG HITAM PEKAT MELENGKUNG (KONTRAS TINGGI) */
+    .dark-terminal-card {
+        background: #0a0a0c;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        color: #f3f4f6;
+    }
+
     /* TOP RUNNER BAR */
     .top-runner-bar {
-        background: #0a0a0c;
+        background: #121216;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 14px;
         padding: 10px 18px;
         margin-bottom: 14px;
         font-size: 12px;
-        color: #e5e7eb;
+        color: #d1d5db;
     }
 
-    /* METRIC CARDS MONOKROM */
+    /* METRIC CARDS HITAM ELEGAN */
     .metric-card {
-        background: #0a0a0c;
+        background: #121216;
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 16px;
         padding: 12px 10px;
         text-align: center;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         transition: all 0.3s ease;
     }
     .metric-card:hover {
@@ -108,7 +119,7 @@ st.markdown("""
         font-weight: 600;
         margin-bottom: 6px;
         border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .wl-green { background: #064e3b; border-color: #059669; color: #ecfdf5; }
     .wl-red { background: #7f1d1d; border-color: #dc2626; color: #fef2f2; }
@@ -130,7 +141,7 @@ st.markdown("""
     }
 
     div[data-baseweb="input"] {
-        background-color: #0a0a0c !important;
+        background-color: #121216 !important;
         border-radius: 12px !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
     }
@@ -139,25 +150,26 @@ st.markdown("""
     }
 
     .stExpander {
-        background-color: #0a0a0c !important;
+        background-color: #121216 !important;
         border-radius: 16px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 4. HEADER BANNER UTAMA
+# 4. HEADER BANNER UTAMA (GAYA LIGHT MODE BERSIH DI ATAS)
 st.markdown("""
-<div class="main-hero">
+<div class="main-hero-light">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <div style="font-size:10px; color:#9ca3af; text-transform:uppercase; letter-spacing:2px; margin-bottom:2px;">APEX MONOCHROME • FUTURISTIC TERMINAL</div>
-            <div class="hero-title">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle">High-Precision Market Intelligence • Orderbook Depth • AI Screener • Multi-Timeframe Analytics</div>
+            <div style="font-size:10px; color:#4b5563; text-transform:uppercase; letter-spacing:2px; margin-bottom:2px; font-weight:700;">APEX DUAL-TONE • MONOCHROME TERMINAL</div>
+            <div class="hero-title-dark">IHSG SCALPING DIMENSION</div>
+            <div class="hero-subtitle-dark">High-Precision Market Intelligence • Orderbook Depth • AI Screener • Multi-Timeframe Analytics</div>
         </div>
-        <div style="text-align: right; background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-            <div style="font-size:9px; color:#9ca3af;">BURSA EFEK INDONESIA</div>
-            <div style="font-size:13px; font-weight:700; color:#34d399;">● LIVE ACTIVE</div>
+        <div style="text-align: right; background: #f3f4f6; padding: 8px 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);">
+            <div style="font-size:9px; color:#4b5563; font-weight:700;">BURSA EFEK INDONESIA</div>
+            <div style="font-size:13px; font-weight:700; color:#059669;">● LIVE ACTIVE</div>
         </div>
     </div>
 </div>
@@ -289,6 +301,9 @@ def fetch_live_market_data(ticker_list):
         if data: results.append(data)
     return pd.DataFrame(results)
 
+# KONTTAINER UTAMA BERBALUT KARTU HITAM PEKAT DI BAWAH (MENYERUPAI REFERENSI)
+st.markdown('<div class="dark-terminal-card">', unsafe_allow_html=True)
+
 # FETCH DATA MARKET LIVE
 with st.spinner("Sinkronisasi data pasar..."):
     df_master = fetch_live_market_data(st.session_state.custom_watchlist)
@@ -297,10 +312,10 @@ with st.spinner("Sinkronisasi data pasar..."):
 if not df_master.empty:
     top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
     bsjp_text = " | ".join([f"⚡ **{row['Ticker']}**: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
-    st.markdown(f'<div class="top-runner-bar">🚀 <b>Apex Monochrome Screener (Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="top-runner-bar">🚀 <b>Apex Dual-Tone Screener (Top Radar)</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
 # 6. COMPACT WATCHLIST MANAGEMENT
-with st.expander("📌 Custom Watchlist Management (Monochrome Minimalist)", expanded=True):
+with st.expander("📌 Custom Watchlist Management (Dual-Tone Minimalist)", expanded=True):
     col_input, col_btn = st.columns([3, 1], gap="small")
     with col_input:
         new_ticker = st.text_input("Tambah Ticker Baru:", placeholder="Ketik kode saham (contoh: GOTO, BUKA, BBRI)").strip().upper()
@@ -525,7 +540,7 @@ if selected_ticker and selected_row:
 
                 fig.update_layout(
                     paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(10, 10, 12, 0.9)',
+                    plot_bgcolor='rgba(18, 18, 22, 0.9)',
                     margin=dict(l=10, r=10, t=10, b=10),
                     height=280,
                     xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#9ca3af'),
@@ -537,3 +552,6 @@ if selected_ticker and selected_row:
                 st.info("Data grafik tidak tersedia saat bursa tutup.")
         except Exception:
             st.warning("Gagal memuat grafik intraday.")
+
+# Tutup kontainer hitam terminal di bawah
+st.markdown('</div>', unsafe_allow_html=True)
