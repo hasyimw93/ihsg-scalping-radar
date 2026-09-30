@@ -25,7 +25,7 @@ if is_bursa_open:
     except Exception:
         pass
 
-# 3. INJEKSI CUSTOM CSS (FIX LEBAR TABEL ORDERBOOK DI PC)
+# 3. INJEKSI CUSTOM CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -82,12 +82,6 @@ st.markdown("""
         color: #cbd5e1;
     }
 
-    /* MEMAKSA TABEL ORDERBOOK MEMENUHI LEBAR KONTainer */
-    .desktop-orderbook-table {
-        width: 100% !important;
-        table-layout: fixed !important;
-    }
-
     .stButton > button {
         background-color: #1d4ed8 !important;
         color: #ffffff !important;
@@ -123,7 +117,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-ajaib">IHSG SCALPING DIMENSION</div>
-            <div class="hero-subtitle-ajaib">Institutional Intelligence • Full-Width Orderbook • Execution Plan</div>
+            <div class="hero-subtitle-ajaib">Institutional Intelligence • Perfect Desktop Orderbook • Execution Plan</div>
         </div>
         <div style="text-align: right; background: #070d1a; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="font-size:9px; color:#94a3b8; font-weight:700;">BEI REALTIME</div>
@@ -485,7 +479,7 @@ if selected_ticker and selected_row:
         </div>
         """, unsafe_allow_html=True)
 
-        # 🖥️ FULL-WIDTH RESPONSIVE ORDERBOOK (MENGGUNAKAN KELAS CSS KHUSUS)
+        # 🖥️ 📱 ORDERBOOK SEMPURNA (MERENDER KESELURUHAN TABEL DALAM 1 BLOK HTML UTUH)
         fraksi = hitung_fraksi_harga(area_beli)
         bids_p = [area_beli - (i * fraksi) for i in range(10)]
         asks_p = [area_beli + ((i + 1) * fraksi) for i in range(10)]
@@ -501,39 +495,39 @@ if selected_ticker and selected_row:
         sum_bid_freq = sum(bids_f)
         sum_ask_freq = sum(asks_f)
 
-        st.markdown(f"""
-        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px;">
-            <table class="desktop-orderbook-table" style="font-size: 11px; color: #e2e8f0; text-align: center; border-collapse: collapse;">
+        # Membangun string baris HTML tabel
+        table_rows_html = ""
+        for i in range(10):
+            ask_c = "#34d399" if i < 2 else "#f87171"
+            table_rows_html += f"""
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <td style="padding: 7px; text-align: left; color: #94a3b8; width: 12%;">{bids_f[i]}</td>
+                <td style="padding: 7px; text-align: right; font-weight: 500; width: 23%;">{bids_v[i]:,}</td>
+                <td style="padding: 7px; color: #f87171; font-weight: 700; width: 15%;">Rp {bids_p[i]:,}</td>
+                <td style="padding: 7px; color: {ask_c}; font-weight: 700; width: 15%;">Rp {asks_p[i]:,}</td>
+                <td style="padding: 7px; text-align: left; font-weight: 500; width: 23%;">{asks_v[i]:,}</td>
+                <td style="padding: 7px; text-align: right; color: #94a3b8; width: 12%;">{asks_f[i]}</td>
+            </tr>
+            """
+
+        full_orderbook_html = f"""
+        <div style="background: #070d1a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px; width: 100%;">
+            <table style="width: 100%; font-size: 11px; color: #e2e8f0; text-align: center; border-collapse: collapse; table-layout: fixed;">
                 <thead>
                     <tr style="color: #94a3b8; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08);">
-                        <th style="padding: 6px; width: 12%; text-align: left;">FREQ</th>
-                        <th style="padding: 6px; width: 23%; text-align: right;">LOT BID</th>
-                        <th style="padding: 6px; width: 15%; color: #f87171;">BID</th>
-                        <th style="padding: 6px; width: 15%; color: #34d399;">ASK</th>
-                        <th style="padding: 6px; width: 23%; text-align: left;">LOT ASK</th>
-                        <th style="padding: 6px; width: 12%; text-align: right;">FREQ</th>
+                        <th style="padding: 8px; width: 12%; text-align: left;">FREQ</th>
+                        <th style="padding: 8px; width: 23%; text-align: right;">LOT BID</th>
+                        <th style="padding: 8px; width: 15%; color: #f87171;">BID</th>
+                        <th style="padding: 8px; width: 15%; color: #34d399;">ASK</th>
+                        <th style="padding: 8px; width: 23%; text-align: left;">LOT ASK</th>
+                        <th style="padding: 8px; width: 12%; text-align: right;">FREQ</th>
                     </tr>
                 </thead>
                 <tbody>
-        """, unsafe_allow_html=True)
-
-        for i in range(10):
-            ask_c = "#34d399" if i < 2 else "#f87171"
-            st.markdown(f"""
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
-                        <td style="padding: 6px; text-align: left; color: #94a3b8;">{bids_f[i]}</td>
-                        <td style="padding: 6px; text-align: right; font-weight: 500;">{bids_v[i]:,}</td>
-                        <td style="padding: 6px; color: #f87171; font-weight: 700;">Rp {bids_p[i]:,}</td>
-                        <td style="padding: 6px; color: {ask_c}; font-weight: 700;">Rp {asks_p[i]:,}</td>
-                        <td style="padding: 6px; text-align: left; font-weight: 500;">{asks_v[i]:,}</td>
-                        <td style="padding: 6px; text-align: right; color: #94a3b8;">{asks_f[i]}</td>
-                    </tr>
-            """, unsafe_allow_html=True)
-
-        st.markdown(f"""
+                    {table_rows_html}
                 </tbody>
             </table>
-            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px;">
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; margin-top: 8px; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; padding-left: 4px; padding-right: 4px;">
                 <span style="color: #94a3b8;">{sum_bid_freq:,}</span>
                 <span style="color: #f87171;">{sum_bid_lot:,} Lot</span>
                 <span style="color: #ffffff;">TOTAL</span>
@@ -541,8 +535,9 @@ if selected_ticker and selected_row:
                 <span style="color: #94a3b8;">{sum_ask_freq:,}</span>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
 
+        st.markdown(full_orderbook_html, unsafe_allow_html=True)
         st.write("")
 
         # ORDER BOOK PRESSURE POWER METER
