@@ -148,27 +148,13 @@ with tab_col3:
 
 st.write("")
 
-# MASTER UNIVERSE IHSG DIPERLUAS SECARA MASIF (MENCAKUP RATUSAN EMITEN DARI BERBAGAI RENTANG HARGA)
+# MASTER UNIVERSE DIOPTIMALKAN (HANYA EMITEN PALING LIKUID & BERPOTENSI MOMENTUM TINGGI)
 if 'master_universe' not in st.session_state:
     st.session_state.master_universe = [
-        # Perbankan & Finansial
-        "BBCA", "BBRI", "BMRI", "BBNI", "ARTO", "BRIS", "NISP", "BBTN", "BDMN", "BNGA", "PNBN", "AGRO", "BBYB", "BABP", "NOBU",
-        # Energi & Batubara
-        "ADRO", "PTBA", "ITMG", "HRUM", "BUMI", "DEWA", "ENRG", "ADMR", "CUAN", "TOBA", "INDY", "DOID", "FIRE", "GTSI", "BIPI",
-        # Infrastruktur, Telekomunikasi & Teknologi
-        "TLKM", "ISAT", "EXCL", "FREN", "GOTO", "BUKA", "MTDL", "EDGE", "MLIA", "CENT", "GHON", "TBIG", "TOWR", "META",
-        # Konsumer & Ritel
-        "ICBP", "INDF", "UNVR", "MYOR", "AMRT", "ACES", "MAPI", "MAPA", "ERAA", "MIDI", "CLEO", "CMRy", "WOOD", "HOKI", "GOOD",
-        # Properti & Konstruksi
-        "BSDE", "CTRA", "PWON", "SMRA", "ASRI", "APLN", "JRPT", "PTPP", "WIKA", "ADHI", "WSKT", "PPRO", "DILD", "OMRE", "KIJA",
-        # Otomotif & Manufaktur
-        "ASII", "AUTO", "IMAS", "SMSM", "INDS", "GJTL", "SRIL", "KBLI", "VOKS", "POLY",
-        # Bahan Baku, Kimia & Logam
-        "TPIA", "BRPT", "INKP", "TKIM", "ANTM", "MDKA", "INCO", "MBMA", "HRUM", "NCKL", "ANTM", "PSAB", "ARCI", "AMMN", "BRMS",
-        # Kesehatan & Farmasi
-        "KLBF", "MIKA", "SILO", "HEAL", "DVLA", "KAEF", "MERK", "PYFA", "SIDO", "PRDA",
-        # Transportasi & Lainnya
-        "GIAA", "ASSA", "BIRD", "SMDR", "IPCM", "TMAS", "WINS", "SHIP", "PANI", "JARR", "TEBE"
+        "BBCA", "BBRI", "BMRI", "BBNI", "ASII", "UNTR", "ADRO", "MDKA", "PTBA", "INCO",
+        "TLKM", "GOTO", "ARTO", "BRIS", "CPIN", "INDF", "ICBP", "ANTM", "HRUM", "PGAS",
+        "AKRA", "MEDC", "ELSA", "ESSA", "ERAA", "CUAN", "BUMI", "DEWA", "ENRG", "TEBE",
+        "PANI", "AMMN", "BRMS", "TOBA", "BUKA", "ACES", "MAPI", "INKP", "TKIM", "JARR"
     ]
 
 if 'trade_journal' not in st.session_state:
@@ -187,7 +173,7 @@ ESTIMATED_SHARES = {
     "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000,
     "BBRI": 151596000000, "BBNI": 37253000000, "PTBA": 11520000000, "INCO": 9933000000,
     "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000, "DEWA": 131230000000,
-    "ENRG": 25100000000, "FREN": 325000000000, "BUKA": 103000000000, "ADRO": 31985000000
+    "ENRG": 25100000000, "BUKA": 103000000000, "ADRO": 31985000000
 }
 
 def hitung_fraksi_harga(price):
@@ -215,6 +201,7 @@ def hitung_rsi(series, period=14):
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
+@st.cache_data(ttl=60)
 def fetch_single_ticker_data(symbol):
     try:
         clean_symbol = symbol.strip().upper()
@@ -295,9 +282,9 @@ def fetch_single_ticker_data(symbol):
     return None
 
 @st.cache_data(ttl=30)
-def fetch_live_market_data(ticker_list):
+def fetch_live_market_data(tuple_tickers):
     results = []
-    for symbol in ticker_list:
+    for symbol in tuple_tickers:
         data = fetch_single_ticker_data(symbol)
         if data: results.append(data)
     return pd.DataFrame(results)
@@ -338,8 +325,8 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("---")
 
-    with st.spinner("Memindai seluruh bursa dan menyinkronkan data pasar..."):
-        df_master = fetch_live_market_data(st.session_state.master_universe)
+    with st.spinner("Memindai emiten potensial berkecepatan tinggi..."):
+        df_master = fetch_live_market_data(tuple(st.session_state.master_universe))
 
     if not df_master.empty:
         top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
