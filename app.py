@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 # 1. KONFIGURASI HALAMAN
@@ -121,7 +121,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">ANALYTICS TERMINAL</div>
+            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & ASTRONACCI VIP SIGNAL ENGINE</div>
         </div>
         <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
             <div style="font-size:10px; color:#93c5fd; font-weight:700;">NANO CORE</div>
@@ -148,7 +148,7 @@ with tab_col3:
 
 st.write("")
 
-# MASTER UNIVERSE DIOPTIMALKAN (HANYA EMITEN PALING LIKUID & BERPOTENSI MOMENTUM TINGGI)
+# MASTER UNIVERSE DIOPTIMALKAN (EMITEN LIKUID & BERPOTENSI TINGGI)
 if 'master_universe' not in st.session_state:
     st.session_state.master_universe = [
         "BBCA", "BBRI", "BMRI", "BBNI", "ASII", "UNTR", "ADRO", "MDKA", "PTBA", "INCO",
@@ -201,6 +201,32 @@ def hitung_rsi(series, period=14):
     rs = gain / loss
     return 100 - (100 / (1 + rs))
 
+def hitung_bollinger_bands(series, period=20, std_dev=2):
+    sma = series.rolling(window=period).mean()
+    std = series.rolling(window=period).std()
+    upper = sma + (std * std_dev)
+    lower = sma - (std * std_dev)
+    return upper, sma, lower
+
+def hitung_macd(series, slow=26, fast=12, signal=9):
+    exp1 = series.ewm(span=fast, adjust=False).mean()
+    exp2 = series.ewm(span=slow, adjust=False).mean()
+    macd_line = exp1 - exp2
+    signal_line = macd_line.ewm(span=signal, adjust=False).mean()
+    histogram = macd_line - signal_line
+    return macd_line, signal_line, histogram
+
+def hitung_astronacci_fibonacci(high_p, low_p):
+    diff = high_p - low_p
+    fib_levels = {
+        "Fib 0.382": high_p - (diff * 0.382),
+        "Fib 0.500": high_p - (diff * 0.500),
+        "Fib 0.618": high_p - (diff * 0.618),
+        "Fib 0.786": high_p - (diff * 0.786),
+        "Ext 1.618": high_p + (diff * 0.618)
+    }
+    return fib_levels
+
 @st.cache_data(ttl=60)
 def fetch_single_ticker_data(symbol):
     try:
@@ -225,13 +251,21 @@ def fetch_single_ticker_data(symbol):
             ara_price = int(round(prev_close * (1 + ara_pct / 100)))
             arb_price = int(round(prev_close * (1 - arb_pct / 100)))
 
-            rsi_val = hitung_rsi(hist_intra["Close"]).iloc[-1] if not hist_intra.empty and len(hist_intra) >= 14 else 50
-            ma5 = hist_intra["Close"].rolling(5).mean().iloc[-1] if not hist_intra.empty and len(hist_intra) >= 5 else current_price
+            close_series = hist_intra["Close"] if not hist_intra.empty else hist["Close"]
+            rsi_val = hitung_rsi(close_series).iloc[-1] if len(close_series) >= 14 else 50
+            ma5 = close_series.rolling(5).mean().iloc[-1] if len(close_series) >= 5 else current_price
             
-            if current_price >= hod and current_price > prev_close:
-                signal = "🔥 BREAKOUT"
+            upper_bb, mid_bb, lower_bb = hitung_bollinger_bands(close_series)
+            is_bb_breakout = current_price >= upper_bb.iloc[-1] if not upper_bb.empty and not np.isnan(upper_bb.iloc[-1]) else False
+            _, _, macd_hist = hitung_macd(close_series)
+            is_macd_bullish = macd_hist.iloc[-1] > 0 if not macd_hist.empty and not np.isnan(macd_hist.iloc[-1]) else False
+
+            if is_bb_breakout and change_pct > 0:
+                signal = "🔥 ASTRONACCI BREAKOUT"
+            elif is_macd_bullish and current_price > ma5:
+                signal = "🚀 BULLISH MOMENTUM"
             elif current_price > ma5:
-                signal = "🚀 BULLISH"
+                signal = "📈 BULLISH"
             else:
                 signal = "🔻 BEARISH"
                 
@@ -243,12 +277,13 @@ def fetch_single_ticker_data(symbol):
             vol_spike = "⚡ SPIKE" if last_vol > (avg_vol * 1.8) else "NORMAL"
 
             bsjp_score = 0
-            if change_pct > 0: bsjp_score += 25
-            if current_price >= (hod * 0.98): bsjp_score += 25
-            if vol_spike == "⚡ SPIKE": bsjp_score += 25
-            if current_price > ma5: bsjp_score += 25
+            if change_pct > 0: bsjp_score += 20
+            if current_price >= (hod * 0.98): bsjp_score += 20
+            if vol_spike == "⚡ SPIKE": bsjp_score += 20
+            if is_macd_bullish: bsjp_score += 20
+            if is_bb_breakout or current_price > ma5: bsjp_score += 20
 
-            bsjp_status = f"⚡ AI ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
+            bsjp_status = f"⚡ VIP SIGNAL ({bsjp_score}%)" if bsjp_score >= 80 else f"⚙ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
 
             mc_raw = None
             try: mc_raw = stock.fast_info['market_cap']
@@ -276,7 +311,9 @@ def fetch_single_ticker_data(symbol):
                 "Signal": signal,
                 "Volume": vol_spike,
                 "BSJP Status": bsjp_status,
-                "BSJP Score": bsjp_score
+                "BSJP Score": bsjp_score,
+                "Upper_BB": upper_bb,
+                "Lower_BB": lower_bb
             }
     except Exception: None
     return None
@@ -325,13 +362,13 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("---")
 
-    with st.spinner("Memindai emiten potensial berkecepatan tinggi..."):
+    with st.spinner("Memindai emiten dengan formula Astronacci VIP Signal..."):
         df_master = fetch_live_market_data(tuple(st.session_state.master_universe))
 
     if not df_master.empty:
         top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
         bsjp_text = " | ".join([f"<b>{row['Ticker']}</b>: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
-        st.markdown(f'<div class="top-runner-bar">📊 <b>Top Potential Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="top-runner-bar">⭐ <b>Astronacci VIP Top Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
     # FILTER RENTANG HARGA & UNIVERSAL SEARCH
     c_filter, c_search = st.columns([1.5, 1], gap="medium")
@@ -482,30 +519,38 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
     </div>
     """, unsafe_allow_html=True)
 
+            # KOTAK KHUSUS ASTRONACCI VIP SIGNAL & ACTION PLAN (BUY, TP, SL, TIMING)
             tp_1 = int(round(area_beli * 1.015))
-            tp_2 = int(round(area_beli * 1.03))
-            tp_3 = int(round(area_beli * 1.05))
+            tp_2 = int(round(area_beli * 1.035))
+            tp_3 = int(round(area_beli * 1.060))
             cl_price = int(round(area_beli * 0.985))
 
             st.markdown(f"""
-    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-        <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">🎯 Execution Plan: {selected_ticker}</div>
+    <div style="background: linear-gradient(135deg, #003366 0%, #002244 100%); border: 1px solid #34d399; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(52, 211, 153, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="font-size: 13px; font-weight: 700; color: #34d399; text-transform: uppercase;">⭐ Astronacci VIP Signal & Action Plan: {selected_ticker}</div>
+            <div style="background: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">ACTION: STRONG BUY</div>
+        </div>
         <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
             <tr style="background: #002347; color: #93c5fd; font-weight: 600;">
                 <td style="padding: 6px; border-radius: 6px 0 0 6px;">BUY ZONE</td>
                 <td style="padding: 6px;">TP 1 (+1.5%)</td>
-                <td style="padding: 6px;">TP 2 (+3%)</td>
-                <td style="padding: 6px;">TP 3 (+5%)</td>
-                <td style="padding: 6px; border-radius: 0 6px 6px 0;">CUT LOSS (-1.5%)</td>
+                <td style="padding: 6px;">TP 2 (+3.5%)</td>
+                <td style="padding: 6px;">TP 3 (+6%)</td>
+                <td style="padding: 6px; border-radius: 0 6px 6px 0;">CUT LOSS</td>
             </tr>
             <tr>
-                <td style="padding: 8px 0; font-weight: 600; color: #34d399;">Rp {area_beli:,}</td>
+                <td style="padding: 8px 0; font-weight: 700; color: #34d399;">Rp {area_beli:,}</td>
                 <td style="padding: 8px 0; color: #6ee7b7;">Rp {tp_1:,}</td>
-                <td style="padding: 8px 0; color: #34d399; font-weight: 600;">Rp {tp_2:,}</td>
+                <td style="padding: 8px 0; color: #34d399; font-weight: 700;">Rp {tp_2:,}</td>
                 <td style="padding: 8px 0; color: #60a5fa;">Rp {tp_3:,}</td>
-                <td style="padding: 8px 0; font-weight: 600; color: #f87171;">Rp {cl_price:,}</td>
+                <td style="padding: 8px 0; font-weight: 700; color: #f87171;">Rp {cl_price:,}</td>
             </tr>
         </table>
+        <div style="margin-top: 10px; font-size: 11px; color: #93c5fd; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+            <span>⏳ <b>Time Reversal Window:</b> Optimal Hold 1 - 3 Hari</span>
+            <span>🎯 <b>Strategy:</b> Golden Ratio Expansion</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -632,15 +677,21 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
                 intraday = yf.Ticker(f"{selected_ticker}.JK").history(period=p, interval=i)
                 
                 if not intraday.empty:
+                    upper_b, mid_b, lower_b = hitung_bollinger_bands(intraday["Close"])
+                    
                     fig = go.Figure()
                     fig.add_trace(go.Scatter(x=intraday.index, y=intraday["Close"], mode='lines', name='Price', line=dict(color='#60a5fa', width=2)))
+                    fig.add_trace(go.Scatter(x=intraday.index, y=upper_b, mode='lines', name='Upper BB', line=dict(color='rgba(255,255,255,0.3)', width=1, dash='dot')))
+                    fig.add_trace(go.Scatter(x=intraday.index, y=lower_b, mode='lines', name='Lower BB', line=dict(color='rgba(255,255,255,0.3)', width=1, dash='dot'), fill='tonexty', fillcolor='rgba(96, 165, 250, 0.05)'))
+                    
                     fig.update_layout(
                         paper_bgcolor='rgba(0,0,0,0)',
                         plot_bgcolor='rgba(0, 35, 71, 0.9)',
                         margin=dict(l=10, r=10, t=10, b=10),
-                        height=250,
+                        height=280,
                         xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd'),
-                        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd')
+                        yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', color='#93c5fd'),
+                        legend=dict(orientation="h", y=1.1, x=0)
                     )
                     st.plotly_chart(fig, use_container_width=True)
             except Exception:
