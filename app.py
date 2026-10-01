@@ -121,7 +121,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & ASTRONACCI VIP SIGNAL ENGINE</div>
+            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & DUAL RADAR ENGINE</div>
         </div>
         <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
             <div style="font-size:10px; color:#93c5fd; font-weight:700;">NANO CORE</div>
@@ -216,17 +216,6 @@ def hitung_macd(series, slow=26, fast=12, signal=9):
     histogram = macd_line - signal_line
     return macd_line, signal_line, histogram
 
-def hitung_astronacci_fibonacci(high_p, low_p):
-    diff = high_p - low_p
-    fib_levels = {
-        "Fib 0.382": high_p - (diff * 0.382),
-        "Fib 0.500": high_p - (diff * 0.500),
-        "Fib 0.618": high_p - (diff * 0.618),
-        "Fib 0.786": high_p - (diff * 0.786),
-        "Ext 1.618": high_p + (diff * 0.618)
-    }
-    return fib_levels
-
 @st.cache_data(ttl=60)
 def fetch_single_ticker_data(symbol):
     try:
@@ -259,6 +248,20 @@ def fetch_single_ticker_data(symbol):
             is_bb_breakout = current_price >= upper_bb.iloc[-1] if not upper_bb.empty and not np.isnan(upper_bb.iloc[-1]) else False
             _, _, macd_hist = hitung_macd(close_series)
             is_macd_bullish = macd_hist.iloc[-1] > 0 if not macd_hist.empty and not np.isnan(macd_hist.iloc[-1]) else False
+
+            # LOGIKA DINAMIS ASTRONACCI
+            if change_pct > 0.5 and is_macd_bullish and (is_bb_breakout or current_price >= hod * 0.96):
+                astronacci_action = "STRONG BUY"
+                action_color = "#34d399"
+                bg_gradient = "linear-gradient(135deg, #003366 0%, #002244 100%)"
+            elif change_pct < -1.0 or rsi_val > 75:
+                astronacci_action = "TAKE PROFIT / SELL"
+                action_color = "#f87171"
+                bg_gradient = "linear-gradient(135deg, #451a03 0%, #221006 100%)"
+            else:
+                astronacci_action = "WAIT / WATCHLIST"
+                action_color = "#fbbf24"
+                bg_gradient = "linear-gradient(135deg, #3b2800 0%, #1f1500 100%)"
 
             if is_bb_breakout and change_pct > 0:
                 signal = "🔥 ASTRONACCI BREAKOUT"
@@ -312,6 +315,9 @@ def fetch_single_ticker_data(symbol):
                 "Volume": vol_spike,
                 "BSJP Status": bsjp_status,
                 "BSJP Score": bsjp_score,
+                "Astronacci Action": astronacci_action,
+                "Action Color": action_color,
+                "Bg Gradient": bg_gradient,
                 "Upper_BB": upper_bb,
                 "Lower_BB": lower_bb
             }
@@ -362,13 +368,46 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("---")
 
-    with st.spinner("Memindai emiten dengan formula Astronacci VIP Signal..."):
+    with st.spinner("Memindai emiten dengan formula Dual Radar Astronacci..."):
         df_master = fetch_live_market_data(tuple(st.session_state.master_universe))
 
     if not df_master.empty:
         top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
         bsjp_text = " | ".join([f"<b>{row['Ticker']}</b>: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
         st.markdown(f'<div class="top-runner-bar">⭐ <b>Astronacci VIP Top Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+
+    # DUAL RADAR: ASTRONACCI STRONG BUY RADAR & POSITIVE MOMENTUM (> 0% s.d. 15%)
+    col_radar1, col_radar2 = st.columns(2, gap="medium")
+    
+    with col_radar1:
+        st.markdown("<h4 style='margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #34d399;'>🔥 Astronacci Strong Buy Radar</h4>", unsafe_allow_html=True)
+        if not df_master.empty:
+            df_strong_buy = df_master[df_master["Astronacci Action"] == "STRONG BUY"]
+            if not df_strong_buy.empty:
+                st.dataframe(
+                    df_strong_buy[["Ticker", "Price", "Change (%)", "Signal", "BSJP Status"]],
+                    use_container_width=True, hide_index=True, height=160
+                )
+            else:
+                st.info("Belum ada emiten Strong Buy saat ini.")
+        else:
+            st.info("Memindai Strong Buy...")
+
+    with col_radar2:
+        st.markdown("<h4 style='margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #60a5fa;'>📈 Potential Momentum (>0% s.d. 15%)</h4>", unsafe_allow_html=True)
+        if not df_master.empty:
+            df_momentum = df_master[(df_master["Raw Change"] > 0.0) & (df_master["Raw Change"] <= 15.0)]
+            if not df_momentum.empty:
+                st.dataframe(
+                    df_momentum[["Ticker", "Price", "Change (%)", "Signal", "BSJP Status"]],
+                    use_container_width=True, hide_index=True, height=160
+                )
+            else:
+                st.info("Belum ada saham dengan kenaikan positif 0-15%.")
+        else:
+            st.info("Memindai momentum...")
+
+    st.markdown("---")
 
     # FILTER RENTANG HARGA & UNIVERSAL SEARCH
     c_filter, c_search = st.columns([1.5, 1], gap="medium")
@@ -426,44 +465,6 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
             st.info("Tidak ada saham sesuai kriteria rentang harga.")
             ticker_options = []
 
-        # MICRO-SCANNER (ACTIVE DETECT)
-        st.markdown("""
-        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 12px; margin-top: 12px; margin-bottom: 12px;">
-            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">📊 Micro-Scanner (Active Detect)</div>
-            <table width="100%" style="font-size: 11px; color: #cbd5e1;">
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="padding: 4px 0;"><b>UNTR</b></td>
-                    <td>Surge: <b style="color: #34d399;">+320%</b></td>
-                    <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">ACCEL</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="padding: 4px 0;"><b>TEBE</b></td>
-                    <td>Surge: <b style="color: #34d399;">+210%</b></td>
-                    <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">BREAKOUT</span></td>
-                </tr>
-                <tr>
-                    <td style="padding: 4px 0;"><b>ANTM</b></td>
-                    <td>Surge: <b style="color: #60a5fa;">+185%</b></td>
-                    <td style="text-align: right;"><span style="background: #002347; color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">SPIKE</span></td>
-                </tr>
-            </table>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # KOLOM KHUSUS TAMBAHAN: SEMUA SAHAM POTENSI NAIK (> 0% HINGGA <= 15%)
-        st.markdown("<h4 style='margin-top: 12px; margin-bottom: 6px; font-size: 13px; color: #34d399;'>🔥 All Positive Potential Momentum (> 0% s.d. 15%)</h4>", unsafe_allow_html=True)
-        if not df_master.empty:
-            df_momentum = df_master[(df_master["Raw Change"] > 0.0) & (df_master["Raw Change"] <= 15.0)]
-            if not df_momentum.empty:
-                st.dataframe(
-                    df_momentum[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-                    use_container_width=True, hide_index=True, height=180
-                )
-            else:
-                st.info("Belum ada saham yang mengalami kenaikan positif saat ini.")
-        else:
-            st.info("Memindai data momentum...")
-
         if search_input:
             custom_data = fetch_single_ticker_data(search_input)
             if custom_data:
@@ -486,6 +487,10 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
         arb_p = int(selected_row.get("ARB", area_beli * 0.93))
         tot_lot = int(selected_row.get("Total Lot", 15000))
         tot_val = int(selected_row.get("Total Val", 5000000000))
+        
+        act_status = selected_row.get("Astronacci Action", "WAIT / WATCHLIST")
+        act_color = selected_row.get("Action Color", "#fbbf24")
+        bg_grad = selected_row.get("Bg Gradient", "linear-gradient(135deg, #3b2800 0%, #1f1500 100%)")
 
         with col_right:
             c_head1, c_head2 = st.columns([1, 1])
@@ -519,17 +524,17 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
     </div>
     """, unsafe_allow_html=True)
 
-            # KOTAK KHUSUS ASTRONACCI VIP SIGNAL & ACTION PLAN (BUY, TP, SL, TIMING)
+            # KOTAK DINAMIS ASTRONACCI VIP SIGNAL
             tp_1 = int(round(area_beli * 1.015))
             tp_2 = int(round(area_beli * 1.035))
             tp_3 = int(round(area_beli * 1.060))
             cl_price = int(round(area_beli * 0.985))
 
             st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #003366 0%, #002244 100%); border: 1px solid #34d399; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(52, 211, 153, 0.15);">
+    <div style="background: {bg_grad}; border: 1px solid {act_color}; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div style="font-size: 13px; font-weight: 700; color: #34d399; text-transform: uppercase;">⭐ Astronacci VIP Signal & Action Plan: {selected_ticker}</div>
-            <div style="background: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">ACTION: STRONG BUY</div>
+            <div style="font-size: 13px; font-weight: 700; color: #ffffff; text-transform: uppercase;">⭐ Astronacci VIP Signal: {selected_ticker}</div>
+            <div style="background: rgba(0,0,0,0.3); color: {act_color}; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; border: 1px solid {act_color};">ACTION: {act_status}</div>
         </div>
         <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
             <tr style="background: #002347; color: #93c5fd; font-weight: 600;">
