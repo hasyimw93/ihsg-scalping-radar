@@ -121,7 +121,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & DUAL RADAR ENGINE</div>
+            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & EXTENDED LIVE MULTI-BAGGER RESEARCH</div>
         </div>
         <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
             <div style="font-size:10px; color:#93c5fd; font-weight:700;">NANO CORE</div>
@@ -131,18 +131,22 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# CUSTOM NAVIGASI TAB KONTROL TOMBOL
-tab_col1, tab_col2, tab_col3 = st.columns(3)
+# CUSTOM NAVIGASI TAB KONTROL TOMBOL (4 TAB UTAMA)
+tab_col1, tab_col2, tab_col3, tab_col4 = st.columns(4)
 with tab_col1:
-    if st.button("⚡ Nano Scalping Terminal", use_container_width=True):
+    if st.button("⚡ Scalping Terminal", use_container_width=True):
         st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
         st.rerun()
 with tab_col2:
-    if st.button("🚀 Weekly Swing Signal", use_container_width=True):
+    if st.button("🚀 Weekly Swing", use_container_width=True):
         st.session_state.active_tab = "🚀 Weekly Swing Signal"
         st.rerun()
 with tab_col3:
-    if st.button("📑 Right Issue & Corporate Action", use_container_width=True):
+    if st.button("💎 Multi-Bagger Hunter", use_container_width=True):
+        st.session_state.active_tab = "💎 Multi-Bagger Hunter"
+        st.rerun()
+with tab_col4:
+    if st.button("📑 Right Issue & CA", use_container_width=True):
         st.session_state.active_tab = "📑 Right Issue & Corporate Action Module"
         st.rerun()
 
@@ -254,14 +258,20 @@ def fetch_single_ticker_data(symbol):
                 astronacci_action = "STRONG BUY"
                 action_color = "#34d399"
                 bg_gradient = "linear-gradient(135deg, #003366 0%, #002244 100%)"
+                timing_buy = "09:00 - 10:15 WIB (Sesi 1 Open)"
+                timing_sell = "14:45 - 15:50 WIB (Jelang Closing)"
             elif change_pct < -1.0 or rsi_val > 75:
                 astronacci_action = "TAKE PROFIT / SELL"
                 action_color = "#f87171"
                 bg_gradient = "linear-gradient(135deg, #451a03 0%, #221006 100%)"
+                timing_buy = "Wait / Hindari Beli Dulu"
+                timing_sell = "Segera Sesi 1 / Awal Sesi 2"
             else:
                 astronacci_action = "WAIT / WATCHLIST"
                 action_color = "#fbbf24"
                 bg_gradient = "linear-gradient(135deg, #3b2800 0%, #1f1500 100%)"
+                timing_buy = "Tunggu Pullback / Support"
+                timing_sell = "Hold Sesuai Target TP"
 
             if is_bb_breakout and change_pct > 0:
                 signal = "🔥 ASTRONACCI BREAKOUT"
@@ -318,6 +328,8 @@ def fetch_single_ticker_data(symbol):
                 "Astronacci Action": astronacci_action,
                 "Action Color": action_color,
                 "Bg Gradient": bg_gradient,
+                "Timing Buy": timing_buy,
+                "Timing Sell": timing_sell,
                 "Upper_BB": upper_bb,
                 "Lower_BB": lower_bb
             }
@@ -368,7 +380,7 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("---")
 
-    with st.spinner("Memindai emiten dengan formula Dual Radar Astronacci..."):
+    with st.spinner("Memindai emiten dengan formula Interaktif Dual Radar..."):
         df_master = fetch_live_market_data(tuple(st.session_state.master_universe))
 
     if not df_master.empty:
@@ -376,32 +388,42 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
         bsjp_text = " | ".join([f"<b>{row['Ticker']}</b>: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
         st.markdown(f'<div class="top-runner-bar">⭐ <b>Astronacci VIP Top Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
-    # DUAL RADAR: ASTRONACCI STRONG BUY RADAR & POSITIVE MOMENTUM (> 0% s.d. 15%)
+    if 'active_selected_ticker' not in st.session_state:
+        st.session_state.active_selected_ticker = "BBCA"
+
     col_radar1, col_radar2 = st.columns(2, gap="medium")
     
     with col_radar1:
-        st.markdown("<h4 style='margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #34d399;'>🔥 Astronacci Strong Buy Radar</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #34d399;'>🔥 Astronacci Strong Buy Radar (Klik Baris)</h4>", unsafe_allow_html=True)
         if not df_master.empty:
-            df_strong_buy = df_master[df_master["Astronacci Action"] == "STRONG BUY"]
+            df_strong_buy = df_master[df_master["Astronacci Action"] == "STRONG BUY"].sort_values(by="BSJP Score", ascending=False)
             if not df_strong_buy.empty:
-                st.dataframe(
+                event_sb = st.dataframe(
                     df_strong_buy[["Ticker", "Price", "Change (%)", "Signal", "BSJP Status"]],
-                    use_container_width=True, hide_index=True, height=160
+                    use_container_width=True, hide_index=True, height=150,
+                    selection_mode="single-row", on_select="rerun", key="table_sb"
                 )
+                sel_sb_rows = event_sb.get("selection", {}).get("rows", [])
+                if sel_sb_rows:
+                    st.session_state.active_selected_ticker = df_strong_buy.iloc[sel_sb_rows[0]]["Ticker"]
             else:
                 st.info("Belum ada emiten Strong Buy saat ini.")
         else:
             st.info("Memindai Strong Buy...")
 
     with col_radar2:
-        st.markdown("<h4 style='margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #60a5fa;'>📈 Potential Momentum (>0% s.d. 15%)</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #60a5fa;'>📈 Potential Momentum (>0% s.d. 15%) (Klik Baris)</h4>", unsafe_allow_html=True)
         if not df_master.empty:
-            df_momentum = df_master[(df_master["Raw Change"] > 0.0) & (df_master["Raw Change"] <= 15.0)]
+            df_momentum = df_master[(df_master["Raw Change"] > 0.0) & (df_master["Raw Change"] <= 15.0)].sort_values(by="Raw Change", ascending=False)
             if not df_momentum.empty:
-                st.dataframe(
+                event_mom = st.dataframe(
                     df_momentum[["Ticker", "Price", "Change (%)", "Signal", "BSJP Status"]],
-                    use_container_width=True, hide_index=True, height=160
+                    use_container_width=True, hide_index=True, height=150,
+                    selection_mode="single-row", on_select="rerun", key="table_mom"
                 )
+                sel_mom_rows = event_mom.get("selection", {}).get("rows", [])
+                if sel_mom_rows:
+                    st.session_state.active_selected_ticker = df_momentum.iloc[sel_mom_rows[0]]["Ticker"]
             else:
                 st.info("Belum ada saham dengan kenaikan positif 0-15%.")
         else:
@@ -409,12 +431,9 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("---")
 
-    # FILTER RENTANG HARGA & UNIVERSAL SEARCH
-    c_filter, c_search = st.columns([1.5, 1], gap="medium")
+    c_filter, _ = st.columns([1.5, 1], gap="medium")
     with c_filter:
         kategori_harga = st.selectbox("📌 Filter Rentang Harga Pasar:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
-    with c_search:
-        search_input = st.text_input("🔍 Universal Search Ticker:", placeholder="Contoh: CUAN, BBCA").strip().upper()
 
     df_filtered = df_master.copy() if not df_master.empty else pd.DataFrame()
     if not df_filtered.empty:
@@ -424,6 +443,8 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
         elif kategori_harga == "4. Rp 1.000 - Rp 2.000": df_filtered = df_filtered[(df_filtered["Price"] >= 1000) & (df_filtered["Price"] < 2000)]
         elif kategori_harga == "5. Rp 500 - Rp 1.000": df_filtered = df_filtered[(df_filtered["Price"] >= 500) & (df_filtered["Price"] < 1000)]
         elif kategori_harga == "6. Rp 1 - Rp 500": df_filtered = df_filtered[(df_filtered["Price"] >= 1) & (df_filtered["Price"] < 500)]
+        
+        df_filtered = df_filtered.sort_values(by=["BSJP Score", "Raw Change"], ascending=[False, False])
 
     st.markdown("<h4 style='margin-bottom: 8px; font-size: 15px; color: #f8fafc;'>⚡ Running Trade (BEI Micro Tick Feed)</h4>", unsafe_allow_html=True)
     np.random.seed(int(datetime.now().second))
@@ -454,26 +475,32 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
     selected_ticker = None
 
     with col_left:
-        st.subheader("🎯 Market Scanner Radar (All Potential Stocks)")
+        st.subheader("🎯 Market Scanner Radar (Auto-Ranked)")
         if not df_filtered.empty:
-            st.dataframe(
+            event_selection = st.dataframe(
                 df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-                use_container_width=True, hide_index=True, height=280
+                use_container_width=True, 
+                hide_index=True, 
+                height=320,
+                selection_mode="single-row",
+                on_select="rerun",
+                key="table_main"
             )
-            ticker_options = df_filtered["Ticker"].tolist()
+            
+            selected_indices = event_selection.get("selection", {}).get("rows", [])
+            if selected_indices:
+                idx_row = selected_indices[0]
+                st.session_state.active_selected_ticker = df_filtered.iloc[idx_row]["Ticker"]
+            
+            selected_ticker = st.session_state.active_selected_ticker
+            if selected_ticker not in df_filtered["Ticker"].values:
+                selected_ticker = df_filtered["Ticker"].iloc[0]
+                st.session_state.active_selected_ticker = selected_ticker
+            
+            selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
         else:
             st.info("Tidak ada saham sesuai kriteria rentang harga.")
-            ticker_options = []
-
-        if search_input:
-            custom_data = fetch_single_ticker_data(search_input)
-            if custom_data:
-                selected_ticker = search_input
-                selected_row = custom_data
-        else:
-            if ticker_options:
-                selected_ticker = st.selectbox("Pilih Saham Target Analisa:", ticker_options, index=0)
-                selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
+            selected_ticker = None
 
         st.write("")
 
@@ -491,11 +518,13 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
         act_status = selected_row.get("Astronacci Action", "WAIT / WATCHLIST")
         act_color = selected_row.get("Action Color", "#fbbf24")
         bg_grad = selected_row.get("Bg Gradient", "linear-gradient(135deg, #3b2800 0%, #1f1500 100%)")
+        t_buy = selected_row.get("Timing Buy", "09:00 - 10:15 WIB")
+        t_sell = selected_row.get("Timing Sell", "14:45 - 15:50 WIB")
 
         with col_right:
             c_head1, c_head2 = st.columns([1, 1])
             with c_head1:
-                st.markdown("<h3 style='margin:0; font-size:20px;'>Orderbook Matrix</h3>", unsafe_allow_html=True)
+                st.markdown(f"<h3 style='margin:0; font-size:20px;'>Orderbook Matrix: {selected_ticker}</h3>", unsafe_allow_html=True)
             with c_head2:
                 st.markdown("<div style='text-align: right; color: #93c5fd; font-size: 13px; font-weight: 500;'>Lihat Antrean Order</div>", unsafe_allow_html=True)
             
@@ -524,7 +553,6 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
     </div>
     """, unsafe_allow_html=True)
 
-            # KOTAK DINAMIS ASTRONACCI VIP SIGNAL
             tp_1 = int(round(area_beli * 1.015))
             tp_2 = int(round(area_beli * 1.035))
             tp_3 = int(round(area_beli * 1.060))
@@ -552,9 +580,9 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
                 <td style="padding: 8px 0; font-weight: 700; color: #f87171;">Rp {cl_price:,}</td>
             </tr>
         </table>
-        <div style="margin-top: 10px; font-size: 11px; color: #93c5fd; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
-            <span>⏳ <b>Time Reversal Window:</b> Optimal Hold 1 - 3 Hari</span>
-            <span>🎯 <b>Strategy:</b> Golden Ratio Expansion</span>
+        <div style="margin-top: 10px; font-size: 11px; color: #cbd5e1; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+            <span>🟢 <b>Timing Buy:</b> <b style="color: #34d399;">{t_buy}</b></span>
+            <span>🔴 <b>Timing Sell/TP:</b> <b style="color: #f87171;">{t_sell}</b></span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -817,6 +845,83 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
             <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 1 (+3%): <b style="color: #34d399;">Rp {tp1_calc:,}</b> (Jual 30%)</div>
             <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 2 (+6%): <b style="color: #34d399;">Rp {tp2_calc:,}</b> (Jual 40%)</div>
             <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 3 (+10%): <b style="color: #60a5fa;">Rp {tp3_calc:,}</b> (Trailing Stop Sisa)</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
+    st.markdown("### 💎 Multi-Bagger Hunter (Gocap to High)")
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Daftar diperluas dengan emiten potensial jangka panjang, harga live real-time, serta perbandingan harga saat pertama kali dirilis.</p>", unsafe_allow_html=True)
+    
+    col_mb1, col_mb2 = st.columns([1.6, 1], gap="medium")
+    
+    with col_mb1:
+        st.markdown("#### 🔬 Extended Live Multi-Bagger Watchlist & Katalis")
+        
+        # DAFTAR EMITEN DIPERLUAS MENJADI 12 EMITEN POTENSIAL
+        mb_tickers_extended = [
+            ("BUMI", "Rp 50", "Restrukturisasi & Batubara", "0.8x (Murah)", "Rp 250 - 500+"),
+            ("DEWA", "Rp 50", "Ekspansi Tambang Emas", "1.2x", "Rp 800 - 1.200+"),
+            ("ENRG", "Rp 90", "Akuisisi Blok Migas Baru", "1.1x", "Rp 3.000+"),
+            ("BRMS", "Rp 50", "Commercial Production Emas", "2.5x", "Rp 1.500+"),
+            ("TEBE", "Rp 350", "Logistik & Infrastruktur", "1.4x", "Rp 4.000+"),
+            ("PTBA", "Rp 1.200", "High Dividend & Energy Cycle", "1.8x", "Rp 5.000+"),
+            ("ADRO", "Rp 1.000", "Green Energy Transition & Cash Rich", "1.3x", "Rp 4.500+"),
+            ("ANTM", "Rp 600", "EV Battery & Nikel Downstream", "2.1x", "Rp 3.000+"),
+            ("MEDC", "Rp 450", "Oil & Gas Super Cycle", "1.0x", "Rp 2.500+"),
+            ("ELSA", "Rp 150", "Energy Services Expansion", "0.9x", "Rp 800+"),
+            ("GOTO", "Rp 90", "E-Commerce Profitability Turnaround", "1.5x", "Rp 500+"),
+            ("ARTO", "Rp 1.500", "Digital Bank Ecosystem Growth", "3.2x", "Rp 6.000+")
+        ]
+        
+        mb_rows = []
+        for t, rilis, kat, pbv, tgt in mb_tickers_extended:
+            t_data = fetch_single_ticker_data(t)
+            p_live = t_data["Price"] if t_data else 0
+            chg_live = t_data["Change (%)"] if t_data else "0%"
+            
+            mb_rows.append({
+                "Emiten": t,
+                "Harga Awal (Rilis)": rilis,
+                "Harga Live": f"Rp {p_live:,}" if p_live > 0 else "N/A",
+                "Perubahan": chg_live,
+                "Katalis Utama": kat,
+                "Valuasi/PBV": pbv,
+                "Target Jangka Panjang": tgt
+            })
+            
+        df_mb_live = pd.DataFrame(mb_rows)
+        st.dataframe(df_mb_live, use_container_width=True, hide_index=True, height=350)
+        
+        st.markdown("#### 📚 Formula Rahasia Multi-Bagger:")
+        st.markdown("""
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; font-size: 12px; color: #cbd5e1;">
+            <b>1. Low Valuation (Deep Value):</b> Cari emiten berharga murah yang mulai mencatat lonjakan volume di harga bawah.<br>
+            <b>2. Turnaround Bisnis:</b> Perusahaan yang sebelumnya terbebani utang kini membukukan laba bersih positif.<br>
+            <b>3. Smart Money Accumulation:</b> Akumulasi institusi jangka panjang pada fase konsolidasi bulanan/mingguan.
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_mb2:
+        st.markdown("#### 🧮 Multi-Bagger Growth Simulator")
+        st.markdown("<font size='2' color='#cbd5e1'>Simulasikan potensi keuntungan menuju target jangka panjang.</font>", unsafe_allow_html=True)
+        
+        sim_harga_beli = st.number_input("Harga Beli Saat Ini (Rp):", min_value=10, value=170, step=10)
+        sim_harga_target = st.number_input("Target Harga Jangka Panjang (Rp):", min_value=50, value=1000, step=50)
+        sim_lot = st.number_input("Jumlah Lot Disimpan:", min_value=1, value=100, step=10)
+        
+        modal_awal = sim_harga_beli * sim_lot * 100
+        nilai_akhir = sim_harga_target * sim_lot * 100
+        potensi_profit = nilai_akhir - modal_awal
+        persen_cuan = ((sim_harga_target - sim_harga_beli) / sim_harga_beli) * 100 if sim_harga_beli > 0 else 0
+        
+        st.markdown(f"""
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
+            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Hasil Simulasi Multi-Bagger:</div>
+            <div style="font-size: 13px; color: #ffffff; margin-bottom: 2px;">Modal Awal: <b>Rp {modal_awal:,.0f}</b></div>
+            <div style="font-size: 13px; color: #ffffff; margin-bottom: 6px;">Nilai Portofolio Akhir: <b style="color: #34d399;">Rp {nilai_akhir:,.0f}</b></div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
+            <div style="font-size: 14px; color: #34d399; font-weight: 700; margin-bottom: 2px;">Potensi Profit: Rp {potensi_profit:,.0f}</div>
+            <div style="font-size: 13px; color: #60a5fa; font-weight: 700;">Potensi Kenaikan: +{persen_cuan:,.2f}% ({(persen_cuan/100):.1f}x Lipat)</div>
         </div>
         """, unsafe_allow_html=True)
 
