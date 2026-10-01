@@ -148,9 +148,16 @@ with tab_col3:
 
 st.write("")
 
-# INITIALIZE SESSION STATE
-if 'custom_watchlist' not in st.session_state:
-    st.session_state.custom_watchlist = ["TEBE", "JPFA", "TLKM", "BBCA", "BMRI", "UNTR", "ASII", "AMRT", "CPIN", "ANTM"]
+# MASTER UNIVERSE IHSG DIPERLUAS
+if 'master_universe' not in st.session_state:
+    st.session_state.master_universe = [
+        "BBCA", "BBRI", "BMRI", "BBNI", "ASII", "UNTR", "ADRO", "MDKA", "PTBA", "INCO",
+        "TLKM", "ISAT", "EXCL", "GOTO", "BUKA", "ARTO", "BRIS", "CPIN", "JPFA", "INDF",
+        "ICBP", "MYOR", "UNVR", "AMRT", "ACES", "MAPI", "INKP", "TKIM", "ANTM", "HRUM",
+        "PGAS", "AKRA", "MEDC", "ELSA", "ESSA", "ERAA", "TPIA", "BRPT", "CUAN", "BUMI",
+        "DEWA", "ENRG", "SMGR", "INTP", "KLBF", "MIKA", "SILO", "JSMR", "TEBE", "JARR",
+        "PANI", "AMMN", "BRMS", "TOBA", "MAPA", "AUTO"
+    ]
 
 if 'trade_journal' not in st.session_state:
     st.session_state.trade_journal = []
@@ -165,7 +172,9 @@ ESTIMATED_SHARES = {
     "TEBE": 1285000000, "JPFA": 11726575001, "TLKM": 99062216600, "CPIN": 16398000000,
     "BBCA": 123275000000, "BMRI": 93333333333, "UNTR": 3730135123, "ASII": 40483553140,
     "JARR": 12000000000, "AMRT": 41524500000, "TPIA": 86522000000, "AKRA": 20073000000,
-    "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000
+    "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000,
+    "BBRI": 151596000000, "BBNI": 37253000000, "PTBA": 11520000000, "INCO": 9933000000,
+    "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000
 }
 
 def hitung_fraksi_harga(price):
@@ -272,7 +281,7 @@ def fetch_single_ticker_data(symbol):
     except Exception: None
     return None
 
-@st.cache_data(ttl=15)
+@st.cache_data(ttl=30)
 def fetch_live_market_data(ticker_list):
     results = []
     for symbol in ticker_list:
@@ -316,62 +325,20 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("---")
 
-    with st.spinner("Menyinkronkan data pasar..."):
-        df_master = fetch_live_market_data(st.session_state.custom_watchlist)
+    with st.spinner("Memindai seluruh bursa dan menyinkronkan data pasar..."):
+        df_master = fetch_live_market_data(st.session_state.master_universe)
 
     if not df_master.empty:
         top_bsjp = df_master.sort_values(by="BSJP Score", ascending=False).head(3)
         bsjp_text = " | ".join([f"<b>{row['Ticker']}</b>: {row['BSJP Status']} (Rp {row['Price']:,})" for _, row in top_bsjp.iterrows()])
-        st.markdown(f'<div class="top-runner-bar">📊 <b>Top Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="top-runner-bar">📊 <b>Top Potential Signal</b>: {bsjp_text}</div>', unsafe_allow_html=True)
 
-    with st.expander("📌 Custom Watchlist Management", expanded=False):
-        col_input, col_btn = st.columns([3, 1], gap="small")
-        with col_input:
-            new_ticker = st.text_input("Tambah Ticker Baru:", placeholder="Ketik kode saham (contoh: GOTO, BBRI)").strip().upper()
-        with col_btn:
-            st.write("")
-            if st.button("➕ Tambah", use_container_width=True):
-                if new_ticker and new_ticker not in st.session_state.custom_watchlist:
-                    st.session_state.custom_watchlist.append(new_ticker)
-                    st.rerun()
-
-        st.markdown("---")
-        st.caption("Daftar Ticker Watchlist Aktif:")
-        
-        cols_chips = st.columns(5)
-        tickers_to_remove = []
-
-        for idx, t_code in enumerate(st.session_state.custom_watchlist):
-            c_target = cols_chips[idx % 5]
-            row_match = df_master[df_master["Ticker"] == t_code] if not df_master.empty else pd.DataFrame()
-            raw_val = row_match.iloc[0]["Raw Change"] if not row_match.empty else 0
-            live_price = row_match.iloc[0]["Price"] if not row_match.empty else 0
-            price_str = f"Rp {live_price:,}" if live_price > 0 else "N/A"
-            bg_color = "#064e3b" if raw_val > 0 else ("#7f1d1d" if raw_val < 0 else "#003366")
-            
-            with c_target:
-                sub_c1, sub_c2 = st.columns([0.8, 0.2])
-                with sub_c1:
-                    st.markdown(f"""
-    <div style="background: {bg_color}; border: 1px solid #0047ab; border-radius: 6px; padding: 6px 10px; font-size: 11px; font-weight: 500; text-align: center; margin-bottom: 6px; color: #ffffff;">
-        {t_code} ({price_str})
-    </div>
-    """, unsafe_allow_html=True)
-                with sub_c2:
-                    if st.button("✕", key=f"del_chip_{t_code}", use_container_width=True):
-                        tickers_to_remove.append(t_code)
-
-        if tickers_to_remove:
-            for r_code in tickers_to_remove:
-                if r_code in st.session_state.custom_watchlist:
-                    st.session_state.custom_watchlist.remove(r_code)
-            st.rerun()
-
+    # FILTER RENTANG HARGA & UNIVERSAL SEARCH
     c_filter, c_search = st.columns([1.5, 1], gap="medium")
     with c_filter:
-        kategori_harga = st.selectbox("📌 Filter Rentang Harga:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
+        kategori_harga = st.selectbox("📌 Filter Rentang Harga Pasar:", ["Semua Saham", "1. > Rp 4.000", "2. Rp 3.000 - Rp 4.000", "3. Rp 2.000 - Rp 3.000", "4. Rp 1.000 - Rp 2.000", "5. Rp 500 - Rp 1.000", "6. Rp 1 - Rp 500"])
     with c_search:
-        search_input = st.text_input("🔍 Universal Search Ticker:", placeholder="Contoh: TEBE, BBCA").strip().upper()
+        search_input = st.text_input("🔍 Universal Search Ticker:", placeholder="Contoh: CUAN, BBCA").strip().upper()
 
     df_filtered = df_master.copy() if not df_master.empty else pd.DataFrame()
     if not df_filtered.empty:
@@ -384,7 +351,7 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
     st.markdown("<h4 style='margin-bottom: 8px; font-size: 15px; color: #f8fafc;'>⚡ Running Trade (BEI Micro Tick Feed)</h4>", unsafe_allow_html=True)
     np.random.seed(int(datetime.now().second))
-    rt_tickers = st.session_state.custom_watchlist if st.session_state.custom_watchlist else ["TEBE", "BBCA", "BMRI"]
+    rt_tickers = st.session_state.master_universe[:15]
     rt_data = []
     current_time_str = datetime.now(jakarta_tz).strftime("%H:%M:%S")
 
@@ -411,16 +378,30 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
     selected_ticker = None
 
     with col_left:
-        st.subheader("🎯 Watchlist Radar")
+        st.subheader("🎯 Market Scanner Radar (All Potential Stocks)")
         if not df_filtered.empty:
             st.dataframe(
                 df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-                use_container_width=True, hide_index=True, height=440
+                use_container_width=True, hide_index=True, height=340
             )
             ticker_options = df_filtered["Ticker"].tolist()
         else:
-            st.info("Tidak ada saham sesuai kriteria.")
+            st.info("Tidak ada saham sesuai kriteria rentang harga.")
             ticker_options = []
+
+        # KOLOM KHUSUS TAMBAHAN: SEMUA SAHAM POTENSI NAIK (> 0% HINGGA <= 15%)
+        st.markdown("<h4 style='margin-top: 16px; margin-bottom: 8px; font-size: 14px; color: #34d399;'>🔥 All Positive Potential Momentum (Kenaikan > 0% s.d. 15%)</h4>", unsafe_allow_html=True)
+        if not df_master.empty:
+            df_momentum = df_master[(df_master["Raw Change"] > 0.0) & (df_master["Raw Change"] <= 15.0)]
+            if not df_momentum.empty:
+                st.dataframe(
+                    df_momentum[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
+                    use_container_width=True, hide_index=True, height=220
+                )
+            else:
+                st.info("Belum ada saham yang mengalami kenaikan positif saat ini.")
+        else:
+            st.info("Memindai data momentum...")
 
         if search_input:
             custom_data = fetch_single_ticker_data(search_input)
@@ -433,29 +414,6 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
                 selected_row = df_filtered[df_filtered["Ticker"] == selected_ticker].iloc[0].to_dict()
 
         st.write("")
-        
-        st.markdown("""
-    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 6px;">
-        <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">📊 Micro-Scanner (Active Detect)</div>
-        <table width="100%" style="font-size: 11px; color: #cbd5e1;">
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 4px 0;"><b>UNTR</b></td>
-                <td>Surge: <b style="color: #34d399;">+320%</b></td>
-                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">ACCEL</span></td>
-            </tr>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 4px 0;"><b>TEBE</b></td>
-                <td>Surge: <b style="color: #34d399;">+210%</b></td>
-                <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">BREAKOUT</span></td>
-            </tr>
-            <tr>
-                <td style="padding: 4px 0;"><b>ANTM</b></td>
-                <td>Surge: <b style="color: #60a5fa;">+185%</b></td>
-                <td style="text-align: right;"><span style="background: #002347; color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">SPIKE</span></td>
-            </tr>
-        </table>
-    </div>
-    """, unsafe_allow_html=True)
 
     if selected_ticker and selected_row:
         area_beli = int(selected_row["Price"])
@@ -686,7 +644,6 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
         df_swing = pd.DataFrame(swing_data)
         st.dataframe(df_swing, use_container_width=True, hide_index=True)
         
-        # FITUR KRUSIAL: ACTIVE SWING PORTFOLIO & CLOSE POSITION MANAGER
         st.markdown("#### 📝 Active Swing Trade Portfolio & Live P&L Tracker")
         if st.session_state.swing_journal:
             live_portfolio_rows = []
@@ -722,7 +679,6 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
             df_live_sj = pd.DataFrame(live_portfolio_rows)
             st.dataframe(df_live_sj.drop(columns=["Index"]), use_container_width=True, hide_index=True)
             
-            # FITUR KRUSIAL: TOMBOL KELOLA / TUTUP POSISI (CLOSE / TAKE PROFIT)
             st.markdown("<font size='2' color='#93c5fd'><b>Kelola Posisi (Take Profit / Tutup Posisi):</b></font>", unsafe_allow_html=True)
             col_del_1, col_del_2 = st.columns([2, 1])
             with col_del_1:
@@ -767,7 +723,6 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
         risk_per_share = entry_swing - sl_swing
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
         
-        # FITUR KRUSIAL: KALKULASI MULTI TAKE PROFIT (TP1, TP2, TP3)
         tp1_calc = int(round(entry_swing * 1.03))
         tp2_calc = int(round(entry_swing * 1.06))
         tp3_calc = int(round(entry_swing * 1.10))
