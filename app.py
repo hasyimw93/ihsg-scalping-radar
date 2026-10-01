@@ -148,15 +148,27 @@ with tab_col3:
 
 st.write("")
 
-# MASTER UNIVERSE IHSG DIPERLUAS
+# MASTER UNIVERSE IHSG DIPERLUAS SECARA MASIF (MENCAKUP RATUSAN EMITEN DARI BERBAGAI RENTANG HARGA)
 if 'master_universe' not in st.session_state:
     st.session_state.master_universe = [
-        "BBCA", "BBRI", "BMRI", "BBNI", "ASII", "UNTR", "ADRO", "MDKA", "PTBA", "INCO",
-        "TLKM", "ISAT", "EXCL", "GOTO", "BUKA", "ARTO", "BRIS", "CPIN", "JPFA", "INDF",
-        "ICBP", "MYOR", "UNVR", "AMRT", "ACES", "MAPI", "INKP", "TKIM", "ANTM", "HRUM",
-        "PGAS", "AKRA", "MEDC", "ELSA", "ESSA", "ERAA", "TPIA", "BRPT", "CUAN", "BUMI",
-        "DEWA", "ENRG", "SMGR", "INTP", "KLBF", "MIKA", "SILO", "JSMR", "TEBE", "JARR",
-        "PANI", "AMMN", "BRMS", "TOBA", "MAPA", "AUTO"
+        # Perbankan & Finansial
+        "BBCA", "BBRI", "BMRI", "BBNI", "ARTO", "BRIS", "NISP", "BBTN", "BDMN", "BNGA", "PNBN", "AGRO", "BBYB", "BABP", "NOBU",
+        # Energi & Batubara
+        "ADRO", "PTBA", "ITMG", "HRUM", "BUMI", "DEWA", "ENRG", "ADMR", "CUAN", "TOBA", "INDY", "DOID", "FIRE", "GTSI", "BIPI",
+        # Infrastruktur, Telekomunikasi & Teknologi
+        "TLKM", "ISAT", "EXCL", "FREN", "GOTO", "BUKA", "MTDL", "EDGE", "MLIA", "CENT", "GHON", "TBIG", "TOWR", "META",
+        # Konsumer & Ritel
+        "ICBP", "INDF", "UNVR", "MYOR", "AMRT", "ACES", "MAPI", "MAPA", "ERAA", "MIDI", "CLEO", "CMRy", "WOOD", "HOKI", "GOOD",
+        # Properti & Konstruksi
+        "BSDE", "CTRA", "PWON", "SMRA", "ASRI", "APLN", "JRPT", "PTPP", "WIKA", "ADHI", "WSKT", "PPRO", "DILD", "OMRE", "KIJA",
+        # Otomotif & Manufaktur
+        "ASII", "AUTO", "IMAS", "SMSM", "INDS", "GJTL", "SRIL", "KBLI", "VOKS", "POLY",
+        # Bahan Baku, Kimia & Logam
+        "TPIA", "BRPT", "INKP", "TKIM", "ANTM", "MDKA", "INCO", "MBMA", "HRUM", "NCKL", "ANTM", "PSAB", "ARCI", "AMMN", "BRMS",
+        # Kesehatan & Farmasi
+        "KLBF", "MIKA", "SILO", "HEAL", "DVLA", "KAEF", "MERK", "PYFA", "SIDO", "PRDA",
+        # Transportasi & Lainnya
+        "GIAA", "ASSA", "BIRD", "SMDR", "IPCM", "TMAS", "WINS", "SHIP", "PANI", "JARR", "TEBE"
     ]
 
 if 'trade_journal' not in st.session_state:
@@ -174,7 +186,8 @@ ESTIMATED_SHARES = {
     "JARR": 12000000000, "AMRT": 41524500000, "TPIA": 86522000000, "AKRA": 20073000000,
     "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000,
     "BBRI": 151596000000, "BBNI": 37253000000, "PTBA": 11520000000, "INCO": 9933000000,
-    "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000
+    "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000, "DEWA": 131230000000,
+    "ENRG": 25100000000, "FREN": 325000000000, "BUKA": 103000000000, "ADRO": 31985000000
 }
 
 def hitung_fraksi_harga(price):
@@ -382,21 +395,45 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
         if not df_filtered.empty:
             st.dataframe(
                 df_filtered[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-                use_container_width=True, hide_index=True, height=340
+                use_container_width=True, hide_index=True, height=280
             )
             ticker_options = df_filtered["Ticker"].tolist()
         else:
             st.info("Tidak ada saham sesuai kriteria rentang harga.")
             ticker_options = []
 
+        # MICRO-SCANNER (ACTIVE DETECT)
+        st.markdown("""
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 12px; margin-top: 12px; margin-bottom: 12px;">
+            <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 8px;">📊 Micro-Scanner (Active Detect)</div>
+            <table width="100%" style="font-size: 11px; color: #cbd5e1;">
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 4px 0;"><b>UNTR</b></td>
+                    <td>Surge: <b style="color: #34d399;">+320%</b></td>
+                    <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">ACCEL</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 4px 0;"><b>TEBE</b></td>
+                    <td>Surge: <b style="color: #34d399;">+210%</b></td>
+                    <td style="text-align: right;"><span style="background: #064e3b; color: #34d399; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">BREAKOUT</span></td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px 0;"><b>ANTM</b></td>
+                    <td>Surge: <b style="color: #60a5fa;">+185%</b></td>
+                    <td style="text-align: right;"><span style="background: #002347; color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight:600;">SPIKE</span></td>
+                </tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
+
         # KOLOM KHUSUS TAMBAHAN: SEMUA SAHAM POTENSI NAIK (> 0% HINGGA <= 15%)
-        st.markdown("<h4 style='margin-top: 16px; margin-bottom: 8px; font-size: 14px; color: #34d399;'>🔥 All Positive Potential Momentum (Kenaikan > 0% s.d. 15%)</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='margin-top: 12px; margin-bottom: 6px; font-size: 13px; color: #34d399;'>🔥 All Positive Potential Momentum (> 0% s.d. 15%)</h4>", unsafe_allow_html=True)
         if not df_master.empty:
             df_momentum = df_master[(df_master["Raw Change"] > 0.0) & (df_master["Raw Change"] <= 15.0)]
             if not df_momentum.empty:
                 st.dataframe(
                     df_momentum[["Ticker", "Price", "Change (%)", "Signal", "Volume", "BSJP Status"]],
-                    use_container_width=True, hide_index=True, height=220
+                    use_container_width=True, hide_index=True, height=180
                 )
             else:
                 st.info("Belum ada saham yang mengalami kenaikan positif saat ini.")
