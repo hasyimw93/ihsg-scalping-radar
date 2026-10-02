@@ -29,6 +29,9 @@ if is_bursa_open:
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
 
+if 'selected_swing_ticker' not in st.session_state:
+    st.session_state.selected_swing_ticker = "ADRO"
+
 if 'selected_mb_ticker' not in st.session_state:
     st.session_state.selected_mb_ticker = "BUMI"
 
@@ -124,7 +127,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & LIVE MULTI-BAGGER RESEARCH</div>
+            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & INTERACTIVE SIGNAL MODULES</div>
         </div>
         <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
             <div style="font-size:10px; color:#93c5fd; font-weight:700;">NANO CORE</div>
@@ -735,26 +738,36 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
 
 elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
     st.markdown("### 🚀 Weekly Swing Signal & Bullish Watchlist")
-    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan (bullish continuation / reversal) lengkap dengan pelacakan P&L portofolio secara real-time.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Rekomendasi saham mingguan dengan potensi kenaikan lengkap dengan Kartu Sinyal Interaktif Astronacci VIP.</p>", unsafe_allow_html=True)
     
-    col_ws1, col_ws2 = st.columns([1.5, 1], gap="medium")
+    col_ws1, col_ws2 = st.columns([1.6, 1], gap="medium")
     
     with col_ws1:
-        st.markdown("#### 📊 Top Weekly Swing Picks (Radar Bullish)")
+        st.markdown("#### 📊 Top Weekly Swing Picks (Klik Baris untuk Lihat Kartu Sinyal)")
         swing_data = {
             "Emiten": ["ADRO", "MDKA", "BBRI", "INKP", "UNTR"],
             "Setup": ["Breakout Resistance", "Pullback MA20", "Accumulation Phase", "Volume Surge", "Golden Cross"],
-            "Buy Zone": ["Rp 2.450 - 2.500", "Rp 2.700 - 2.750", "Rp 4.900 - 5.000", "Rp 7.800 - 7.950", "Rp 26.500 - 27.000"],
-            "Target 1 (+3%)": ["Rp 2.575", "Rp 2.825", "Rp 5.150", "Rp 8.150", "Rp 27.800"],
-            "Target 2 (+6%)": ["Rp 2.650", "Rp 2.950", "Rp 5.300", "Rp 8.450", "Rp 28.600"],
-            "Target 3 (+10%)": ["Rp 2.750", "Rp 3.050", "Rp 5.500", "Rp 8.750", "Rp 29.500"],
-            "Stop Loss (-3%)": ["Rp 2.380", "Rp 2.620", "Rp 4.800", "Rp 7.600", "Rp 25.800"],
-            "Target Waktu": ["1 - 2 Minggu", "2 - 3 Minggu", "1 - 3 Minggu", "3 - 5 Hari", "2 - 4 Minggu"],
-            "RRR": ["1 : 2.5", "1 : 3.1", "1 : 2.2", "1 : 2.8", "1 : 2.6"]
+            "Buy Zone": [2480, 2720, 4950, 7850, 26800],
+            "Target 1 (+3% DX)": [2550, 2800, 5100, 8100, 27600],
+            "Target 2 (+6% DX)": [2630, 2880, 5250, 8350, 28400],
+            "Target 3 (+10% DX)": [2730, 2990, 5450, 8650, 29500],
+            "Stop Loss": [2400, 2640, 4800, 7600, 26000],
+            "Target Waktu": ["1-2 Minggu", "2-3 Minggu", "1-3 Minggu", "3-5 Hari", "2-4 Minggu"]
         }
         df_swing = pd.DataFrame(swing_data)
-        st.dataframe(df_swing, use_container_width=True, hide_index=True)
         
+        event_swing_sel = st.dataframe(
+            df_swing, use_container_width=True, hide_index=True, height=220,
+            selection_mode="single-row", on_select="rerun", key="table_swing_select"
+        )
+        
+        sel_swing_rows = event_swing_sel.get("selection", {}).get("rows", [])
+        if sel_swing_rows:
+            st.session_state.selected_swing_ticker = df_swing.iloc[sel_swing_rows[0]]["Emiten"]
+            
+        cur_sel_swing = st.session_state.selected_swing_ticker
+        matched_swing_row = df_swing[df_swing["Emiten"] == cur_sel_swing].iloc[0]
+
         st.markdown("#### 📝 Active Swing Trade Portfolio & Live P&L Tracker")
         if st.session_state.swing_journal:
             live_portfolio_rows = []
@@ -822,21 +835,50 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
                 st.rerun()
 
     with col_ws2:
-        st.markdown("#### 🧮 Swing Trade Position Sizing & Multi-TP")
-        st.markdown("<font size='2' color='#cbd5e1'>Kalkulator manajemen risiko dan target profit bertahap.</font>", unsafe_allow_html=True)
+        st.markdown(f"#### ⭐ Astronacci VIP Signal: {cur_sel_swing}")
         
+        buy_z_val = matched_swing_row["Buy Zone"]
+        tp1_val = matched_swing_row["Target 1 (+3% DX)"]
+        tp2_val = matched_swing_row["Target 2 (+6% DX)"]
+        tp3_val = matched_swing_row["Target 3 (+10% DX)"]
+        sl_val = matched_swing_row["Stop Loss"]
+
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #451a03 0%, #221006 100%); border: 1px solid #f87171; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 13px; font-weight: 700; color: #ffffff; text-transform: uppercase;">⭐ VIP Signal Card: {cur_sel_swing}</div>
+                <div style="background: rgba(0,0,0,0.3); color: #f87171; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; border: 1px solid #f87171;">ACTION: TAKE PROFIT / SELL</div>
+            </div>
+            <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
+                <tr style="background: #002347; color: #93c5fd; font-weight: 600;">
+                    <td style="padding: 6px; border-radius: 6px 0 0 6px;">BUY ZONE</td>
+                    <td style="padding: 6px;">TP 1 (+1.5%)</td>
+                    <td style="padding: 6px;">TP 2 (+3.5%)</td>
+                    <td style="padding: 6px;">TP 3 (+6%)</td>
+                    <td style="padding: 6px; border-radius: 0 6px 6px 0;">CUT LOSS</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: 700; color: #34d399;">Rp {buy_z_val:,}</td>
+                    <td style="padding: 8px 0; color: #6ee7b7;">Rp {tp1_val:,}</td>
+                    <td style="padding: 8px 0; color: #34d399; font-weight: 700;">Rp {tp2_val:,}</td>
+                    <td style="padding: 8px 0; color: #60a5fa;">Rp {tp3_val:,}</td>
+                    <td style="padding: 8px 0; font-weight: 700; color: #f87171;">Rp {sl_val:,}</td>
+                </tr>
+            </table>
+            <div style="margin-top: 10px; font-size: 11px; color: #cbd5e1; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                <span>🟢 <b>Timing Buy:</b> <b style="color: #34d399;">Wait / Pullback Area</b></span>
+                <span>🔴 <b>Timing Sell/TP:</b> <b style="color: #f87171;">Sesi 1 / Awal Sesi 2</b></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("#### 🧮 Swing Trade Position Sizing & Multi-TP")
         modal_swing = st.number_input("Total Modal Swing (Rp):", min_value=1000000, value=25000000, step=1000000)
         risk_pct_swing = st.slider("Risiko per Trade (% dari Modal):", 0.5, 5.0, 2.0, 0.5)
-        entry_swing = st.number_input("Harga Entry Rencana:", min_value=100, value=2500, step=50)
-        sl_swing = st.number_input("Harga Stop Loss Rencana:", min_value=100, value=2380, step=50)
         
         max_risk_rp = modal_swing * (risk_pct_swing / 100)
-        risk_per_share = entry_swing - sl_swing
+        risk_per_share = buy_z_val - sl_val
         recommended_lots = int((max_risk_rp / risk_per_share) // 100) if risk_per_share > 0 else 0
-        
-        tp1_calc = int(round(entry_swing * 1.03))
-        tp2_calc = int(round(entry_swing * 1.06))
-        tp3_calc = int(round(entry_swing * 1.10))
         
         st.markdown(f"""
         <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
@@ -845,9 +887,9 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
             <div style="font-size: 13px; color: #ffffff; margin-bottom: 6px;">Lot Optimal Dibeli: <b style="color: #34d399;">{recommended_lots:,} Lot</b></div>
             <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
             <div style="font-size: 12px; color: #93c5fd; font-weight: 600; margin-bottom: 4px;">Target Profit Bertahap:</div>
-            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 1 (+3%): <b style="color: #34d399;">Rp {tp1_calc:,}</b> (Jual 30%)</div>
-            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 2 (+6%): <b style="color: #34d399;">Rp {tp2_calc:,}</b> (Jual 40%)</div>
-            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 3 (+10%): <b style="color: #60a5fa;">Rp {tp3_calc:,}</b> (Trailing Stop Sisa)</div>
+            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 1: <b style="color: #34d399;">Rp {tp1_val:,}</b> (Jual 30%)</div>
+            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 2: <b style="color: #34d399;">Rp {tp2_val:,}</b> (Jual 40%)</div>
+            <div style="font-size: 12px; color: #cbd5e1;">🎯 TP 3: <b style="color: #60a5fa;">Rp {tp3_val:,}</b> (Trailing Stop Sisa)</div>
         </div>
         """, unsafe_allow_html=True)
 
