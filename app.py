@@ -29,6 +29,9 @@ if is_bursa_open:
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
 
+if 'selected_mb_ticker' not in st.session_state:
+    st.session_state.selected_mb_ticker = "BUMI"
+
 # 3. INJEKSI CUSTOM CSS (BIRU KHAS AJAIB KONSISTEN & JUDUL BESAR)
 st.markdown("""
 <style>
@@ -121,7 +124,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & EXTENDED LIVE MULTI-BAGGER RESEARCH</div>
+            <div class="hero-subtitle-nano">ANALYTICS TERMINAL & LIVE MULTI-BAGGER RESEARCH</div>
         </div>
         <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
             <div style="font-size:10px; color:#93c5fd; font-weight:700;">NANO CORE</div>
@@ -850,63 +853,67 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
 
 elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
     st.markdown("### 💎 Multi-Bagger Hunter (Gocap to High)")
-    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Daftar diperluas dengan emiten potensial jangka panjang, harga live real-time, serta perbandingan harga saat pertama kali dirilis.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #93c5fd; font-size: 13px;'>Analisis saham berharga murah dengan kartu sinyal interaktif target jangka panjang (Multi-Bagger Style).</p>", unsafe_allow_html=True)
     
-    col_mb1, col_mb2 = st.columns([1.6, 1], gap="medium")
+    mb_tickers_extended = [
+        ("BUMI", "Rp 50", "Restrukturisasi & Batubara", "0.8x (Murah)", 250, 400, 500, 40),
+        ("DEWA", "Rp 50", "Ekspansi Tambang Emas", "1.2x", 500, 800, 1200, 150),
+        ("ENRG", "Rp 90", "Akuisisi Blok Migas Baru", "1.1x", 1500, 2200, 3000, 800),
+        ("BRMS", "Rp 50", "Commercial Production Emas", "2.5x", 800, 1200, 1500, 300),
+        ("TEBE", "Rp 350", "Logistik & Infrastruktur", "1.4x", 2000, 3000, 4000, 1500),
+        ("PTBA", "Rp 1.200", "High Dividend & Energy Cycle", "1.8x", 3000, 4000, 5000, 2200),
+        ("ADRO", "Rp 1.000", "Green Energy Transition & Cash Rich", "1.3x", 2500, 3500, 4500, 1800),
+        ("ANTM", "Rp 600", "EV Battery & Nikel Downstream", "2.1x", 1500, 2200, 3000, 1000),
+        ("MEDC", "Rp 450", "Oil & Gas Super Cycle", "1.0x", 1200, 1800, 2500, 800),
+        ("ELSA", "Rp 150", "Energy Services Expansion", "0.9x", 400, 600, 800, 250),
+        ("GOTO", "Rp 90", "E-Commerce Profitability Turnaround", "1.5x", 200, 350, 500, 60),
+        ("ARTO", "Rp 1.500", "Digital Bank Ecosystem Growth", "3.2x", 3000, 4500, 6000, 2200)
+    ]
+    
+    mb_rows = []
+    mb_data_dict = {}
+    for t, rilis, kat, pbv, t1, t2, t3, sl in mb_tickers_extended:
+        t_data = fetch_single_ticker_data(t)
+        p_live = t_data["Price"] if t_data else 0
+        chg_live = t_data["Change (%)"] if t_data else "0%"
+        
+        mb_rows.append({
+            "Emiten": t,
+            "Harga Awal (Rilis)": rilis,
+            "Harga Live": f"Rp {p_live:,}" if p_live > 0 else "N/A",
+            "Perubahan": chg_live,
+            "Katalis Utama": kat,
+            "Valuasi/PBV": pbv,
+            "Target Utama": f"Rp {t3:,}+"
+        })
+        mb_data_dict[t] = {
+            "live_price": p_live if p_live > 0 else 100,
+            "t1": t1, "t2": t2, "t3": t3, "sl": sl,
+            "katalis": kat
+        }
+        
+    df_mb_live = pd.DataFrame(mb_rows)
+    
+    col_mb1, col_mb2 = st.columns([1.5, 1], gap="medium")
     
     with col_mb1:
-        st.markdown("#### 🔬 Extended Live Multi-Bagger Watchlist & Katalis")
+        st.markdown("#### 🔬 Live Multi-Bagger Watchlist (Klik Baris untuk Analisis Kartu)")
+        event_mb_sel = st.dataframe(
+            df_mb_live, use_container_width=True, hide_index=True, height=280,
+            selection_mode="single-row", on_select="rerun", key="table_mb_select"
+        )
         
-        # DAFTAR EMITEN DIPERLUAS MENJADI 12 EMITEN POTENSIAL
-        mb_tickers_extended = [
-            ("BUMI", "Rp 50", "Restrukturisasi & Batubara", "0.8x (Murah)", "Rp 250 - 500+"),
-            ("DEWA", "Rp 50", "Ekspansi Tambang Emas", "1.2x", "Rp 800 - 1.200+"),
-            ("ENRG", "Rp 90", "Akuisisi Blok Migas Baru", "1.1x", "Rp 3.000+"),
-            ("BRMS", "Rp 50", "Commercial Production Emas", "2.5x", "Rp 1.500+"),
-            ("TEBE", "Rp 350", "Logistik & Infrastruktur", "1.4x", "Rp 4.000+"),
-            ("PTBA", "Rp 1.200", "High Dividend & Energy Cycle", "1.8x", "Rp 5.000+"),
-            ("ADRO", "Rp 1.000", "Green Energy Transition & Cash Rich", "1.3x", "Rp 4.500+"),
-            ("ANTM", "Rp 600", "EV Battery & Nikel Downstream", "2.1x", "Rp 3.000+"),
-            ("MEDC", "Rp 450", "Oil & Gas Super Cycle", "1.0x", "Rp 2.500+"),
-            ("ELSA", "Rp 150", "Energy Services Expansion", "0.9x", "Rp 800+"),
-            ("GOTO", "Rp 90", "E-Commerce Profitability Turnaround", "1.5x", "Rp 500+"),
-            ("ARTO", "Rp 1.500", "Digital Bank Ecosystem Growth", "3.2x", "Rp 6.000+")
-        ]
-        
-        mb_rows = []
-        for t, rilis, kat, pbv, tgt in mb_tickers_extended:
-            t_data = fetch_single_ticker_data(t)
-            p_live = t_data["Price"] if t_data else 0
-            chg_live = t_data["Change (%)"] if t_data else "0%"
+        selected_mb_rows = event_mb_sel.get("selection", {}).get("rows", [])
+        if selected_mb_rows:
+            st.session_state.selected_mb_ticker = df_mb_live.iloc[selected_mb_rows[0]]["Emiten"]
             
-            mb_rows.append({
-                "Emiten": t,
-                "Harga Awal (Rilis)": rilis,
-                "Harga Live": f"Rp {p_live:,}" if p_live > 0 else "N/A",
-                "Perubahan": chg_live,
-                "Katalis Utama": kat,
-                "Valuasi/PBV": pbv,
-                "Target Jangka Panjang": tgt
-            })
-            
-        df_mb_live = pd.DataFrame(mb_rows)
-        st.dataframe(df_mb_live, use_container_width=True, hide_index=True, height=350)
-        
-        st.markdown("#### 📚 Formula Rahasia Multi-Bagger:")
-        st.markdown("""
-        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; font-size: 12px; color: #cbd5e1;">
-            <b>1. Low Valuation (Deep Value):</b> Cari emiten berharga murah yang mulai mencatat lonjakan volume di harga bawah.<br>
-            <b>2. Turnaround Bisnis:</b> Perusahaan yang sebelumnya terbebani utang kini membukukan laba bersih positif.<br>
-            <b>3. Smart Money Accumulation:</b> Akumulasi institusi jangka panjang pada fase konsolidasi bulanan/mingguan.
-        </div>
-        """, unsafe_allow_html=True)
+        cur_sel_mb = st.session_state.selected_mb_ticker
+        mb_info = mb_data_dict.get(cur_sel_mb, {"live_price": 100, "t1": 300, "t2": 600, "t3": 1000, "sl": 50, "katalis": "Transformasi"})
 
-    with col_mb2:
+        st.markdown("---")
         st.markdown("#### 🧮 Multi-Bagger Growth Simulator")
-        st.markdown("<font size='2' color='#cbd5e1'>Simulasikan potensi keuntungan menuju target jangka panjang.</font>", unsafe_allow_html=True)
-        
-        sim_harga_beli = st.number_input("Harga Beli Saat Ini (Rp):", min_value=10, value=170, step=10)
-        sim_harga_target = st.number_input("Target Harga Jangka Panjang (Rp):", min_value=50, value=1000, step=50)
+        sim_harga_beli = st.number_input("Harga Beli Saat Ini (Rp):", min_value=10, value=int(mb_info["live_price"]), step=10)
+        sim_harga_target = st.number_input("Target Harga Jangka Panjang (Rp):", min_value=50, value=int(mb_info["t3"]), step=50)
         sim_lot = st.number_input("Jumlah Lot Disimpan:", min_value=1, value=100, step=10)
         
         modal_awal = sim_harga_beli * sim_lot * 100
@@ -915,13 +922,64 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
         persen_cuan = ((sim_harga_target - sim_harga_beli) / sim_harga_beli) * 100 if sim_harga_beli > 0 else 0
         
         st.markdown(f"""
-        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; margin-top: 10px;">
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px;">
             <div style="font-size: 12px; font-weight: 600; color: #f8fafc; text-transform: uppercase; margin-bottom: 6px;">Hasil Simulasi Multi-Bagger:</div>
             <div style="font-size: 13px; color: #ffffff; margin-bottom: 2px;">Modal Awal: <b>Rp {modal_awal:,.0f}</b></div>
             <div style="font-size: 13px; color: #ffffff; margin-bottom: 6px;">Nilai Portofolio Akhir: <b style="color: #34d399;">Rp {nilai_akhir:,.0f}</b></div>
             <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
             <div style="font-size: 14px; color: #34d399; font-weight: 700; margin-bottom: 2px;">Potensi Profit: Rp {potensi_profit:,.0f}</div>
             <div style="font-size: 13px; color: #60a5fa; font-weight: 700;">Potensi Kenaikan: +{persen_cuan:,.2f}% ({(persen_cuan/100):.1f}x Lipat)</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_mb2:
+        st.markdown(f"#### ⭐ Multi-Bagger Signal Card: {cur_sel_mb}")
+        
+        live_p_card = mb_info["live_price"]
+        t1_card = mb_info["t1"]
+        t2_card = mb_info["t2"]
+        t3_card = mb_info["t3"]
+        sl_card = mb_info["sl"]
+        kat_card = mb_info["katalis"]
+
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #003366 0%, #002244 100%); border: 1px solid #34d399; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 13px; font-weight: 700; color: #ffffff; text-transform: uppercase;">💎 Long-Term Target: {cur_sel_mb}</div>
+                <div style="background: rgba(0,0,0,0.3); color: #34d399; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; border: 1px solid #34d399;">ACTION: ACCUMULATE</div>
+            </div>
+            <table width="100%" style="font-size: 11px; color: #e2e8f0; text-align: center;">
+                <tr style="background: #002347; color: #93c5fd; font-weight: 600;">
+                    <td style="padding: 6px; border-radius: 6px 0 0 6px;">BUY ZONE</td>
+                    <td style="padding: 6px;">TARGET 1 (2x)</td>
+                    <td style="padding: 6px;">TARGET 2 (3x)</td>
+                    <td style="padding: 6px;">TARGET 3 (5x+)</td>
+                    <td style="padding: 6px; border-radius: 0 6px 6px 0;">INVALIDATION</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; font-weight: 700; color: #34d399;">Rp {live_p_card:,}</td>
+                    <td style="padding: 8px 0; color: #6ee7b7;">Rp {t1_card:,}</td>
+                    <td style="padding: 8px 0; color: #34d399; font-weight: 700;">Rp {t2_card:,}</td>
+                    <td style="padding: 8px 0; color: #60a5fa;">Rp {t3_card:,}</td>
+                    <td style="padding: 8px 0; font-weight: 700; color: #f87171;">Rp {sl_card:,}</td>
+                </tr>
+            </table>
+            <div style="margin-top: 10px; font-size: 11px; color: #cbd5e1; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+                <span>📌 <b>Katalis Utama:</b> <b style="color: #93c5fd;">{kat_card}</b></span>
+            </div>
+            <div style="margin-top: 6px; font-size: 11px; color: #cbd5e1; display: flex; justify-content: space-between;">
+                <span>🟢 <b>Akumulasi:</b> <b style="color: #34d399;">Fase Konsolidasi</b></span>
+                <span>🔴 <b>Batas Cut Loss/Review:</b> <b style="color: #f87171;">Break Support Bawah</b></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("#### 📚 Formula Rahasia Multi-Bagger:")
+        st.markdown("""
+        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 14px; font-size: 12px; color: #cbd5e1;">
+            <b>1. Low Valuation (Deep Value):</b> Cari emiten berharga murah yang mencatat lonjakan volume di harga bawah.<br>
+            <b>2. Turnaround Bisnis:</b> Perusahaan yang sebelumnya terbebani utang kini membukukan laba bersih positif.<br>
+            <b>3. Smart Money Accumulation:</b> Akumulasi institusi jangka panjang pada fase konsolidasi bulanan/mingguan.
         </div>
         """, unsafe_allow_html=True)
 
