@@ -172,7 +172,7 @@ if 'master_universe' not in st.session_state:
         "AKRA", "MEDC", "ELSA", "ESSA", "ERAA", "CUAN", "BUMI", "DEWA", "ENRG", "TEBE",
         "PANI", "AMMN", "BRMS", "TOBA", "BUKA", "ACES", "MAPI", "INKP", "TKIM", "JARR",
         "GGRM", "HMSP", "UNVR", "KLBF", "SMGR", "INTP", "JSMR", "EXCL", "ISAT", "TBIG",
-        "DOOH", "RAJA"
+        "DOOH", "RAJA", "ITMG"
     ]
 
 @st.cache_data(ttl=300)
@@ -204,7 +204,8 @@ ESTIMATED_SHARES = {
     "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000,
     "BBRI": 151596000000, "BBNI": 37253000000, "PTBA": 11520000000, "INCO": 9933000000,
     "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000, "DEWA": 131230000000,
-    "ENRG": 25100000000, "BUKA": 103000000000, "ADRO": 31985000000, "DOOH": 5000000000, "RAJA": 9500000000
+    "ENRG": 25100000000, "BUKA": 103000000000, "ADRO": 31985000000, "DOOH": 5000000000, "RAJA": 9500000000,
+    "ITMG": 1129925000
 }
 
 def hitung_fraksi_harga(price):
@@ -292,19 +293,16 @@ def fetch_single_ticker_data(symbol):
             if change_pct >= -2.0 and (is_macd_bullish or is_bb_breakout or change_pct >= 0):
                 astronacci_action = "STRONG BUY"
                 action_color = "#34d399"
-                bg_gradient = "linear-gradient(135deg, #003366 0%, #002244 100%)"
                 timing_buy = "09:00 - 10:15 WIB (Fibonacci Support Area)"
                 timing_sell = "14:45 - 15:50 WIB (Fibonacci Extension TP)"
             elif change_pct < -3.0 or rsi_val > 78:
                 astronacci_action = "TAKE PROFIT / SELL"
                 action_color = "#f87171"
-                bg_gradient = "linear-gradient(135deg, #451a03 0%, #221006 100%)"
                 timing_buy = "Wait / Area Retracement Belum Tercapai"
                 timing_sell = "Segera Sesi 1 / Awal Sesi 2"
             else:
                 astronacci_action = "STRONG BUY"
                 action_color = "#34d399"
-                bg_gradient = "linear-gradient(135deg, #003366 0%, #002244 100%)"
                 timing_buy = "Akumulasi di Area Support Fibo"
                 timing_sell = "Hold Sesuai Target TP"
 
@@ -367,7 +365,6 @@ def fetch_single_ticker_data(symbol):
                 "Prediksi Profit (3-15%+)": prediksi_profit_str,
                 "Astronacci Action": astronacci_action,
                 "Action Color": action_color,
-                "Bg Gradient": bg_gradient,
                 "Timing Buy": timing_buy,
                 "Timing Sell": timing_sell,
                 "Upper_BB": upper_bb,
@@ -399,7 +396,7 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
             ihsg_change = ihsg_current - ihsg_prev
             ihsg_pct = (ihsg_change / ihsg_prev) * 100
             
-            col_ihsg1, col_ihsg2, col_ihsg3 = st.columns([1, 1, 2])
+            col_ihsg1, col_ihsg2, _ = st.columns([1, 1, 2])
             with col_ihsg1:
                 st.metric(label="IHSG Index", value=f"{ihsg_current:,.2f}", delta=f"{ihsg_pct:+.2f}%")
             with col_ihsg2:
@@ -800,24 +797,37 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
 # ------------------------------------------
 elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
     st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule")
-    st.markdown("Modul pemburu dividen lengkap dengan persentase Yield, estimasi nilai dividen per lembar, serta skema waktu wajib beli agar berhak menerima dividen.")
+    st.markdown("Modul pemburu dividen lengkap dengan daftar komprehensif seluruh emiten pembagi dividen, persentase Yield, estimasi nilai dividen, serta skema waktu wajib beli.")
     
     col_div1, col_div2 = st.columns([1.6, 1.4], gap="medium")
     
     with col_div1:
-        st.markdown("#### 📊 Watchlist Saham High Dividend Yield")
+        st.markdown("#### 📊 Watchlist Komprehensif Saham Pembagi Dividen (BEI)")
+        
+        # Daftar lengkap semua saham utama pembagi dividen
         df_div = pd.DataFrame([
             {"Emiten": "PTBA", "Harga (Rp)": 3180, "Dividen/Svr (Rp)": 410, "Yield (%)": "12.89%", "Cum Date": "15 Apr 2026", "Ex Date": "16 Apr 2026", "Payment": "10 Mei 2026"},
             {"Emiten": "ADRO", "Harga (Rp)": 2500, "Dividen/Svr (Rp)": 220, "Yield (%)": "8.80%", "Cum Date": "22 Mei 2026", "Ex Date": "25 Mei 2026", "Payment": "15 Jun 2026"},
-            {"Emiten": "BMRI", "Harga (Rp)": 4030, "Dividen/Svr (Rp)": 350, "Yield (%)": "8.68%", "Cum Date": "10 Mar 2026", "Ex Date": "11 Mar 2026", "Payment": "04 Apr 2026"},
-            {"Emiten": "BBRI", "Harga (Rp)": 4950, "Dividen/Svr (Rp)": 235, "Yield (%)": "4.75%", "Cum Date": "18 Mar 2026", "Ex Date": "19 Mar 2026", "Payment": "12 Apr 2026"},
             {"Emiten": "ASII", "Harga (Rp)": 4630, "Dividen/Svr (Rp)": 421, "Yield (%)": "9.09%", "Cum Date": "05 Mei 2026", "Ex Date": "06 Mei 2026", "Payment": "28 Mei 2026"},
-            {"Emiten": "TLKM", "Harga (Rp)": 2900, "Dividen/Svr (Rp)": 165, "Yield (%)": "5.68%", "Cum Date": "02 Jun 2026", "Ex Date": "03 Jun 2026", "Payment": "30 Jun 2026"}
+            {"Emiten": "BMRI", "Harga (Rp)": 4030, "Dividen/Svr (Rp)": 350, "Yield (%)": "8.68%", "Cum Date": "10 Mar 2026", "Ex Date": "11 Mar 2026", "Payment": "04 Apr 2026"},
+            {"Emiten": "ITMG", "Harga (Rp)": 27500, "Dividen/Svr (Rp)": 2050, "Yield (%)": "7.45%", "Cum Date": "12 Apr 2026", "Ex Date": "13 Apr 2026", "Payment": "02 Mei 2026"},
+            {"Emiten": "UNTR", "Harga (Rp)": 26015, "Dividen/Svr (Rp)": 1650, "Yield (%)": "6.34%", "Cum Date": "20 Apr 2026", "Ex Date": "21 Apr 2026", "Payment": "12 Mei 2026"},
+            {"Emiten": "TLKM", "Harga (Rp)": 2900, "Dividen/Svr (Rp)": 165, "Yield (%)": "5.68%", "Cum Date": "02 Jun 2026", "Ex Date": "03 Jun 2026", "Payment": "30 Jun 2026"},
+            {"Emiten": "BBRI", "Harga (Rp)": 4950, "Dividen/Svr (Rp)": 235, "Yield (%)": "4.75%", "Cum Date": "18 Mar 2026", "Ex Date": "19 Mar 2026", "Payment": "12 Apr 2026"},
+            {"Emiten": "INDF", "Harga (Rp)": 7450, "Dividen/Svr (Rp)": 290, "Yield (%)": "3.89%", "Cum Date": "08 Jul 2026", "Ex Date": "09 Jul 2026", "Payment": "29 Jul 2026"},
+            {"Emiten": "ICBP", "Harga (Rp)": 11200, "Dividen/Svr (Rp)": 265, "Yield (%)": "2.37%", "Cum Date": "07 Jul 2026", "Ex Date": "08 Jul 2026", "Payment": "28 Jul 2026"},
+            {"Emiten": "BBNI", "Harga (Rp)": 5200, "Dividen/Svr (Rp)": 280, "Yield (%)": "5.38%", "Cum Date": "14 Mar 2026", "Ex Date": "15 Mar 2026", "Payment": "05 Apr 2026"},
+            {"Emiten": "BBCA", "Harga (Rp)": 10150, "Dividen/Svr (Rp)": 270, "Yield (%)": "2.66%", "Cum Date": "20 Mar 2026", "Ex Date": "21 Mar 2026", "Payment": "15 Apr 2026"},
+            {"Emiten": "ANTM", "Harga (Rp)": 1550, "Dividen/Svr (Rp)": 85, "Yield (%)": "5.48%", "Cum Date": "25 Mei 2026", "Ex Date": "26 Mei 2026", "Payment": "18 Jun 2026"},
+            {"Emiten": "AKRA", "Harga (Rp)": 1650, "Dividen/Svr (Rp)": 125, "Yield (%)": "7.58%", "Cum Date": "10 Apr 2026", "Ex Date": "11 Apr 2026", "Payment": "30 Apr 2026"},
+            {"Emiten": "PGAS", "Harga (Rp)": 1450, "Dividen/Svr (Rp)": 110, "Yield (%)": "7.59%", "Cum Date": "15 Jun 2026", "Ex Date": "16 Jun 2026", "Payment": "08 Jul 2026"}
         ])
-        st.dataframe(df_div, use_container_width=True, hide_index=True)
+        
+        st.dataframe(df_div, use_container_width=True, height=310, hide_index=True)
         
         st.markdown("#### 🧮 Kalkulator Simulasi Cuan Dividen")
-        sim_div_emiten = st.selectbox("Pilih Emiten:", ["PTBA", "ADRO", "BMRI", "BBRI", "ASII", "TLKM"])
+        emitens_list = df_div["Emiten"].tolist()
+        sim_div_emiten = st.selectbox("Pilih Emiten Pembagi Dividen:", emitens_list)
         sim_lot_div = st.number_input("Jumlah Saham yang Dimiliki (Lot):", value=50, step=10)
         
         row_sel = df_div[df_div["Emiten"] == sim_div_emiten].iloc[0]
@@ -848,10 +858,10 @@ elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
         Hari terakhir Anda **wajib punya/beli saham** ini di portofolio sebelum penutupan market agar tercatat sebagai penerima dividen.
         
         🔴 **2. EX DATE ({row_sel['Ex Date']})**  
-        Hari pertama saham diperdagangkan **tanpa hak dividen** (*ex-dividend*). Harga biasanya terkoreksi. Jangan beli di hari ini jika mengincar dividen!
+        Hari pertama saham diperdagangkan **tanpa hak dividen** (*ex-dividend*). Harga biasanya terkoreksi (dividen drop). Jangan beli di hari ini jika mengincar dividen!
         
         🔵 **3. RECORDING DATE (H+1 Ex-Date)**  
-        Tanggal Kustodian mencetak daftar resmi investor yang berhak atas dividen.
+        Tanggal Kustodian KSEI mencetak daftar resmi investor yang berhak atas dividen.
         
         💰 **4. PAYMENT DATE ({row_sel['Payment']})**  
         Hari pencairan uang dividen masuk secara otomatis ke dalam Rekening Dana Nasabah (RDN) Anda.
