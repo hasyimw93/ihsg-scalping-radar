@@ -751,26 +751,45 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
         """, unsafe_allow_html=True)
 
 # ------------------------------------------
-# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE (UPDATE OKTOBER 2026 SESUAI GAMBAR)
+# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE (DENGAN FETCH HARGA LIVE)
 # ------------------------------------------
 elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
-    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule (Update Oktober 2026)")
-    st.markdown("Kalender dividen real-time berdasarkan data keterbukaan informasi bursa terbaru (termasuk UNTR, ASGR, AALI, GEMS, TLDN).")
+    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule (Real-Time Price Sync)")
+    st.markdown("Kalender dividen dengan harga saham yang disinkronkan secara *real-time* langsung dari bursa via yFinance.")
     
     col_div1, col_div2 = st.columns([1.6, 1.4], gap="medium")
     
     with col_div1:
-        st.markdown("#### 📊 Kalender & Watchlist Dividen Terbaru (Oktober 2026)")
+        st.markdown("#### 📊 Kalender & Watchlist Dividen (Live Market Price)")
         
-        # Data disesuaikan persis dengan gambar kalender dividen
-        df_div = pd.DataFrame([
-            {"Emiten": "UNTR", "Harga (Rp)": 26015, "Dividen/Svr (Rp)": 430, "Yield (%)": "1.65%", "Cum Date": "6 Okt 2026", "Ex Date": "7 Okt 2026", "Payment": "26 Okt 2026"},
-            {"Emiten": "ASGR", "Harga (Rp)": 1500, "Dividen/Svr (Rp)": 297, "Yield (%)": "19.80%", "Cum Date": "7 Okt 2026", "Ex Date": "8 Okt 2026", "Payment": "26 Okt 2026"},
-            {"Emiten": "AALI", "Harga (Rp)": 7200, "Dividen/Svr (Rp)": 233, "Yield (%)": "3.24%", "Cum Date": "8 Okt 2026", "Ex Date": "9 Okt 2026", "Payment": "26 Okt 2026"},
-            {"Emiten": "GEMS", "Harga (Rp)": 7500, "Dividen/Svr (Rp)": 611, "Yield (%)": "8.15%", "Cum Date": "8 Okt 2026", "Ex Date": "9 Okt 2026", "Payment": "22 Okt 2026"},
-            {"Emiten": "TLDN", "Harga (Rp)": 550, "Dividen/Svr (Rp)": 20, "Yield (%)": "3.64%", "Cum Date": "12 Okt 2026", "Ex Date": "13 Okt 2026", "Payment": "22 Okt 2026"}
-        ])
+        # Daftar data dasar dividen (ticker, nominal dividen, jadwal)
+        raw_div_list = [
+            {"Emiten": "UNTR", "Div": 430, "Cum": "6 Okt 2026", "Ex": "7 Okt 2026", "Pay": "26 Okt 2026"},
+            {"Emiten": "ASGR", "Div": 297, "Cum": "7 Okt 2026", "Ex": "8 Okt 2026", "Pay": "26 Okt 2026"},
+            {"Emiten": "AALI", "Div": 233, "Cum": "8 Okt 2026", "Ex": "9 Okt 2026", "Pay": "26 Okt 2026"},
+            {"Emiten": "GEMS", "Div": 611, "Cum": "8 Okt 2026", "Ex": "9 Okt 2026", "Pay": "22 Okt 2026"},
+            {"Emiten": "TLDN", "Div": 20, "Cum": "12 Okt 2026", "Ex": "13 Okt 2026", "Pay": "22 Okt 2026"}
+        ]
         
+        # Ambil harga live secara otomatis
+        live_div_data = []
+        for item in raw_div_list:
+            t_symbol = item["Emiten"]
+            live_p = fetch_single_ticker_data(t_symbol)
+            current_p = live_p["Price"] if live_p else 1000  # Fallback aman
+            yield_calc = (item["Div"] / current_p) * 100 if current_p > 0 else 0
+            
+            live_div_data.append({
+                "Emiten": t_symbol,
+                "Harga (Rp)": current_p,
+                "Dividen/Svr (Rp)": item["Div"],
+                "Yield (%)": f"{yield_calc:.2f}%",
+                "Cum Date": item["Cum"],
+                "Ex Date": item["Ex"],
+                "Payment": item["Pay"]
+            })
+            
+        df_div = pd.DataFrame(live_div_data)
         st.dataframe(df_div, use_container_width=True, height=270, hide_index=True)
         
         st.markdown("#### 🧮 Kalkulator Simulasi Cuan Dividen")
@@ -791,7 +810,7 @@ elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
         st.markdown(f"""
         <div style="background: #003366; border: 1px solid #34d399; border-radius: 12px; padding: 14px; margin-top: 10px;">
             <div style="font-size: 11px; font-weight: 700; color: #93c5fd; text-transform: uppercase;">Hasil Kalkulasi Dividen {sim_div_emiten}:</div>
-            <div style="font-size: 13px; color: #ffffff; margin-top: 4px;">Total Modal Investasi: <b>Rp {total_modal_div:,.0f}</b></div>
+            <div style="font-size: 13px; color: #ffffff; margin-top: 4px;">Total Modal Investasi (Live): <b>Rp {total_modal_div:,.0f}</b></div>
             <div style="font-size: 14px; color: #34d399; margin-top: 2px; font-weight: 700;">Total Dividen Diterima (Gross): Rp {total_div_diterima:,.0f} ({yield_val})</div>
             <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Wajib Beli Paling Lambat (Cum Date): <b style="color: #6ee7b7;">{cum_date_val}</b></div>
         </div>
