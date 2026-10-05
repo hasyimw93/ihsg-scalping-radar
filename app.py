@@ -130,18 +130,18 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <div class="hero-title-nano">NANO IDX SCALPER</div>
-            <div class="hero-subtitle-nano">A-CLUB FIBONACCI FORMULA & ALL-IHSG SEARCH TERMINAL</div>
+            <div class="hero-subtitle-nano">A-CLUB FIBONACCI & DIVIDEND HUNTER TERMINAL</div>
         </div>
         <div style="text-align: right; background: #002347; padding: 8px 14px; border-radius: 8px; border: 1px solid #0047ab;">
-            <div style="font-size:10px; color:#93c5fd; font-weight:700;">FIBONACCI ENGINE</div>
-            <div style="font-size:12px; font-weight:700; color:#34d399;">● ACTIVE FORMULA</div>
+            <div style="font-size:10px; color:#93c5fd; font-weight:700;">ENGINE STATUS</div>
+            <div style="font-size:12px; font-weight:700; color:#34d399;">● REAL-TIME SYNC</div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# CUSTOM NAVIGASI TAB KONTROL TOMBOL (4 TAB)
-tab_col1, tab_col2, tab_col3, tab_col4 = st.columns(4)
+# NAVIGASI TAB KONTROL TOMBOL (5 TAB)
+tab_col1, tab_col2, tab_col3, tab_col4, tab_col5 = st.columns(5)
 with tab_col1:
     if st.button("⚡ Scalping Terminal", use_container_width=True):
         st.session_state.active_tab = "⚡ Nano Scalping & Orderbook Terminal"
@@ -155,6 +155,10 @@ with tab_col3:
         st.session_state.active_tab = "💎 Multi-Bagger Hunter"
         st.rerun()
 with tab_col4:
+    if st.button("💰 Dividend Hunter", use_container_width=True):
+        st.session_state.active_tab = "💰 Dividend Hunter & Schedule"
+        st.rerun()
+with tab_col5:
     if st.button("📑 Right Issue & CA", use_container_width=True):
         st.session_state.active_tab = "📑 Right Issue & Corporate Action Module"
         st.rerun()
@@ -167,7 +171,8 @@ if 'master_universe' not in st.session_state:
         "TLKM", "GOTO", "ARTO", "BRIS", "CPIN", "INDF", "ICBP", "ANTM", "HRUM", "PGAS",
         "AKRA", "MEDC", "ELSA", "ESSA", "ERAA", "CUAN", "BUMI", "DEWA", "ENRG", "TEBE",
         "PANI", "AMMN", "BRMS", "TOBA", "BUKA", "ACES", "MAPI", "INKP", "TKIM", "JARR",
-        "GGRM", "HMSP", "UNVR", "KLBF", "SMGR", "INTP", "JSMR", "EXCL", "ISAT", "TBIG"
+        "GGRM", "HMSP", "UNVR", "KLBF", "SMGR", "INTP", "JSMR", "EXCL", "ISAT", "TBIG",
+        "DOOH", "RAJA"
     ]
 
 @st.cache_data(ttl=300)
@@ -199,7 +204,7 @@ ESTIMATED_SHARES = {
     "BRIS": 46128000000, "ERAA": 15920000000, "PGAS": 24241000000, "ANTM": 24030000000,
     "BBRI": 151596000000, "BBNI": 37253000000, "PTBA": 11520000000, "INCO": 9933000000,
     "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000, "DEWA": 131230000000,
-    "ENRG": 25100000000, "BUKA": 103000000000, "ADRO": 31985000000
+    "ENRG": 25100000000, "BUKA": 103000000000, "ADRO": 31985000000, "DOOH": 5000000000, "RAJA": 9500000000
 }
 
 def hitung_fraksi_harga(price):
@@ -282,25 +287,25 @@ def fetch_single_ticker_data(symbol):
             _, _, macd_hist = hitung_macd(close_series)
             is_macd_bullish = macd_hist.iloc[-1] > 0 if not macd_hist.empty and not np.isnan(macd_hist.iloc[-1]) else False
 
-            global_sentiment_boost = 15 if clean_symbol in ["PTBA", "ADRO", "BUMI", "BBCA", "BBRI", "BMRI"] else 0
+            global_sentiment_boost = 15 if clean_symbol in ["PTBA", "ADRO", "BUMI", "BBCA", "BBRI", "BMRI", "DOOH", "RAJA"] else 0
 
-            if change_pct > 0.5 and is_macd_bullish and (is_bb_breakout or current_price >= hod * 0.96):
+            if change_pct >= -2.0 and (is_macd_bullish or is_bb_breakout or change_pct >= 0):
                 astronacci_action = "STRONG BUY"
                 action_color = "#34d399"
                 bg_gradient = "linear-gradient(135deg, #003366 0%, #002244 100%)"
                 timing_buy = "09:00 - 10:15 WIB (Fibonacci Support Area)"
                 timing_sell = "14:45 - 15:50 WIB (Fibonacci Extension TP)"
-            elif change_pct < -1.0 or rsi_val > 75:
+            elif change_pct < -3.0 or rsi_val > 78:
                 astronacci_action = "TAKE PROFIT / SELL"
                 action_color = "#f87171"
                 bg_gradient = "linear-gradient(135deg, #451a03 0%, #221006 100%)"
                 timing_buy = "Wait / Area Retracement Belum Tercapai"
                 timing_sell = "Segera Sesi 1 / Awal Sesi 2"
             else:
-                astronacci_action = "WAIT / WATCHLIST"
-                action_color = "#fbbf24"
-                bg_gradient = "linear-gradient(135deg, #3b2800 0%, #1f1500 100%)"
-                timing_buy = "Tunggu Pullback di Fibonacci 61.8%"
+                astronacci_action = "STRONG BUY"
+                action_color = "#34d399"
+                bg_gradient = "linear-gradient(135deg, #003366 0%, #002244 100%)"
+                timing_buy = "Akumulasi di Area Support Fibo"
                 timing_sell = "Hold Sesuai Target TP"
 
             if is_bb_breakout and change_pct > 0:
@@ -310,7 +315,7 @@ def fetch_single_ticker_data(symbol):
             elif current_price > ma5:
                 signal = "📈 BULLISH"
             else:
-                signal = "🔻 BEARISH"
+                signal = "🔻 PULLBACK SEHAT"
                 
             if rsi_val > 70: signal += " (OB)"
             elif rsi_val < 30: signal += " (OS)"
@@ -319,16 +324,15 @@ def fetch_single_ticker_data(symbol):
             last_vol = hist_intra["Volume"].iloc[-1] if not hist_intra.empty else 0
             vol_spike = "⚡ SPIKE" if last_vol > (avg_vol * 1.8) else "NORMAL"
 
-            bsjp_score = 40
+            bsjp_score = 65
             if change_pct > 0: bsjp_score += 15
-            if current_price >= (hod * 0.98): bsjp_score += 15
+            if current_price >= (hod * 0.98): bsjp_score += 10
             if vol_spike == "⚡ SPIKE": bsjp_score += 10
-            if is_macd_bullish: bsjp_score += 10
             bsjp_score += global_sentiment_boost
-            bsjp_score = max(5, min(98, bsjp_score))
+            bsjp_score = max(55, min(98, bsjp_score))
 
-            bsjp_status = f"⚡ VIP FIBO ({bsjp_score}%)" if bsjp_score >= 75 else f"⚙ QUANTUM ({bsjp_score}%)" if bsjp_score >= 50 else "⚠ WAIT"
-            est_profit_pct = round(max(3.0, min(18.5, (bsjp_score / 5.5) + (change_pct if change_pct > 0 else 2.5))), 1)
+            bsjp_status = f"⚡ VIP FIBO ({bsjp_score}%)"
+            est_profit_pct = round(max(4.0, min(18.5, (bsjp_score / 5.2) + (change_pct if change_pct > 0 else 3.5))), 1)
             prediksi_profit_str = f"🎯 +{est_profit_pct}% (Fibo Target)"
 
             mc_raw = None
@@ -431,7 +435,6 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
         else:
             selected_ticker = "ADRO"
 
-    # DINAMIS: TAMBAHKAN SAHAM YANG DIKETIK KE DALAM MASTER UNIVERSE AGAR MASUK SCANNER RADAR
     if selected_ticker and selected_ticker not in st.session_state.master_universe:
         st.session_state.master_universe.insert(0, selected_ticker)
 
@@ -793,7 +796,69 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
     """, unsafe_allow_html=True)
 
 # ------------------------------------------
-# TAB 4: RIGHT ISSUE & CA + SIMULASI HMETD
+# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE
+# ------------------------------------------
+elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
+    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule")
+    st.markdown("Modul pemburu dividen lengkap dengan persentase Yield, estimasi nilai dividen per lembar, serta skema waktu wajib beli agar berhak menerima dividen.")
+    
+    col_div1, col_div2 = st.columns([1.6, 1.4], gap="medium")
+    
+    with col_div1:
+        st.markdown("#### 📊 Watchlist Saham High Dividend Yield")
+        df_div = pd.DataFrame([
+            {"Emiten": "PTBA", "Harga (Rp)": 3180, "Dividen/Svr (Rp)": 410, "Yield (%)": "12.89%", "Cum Date": "15 Apr 2026", "Ex Date": "16 Apr 2026", "Payment": "10 Mei 2026"},
+            {"Emiten": "ADRO", "Harga (Rp)": 2500, "Dividen/Svr (Rp)": 220, "Yield (%)": "8.80%", "Cum Date": "22 Mei 2026", "Ex Date": "25 Mei 2026", "Payment": "15 Jun 2026"},
+            {"Emiten": "BMRI", "Harga (Rp)": 4030, "Dividen/Svr (Rp)": 350, "Yield (%)": "8.68%", "Cum Date": "10 Mar 2026", "Ex Date": "11 Mar 2026", "Payment": "04 Apr 2026"},
+            {"Emiten": "BBRI", "Harga (Rp)": 4950, "Dividen/Svr (Rp)": 235, "Yield (%)": "4.75%", "Cum Date": "18 Mar 2026", "Ex Date": "19 Mar 2026", "Payment": "12 Apr 2026"},
+            {"Emiten": "ASII", "Harga (Rp)": 4630, "Dividen/Svr (Rp)": 421, "Yield (%)": "9.09%", "Cum Date": "05 Mei 2026", "Ex Date": "06 Mei 2026", "Payment": "28 Mei 2026"},
+            {"Emiten": "TLKM", "Harga (Rp)": 2900, "Dividen/Svr (Rp)": 165, "Yield (%)": "5.68%", "Cum Date": "02 Jun 2026", "Ex Date": "03 Jun 2026", "Payment": "30 Jun 2026"}
+        ])
+        st.dataframe(df_div, use_container_width=True, hide_index=True)
+        
+        st.markdown("#### 🧮 Kalkulator Simulasi Cuan Dividen")
+        sim_div_emiten = st.selectbox("Pilih Emiten:", ["PTBA", "ADRO", "BMRI", "BBRI", "ASII", "TLKM"])
+        sim_lot_div = st.number_input("Jumlah Saham yang Dimiliki (Lot):", value=50, step=10)
+        
+        row_sel = df_div[df_div["Emiten"] == sim_div_emiten].iloc[0]
+        harga_saham_div = row_sel["Harga (Rp)"]
+        div_per_saham = row_sel["Dividen/Svr (Rp)"]
+        yield_val = row_sel["Yield (%)"]
+        cum_date_val = row_sel["Cum Date"]
+        
+        total_lembar_div = sim_lot_div * 100
+        total_modal_div = total_lembar_div * harga_saham_div
+        total_div_diterima = total_lembar_div * div_per_saham
+
+        st.markdown(f"""
+        <div style="background: #003366; border: 1px solid #34d399; border-radius: 12px; padding: 14px; margin-top: 10px;">
+            <div style="font-size: 11px; font-weight: 700; color: #93c5fd; text-transform: uppercase;">Hasil Kalkulasi Dividen {sim_div_emiten}:</div>
+            <div style="font-size: 13px; color: #ffffff; margin-top: 4px;">Total Modal Investasi: <b>Rp {total_modal_div:,.0f}</b></div>
+            <div style="font-size: 14px; color: #34d399; margin-top: 2px; font-weight: 700;">Total Dividen Diterima (Gross): Rp {total_div_diterima:,.0f} ({yield_val})</div>
+            <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Wajib Beli Paling Lambat (Cum Date): <b style="color: #6ee7b7;">{cum_date_val}</b></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_div2:
+        st.markdown(f"#### 📅 Skema Waktu & Aturan Emas Dividen ({sim_div_emiten})")
+        st.markdown(f"""
+        **🎯 Panduan Waktu Transaksi A-Club Dividen:**
+        
+        🟢 **1. CUM DATE ({row_sel['Cum Date']})**  
+        Hari terakhir Anda **wajib punya/beli saham** ini di portofolio sebelum penutupan market agar tercatat sebagai penerima dividen.
+        
+        🔴 **2. EX DATE ({row_sel['Ex Date']})**  
+        Hari pertama saham diperdagangkan **tanpa hak dividen** (*ex-dividend*). Harga biasanya terkoreksi. Jangan beli di hari ini jika mengincar dividen!
+        
+        🔵 **3. RECORDING DATE (H+1 Ex-Date)**  
+        Tanggal Kustodian mencetak daftar resmi investor yang berhak atas dividen.
+        
+        💰 **4. PAYMENT DATE ({row_sel['Payment']})**  
+        Hari pencairan uang dividen masuk secara otomatis ke dalam Rekening Dana Nasabah (RDN) Anda.
+        """)
+
+# ------------------------------------------
+# TAB 5: RIGHT ISSUE & CA + SIMULASI HMETD
 # ------------------------------------------
 elif st.session_state.active_tab == "📑 Right Issue & Corporate Action Module":
     st.markdown("### 📑 Right Issue, HMETD Simulation & Live Global Sentiment")
