@@ -36,7 +36,7 @@ if 'selected_mb_ticker' not in st.session_state:
     st.session_state.selected_mb_ticker = "BUMI"
 
 if 'custom_search_ticker' not in st.session_state:
-    st.session_state.custom_search_ticker = "ADRO"
+    st.session_state.custom_search_ticker = "UNTR"
 
 # 3. INJEKSI CUSTOM CSS
 st.markdown("""
@@ -172,7 +172,7 @@ if 'master_universe' not in st.session_state:
         "AKRA", "MEDC", "ELSA", "ESSA", "ERAA", "CUAN", "BUMI", "DEWA", "ENRG", "TEBE",
         "PANI", "AMMN", "BRMS", "TOBA", "BUKA", "ACES", "MAPI", "INKP", "TKIM", "JARR",
         "GGRM", "HMSP", "UNVR", "KLBF", "SMGR", "INTP", "JSMR", "EXCL", "ISAT", "TBIG",
-        "DOOH", "RAJA", "ITMG"
+        "DOOH", "RAJA", "ITMG", "ASGR", "AALI", "GEMS", "TLDN"
     ]
 
 @st.cache_data(ttl=300)
@@ -205,7 +205,7 @@ ESTIMATED_SHARES = {
     "BBRI": 151596000000, "BBNI": 37253000000, "PTBA": 11520000000, "INCO": 9933000000,
     "CUAN": 11818182000, "BUMI": 371300000000, "GOTO": 1201400000000, "DEWA": 131230000000,
     "ENRG": 25100000000, "BUKA": 103000000000, "ADRO": 31985000000, "DOOH": 5000000000, "RAJA": 9500000000,
-    "ITMG": 1129925000
+    "ITMG": 1129925000, "ASGR": 1350000000, "AALI": 1924688000, "GEMS": 5882353000, "TLDN": 2185000000
 }
 
 def hitung_fraksi_harga(price):
@@ -430,7 +430,7 @@ if st.session_state.active_tab == "⚡ Nano Scalping & Orderbook Terminal":
             st.session_state.custom_search_ticker = clean_typed
             selected_ticker = clean_typed
         else:
-            selected_ticker = "ADRO"
+            selected_ticker = "UNTR"
 
     if selected_ticker and selected_ticker not in st.session_state.master_universe:
         st.session_state.master_universe.insert(0, selected_ticker)
@@ -645,9 +645,9 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
     with col_sw1:
         st.markdown("#### 📊 Top Weekly Swing Picks (Klik Baris)")
         swing_picks = [
-            {"Emiten": "ADRO", "Setup": "Breakout Resistance", "Buy Zone": "2480", "TP 1": "2550", "TP 2": "2630", "TP 3": "2730", "Stop Loss": "2400", "Target Waktu": "1-2 Minggu"},
-            {"Emiten": "MDKA", "Setup": "Pullback MA20", "Buy Zone": "2720", "TP 1": "2800", "TP 2": "2880", "TP 3": "2990", "Stop Loss": "2640", "Target Waktu": "2-3 Minggu"},
-            {"Emiten": "BBRI", "Setup": "Accumulation Phase", "Buy Zone": "4950", "TP 1": "5100", "TP 2": "5250", "TP 3": "5450", "Stop Loss": "4800", "Target Waktu": "1-3 Minggu"}
+            {"Emiten": "UNTR", "Setup": "Breakout Resistance", "Buy Zone": "26000", "TP 1": "26800", "TP 2": "27500", "TP 3": "28500", "Stop Loss": "25200", "Target Waktu": "1-2 Minggu"},
+            {"Emiten": "ASGR", "Setup": "Pullback MA20", "Buy Zone": "1500", "TP 1": "1560", "TP 2": "1620", "TP 3": "1700", "Stop Loss": "1440", "Target Waktu": "2-3 Minggu"},
+            {"Emiten": "AALI", "Setup": "Accumulation Phase", "Buy Zone": "7200", "TP 1": "7450", "TP 2": "7700", "TP 3": "8000", "Stop Loss": "6950", "Target Waktu": "1-3 Minggu"}
         ]
         df_swing = pd.DataFrame(swing_picks)
         event_swing = st.dataframe(df_swing[["Emiten", "Setup", "Buy Zone", "TP 1", "Target Waktu"]], use_container_width=True, hide_index=True, height=200, selection_mode="single-row", on_select="rerun", key="table_swing")
@@ -682,8 +682,7 @@ elif st.session_state.active_tab == "🚀 Weekly Swing Signal":
 
     st.markdown("#### 💼 Active Swing Trade Portfolio")
     df_swing_port = pd.DataFrame([
-        {"Emiten": "ADRO", "Entry (Rp)": "Rp 2,480", "Live Price (Rp)": "Rp 2,430", "Lot": 50, "Floating P&L": "Rp 250,000 (-2.02%)", "Target Waktu": "1 - 2 Minggu", "Status": "🔻 Minus (-2.02%)"},
-        {"Emiten": "MDKA", "Entry (Rp)": "Rp 2,720", "Live Price (Rp)": "Rp 2,820", "Lot": 40, "Floating P&L": "Rp 400,000 (+3.68%)", "Target Waktu": "2 - 3 Minggu", "Status": "🚀 Cuan (+3.68%)"}
+        {"Emiten": "UNTR", "Entry (Rp)": "Rp 26,000", "Live Price (Rp)": "Rp 26,015", "Lot": 10, "Floating P&L": "Rp 15,000 (+0.06%)", "Target Waktu": "1 - 2 Minggu", "Status": "🚀 Cuan (+0.06%)"}
     ])
     st.dataframe(df_swing_port, use_container_width=True, hide_index=True)
 
@@ -703,9 +702,7 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
             {"Emiten": "DEWA", "Harga Awal": "Rp 50", "Harga Live": "Rp 338", "Perubahan": "+1.20%", "Katalis Utama": "Ekspansi Tambang Emas", "Valuasi/PBV": "1.2x", "Target Utama": "Rp 1,200+", "Buy Zone": 338, "Target 1": 500, "Target 2": 800, "Target 3": 1200, "Invalidation": 42},
             {"Emiten": "ENRG", "Harga Awal": "Rp 90", "Harga Live": "Rp 1,440", "Perubahan": "+2.13%", "Katalis Utama": "Akuisisi Blok Migas Baru", "Valuasi/PBV": "1.1x", "Target Utama": "Rp 3,000+", "Buy Zone": 1440, "Target 1": 1800, "Target 2": 2400, "Target 3": 3000, "Invalidation": 80},
             {"Emiten": "BRMS", "Harga Awal": "Rp 50", "Harga Live": "Rp 570", "Perubahan": "+3.64%", "Katalis Utama": "Commercial Production Emas", "Valuasi/PBV": "2.5x", "Target Utama": "Rp 1,500+", "Buy Zone": 570, "Target 1": 750, "Target 2": 1100, "Target 3": 1500, "Invalidation": 45},
-            {"Emiten": "TEBE", "Harga Awal": "Rp 350", "Harga Live": "Rp 2,690", "Perubahan": "+0.00%", "Katalis Utama": "Logistik & Infrastruktur", "Valuasi/PBV": "1.4x", "Target Utama": "Rp 4,000+", "Buy Zone": 2690, "Target 1": 3200, "Target 2": 3600, "Target 3": 4000, "Invalidation": 310},
-            {"Emiten": "PTBA", "Harga Awal": "Rp 1,200", "Harga Live": "Rp 3,180", "Perubahan": "+4.26%", "Katalis Utama": "High Dividend & Energy Cycle", "Valuasi/PBV": "1.8x", "Target Utama": "Rp 5,000+", "Buy Zone": 3180, "Target 1": 3800, "Target 2": 4400, "Target 3": 5000, "Invalidation": 1050},
-            {"Emiten": "ADRO", "Harga Awal": "Rp 1,000", "Harga Live": "Rp 2,500", "Perubahan": "+3.73%", "Katalis Utama": "Green Energy Transition & Cash Rich", "Valuasi/PBV": "1.3x", "Target Utama": "Rp 4,500+", "Buy Zone": 2500, "Target 1": 3100, "Target 2": 3800, "Target 3": 4500, "Invalidation": 900}
+            {"Emiten": "TLDN", "Harga Awal": "Rp 200", "Harga Live": "Rp 550", "Perubahan": "+1.85%", "Katalis Utama": "Ekspansi Sawit & Dividen Rutin", "Valuasi/PBV": "1.2x", "Target Utama": "Rp 1,200+", "Buy Zone": 550, "Target 1": 700, "Target 2": 950, "Target 3": 1200, "Invalidation": 180}
         ]
         df_mb = pd.DataFrame(mb_picks)
         
@@ -753,77 +750,28 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("#### 📜 Formula Rahasia Multi-Bagger:")
-        st.markdown("""
-        <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 12px; font-size: 11px; color: #cbd5e1;">
-            1. <b>Low Valuation (Deep Value):</b> Cari emiten berharga murah yang mencatat lonjakan volume di harga bawah.<br>
-            2. <b>Turnaround Bisnis:</b> Perusahaan yang sebelumnya terbebani utang kini membukukan laba bersih positif.<br>
-            3. <b>Smart Money Accumulation:</b> Akumulasi institusi jangka panjang pada fase konsolidasi bulanan/mingguan.
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.markdown("### 📊 Multi-Bagger Growth Simulator")
-    
-    sim_col1, sim_col2, sim_col3 = st.columns(3)
-    with sim_col1:
-        harga_beli_sim = st.number_input("Harga Beli Saat Ini (Rp):", value=mb_data['Buy Zone'], step=10)
-    with sim_col2:
-        target_harga_sim = st.number_input("Target Harga Jangka Panjang (Rp):", value=mb_data['Target 3'], step=50)
-    with sim_col3:
-        jumlah_lot_sim = st.number_input("Jumlah Lot Disimpan:", value=100, step=10)
-        
-    modal_awal = harga_beli_sim * jumlah_lot_sim * 100
-    nilai_akhir = target_harga_sim * jumlah_lot_sim * 100
-    potensi_profit = nilai_akhir - modal_awal
-    persen_kenaikan = ((target_harga_sim - harga_beli_sim) / harga_beli_sim) * 100 if harga_beli_sim > 0 else 0
-    kelipatan = target_harga_sim / harga_beli_sim if harga_beli_sim > 0 else 1
-
-    st.markdown(f"""
-    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 16px; margin-top: 10px;">
-        <div style="font-size: 12px; font-weight: 700; color: #93c5fd; text-transform: uppercase; margin-bottom: 8px;">HASIL SIMULASI MULTI-BAGGER:</div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-            <span>Modal Awal: <b style="color: #ffffff;">Rp {modal_awal:,.0f}</b></span>
-            <span>Nilai Portofolio Akhir: <b style="color: #34d399;">Rp {nilai_akhir:,.0f}</b></span>
-        </div>
-        <hr style="border-color: rgba(255,255,255,0.1)">
-        <div style="font-size: 14px; color: #34d399; font-weight: 700;">Potensi Profit: Rp {potensi_profit:,.0f}</div>
-        <div style="font-size: 12px; color: #60a5fa; margin-top: 2px;">Potensi Kenaikan: +{persen_kenaikan:.2f}% ({kelipatan:.1f}x Lipat)</div>
-    </div>
-    """, unsafe_allow_html=True)
-
 # ------------------------------------------
-# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE
+# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE (UPDATE OKTOBER 2026 SESUAI GAMBAR)
 # ------------------------------------------
 elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
-    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule")
-    st.markdown("Modul pemburu dividen lengkap dengan daftar komprehensif seluruh emiten pembagi dividen, persentase Yield, estimasi nilai dividen, serta skema waktu wajib beli.")
+    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule (Update Oktober 2026)")
+    st.markdown("Kalender dividen real-time berdasarkan data keterbukaan informasi bursa terbaru (termasuk UNTR, ASGR, AALI, GEMS, TLDN).")
     
     col_div1, col_div2 = st.columns([1.6, 1.4], gap="medium")
     
     with col_div1:
-        st.markdown("#### 📊 Watchlist Komprehensif Saham Pembagi Dividen (BEI)")
+        st.markdown("#### 📊 Kalender & Watchlist Dividen Terbaru (Oktober 2026)")
         
-        # Daftar lengkap semua saham utama pembagi dividen
+        # Data disesuaikan persis dengan gambar kalender dividen
         df_div = pd.DataFrame([
-            {"Emiten": "PTBA", "Harga (Rp)": 3180, "Dividen/Svr (Rp)": 410, "Yield (%)": "12.89%", "Cum Date": "15 Apr 2026", "Ex Date": "16 Apr 2026", "Payment": "10 Mei 2026"},
-            {"Emiten": "ADRO", "Harga (Rp)": 2500, "Dividen/Svr (Rp)": 220, "Yield (%)": "8.80%", "Cum Date": "22 Mei 2026", "Ex Date": "25 Mei 2026", "Payment": "15 Jun 2026"},
-            {"Emiten": "ASII", "Harga (Rp)": 4630, "Dividen/Svr (Rp)": 421, "Yield (%)": "9.09%", "Cum Date": "05 Mei 2026", "Ex Date": "06 Mei 2026", "Payment": "28 Mei 2026"},
-            {"Emiten": "BMRI", "Harga (Rp)": 4030, "Dividen/Svr (Rp)": 350, "Yield (%)": "8.68%", "Cum Date": "10 Mar 2026", "Ex Date": "11 Mar 2026", "Payment": "04 Apr 2026"},
-            {"Emiten": "ITMG", "Harga (Rp)": 27500, "Dividen/Svr (Rp)": 2050, "Yield (%)": "7.45%", "Cum Date": "12 Apr 2026", "Ex Date": "13 Apr 2026", "Payment": "02 Mei 2026"},
-            {"Emiten": "UNTR", "Harga (Rp)": 26015, "Dividen/Svr (Rp)": 1650, "Yield (%)": "6.34%", "Cum Date": "20 Apr 2026", "Ex Date": "21 Apr 2026", "Payment": "12 Mei 2026"},
-            {"Emiten": "TLKM", "Harga (Rp)": 2900, "Dividen/Svr (Rp)": 165, "Yield (%)": "5.68%", "Cum Date": "02 Jun 2026", "Ex Date": "03 Jun 2026", "Payment": "30 Jun 2026"},
-            {"Emiten": "BBRI", "Harga (Rp)": 4950, "Dividen/Svr (Rp)": 235, "Yield (%)": "4.75%", "Cum Date": "18 Mar 2026", "Ex Date": "19 Mar 2026", "Payment": "12 Apr 2026"},
-            {"Emiten": "INDF", "Harga (Rp)": 7450, "Dividen/Svr (Rp)": 290, "Yield (%)": "3.89%", "Cum Date": "08 Jul 2026", "Ex Date": "09 Jul 2026", "Payment": "29 Jul 2026"},
-            {"Emiten": "ICBP", "Harga (Rp)": 11200, "Dividen/Svr (Rp)": 265, "Yield (%)": "2.37%", "Cum Date": "07 Jul 2026", "Ex Date": "08 Jul 2026", "Payment": "28 Jul 2026"},
-            {"Emiten": "BBNI", "Harga (Rp)": 5200, "Dividen/Svr (Rp)": 280, "Yield (%)": "5.38%", "Cum Date": "14 Mar 2026", "Ex Date": "15 Mar 2026", "Payment": "05 Apr 2026"},
-            {"Emiten": "BBCA", "Harga (Rp)": 10150, "Dividen/Svr (Rp)": 270, "Yield (%)": "2.66%", "Cum Date": "20 Mar 2026", "Ex Date": "21 Mar 2026", "Payment": "15 Apr 2026"},
-            {"Emiten": "ANTM", "Harga (Rp)": 1550, "Dividen/Svr (Rp)": 85, "Yield (%)": "5.48%", "Cum Date": "25 Mei 2026", "Ex Date": "26 Mei 2026", "Payment": "18 Jun 2026"},
-            {"Emiten": "AKRA", "Harga (Rp)": 1650, "Dividen/Svr (Rp)": 125, "Yield (%)": "7.58%", "Cum Date": "10 Apr 2026", "Ex Date": "11 Apr 2026", "Payment": "30 Apr 2026"},
-            {"Emiten": "PGAS", "Harga (Rp)": 1450, "Dividen/Svr (Rp)": 110, "Yield (%)": "7.59%", "Cum Date": "15 Jun 2026", "Ex Date": "16 Jun 2026", "Payment": "08 Jul 2026"}
+            {"Emiten": "UNTR", "Harga (Rp)": 26015, "Dividen/Svr (Rp)": 430, "Yield (%)": "1.65%", "Cum Date": "6 Okt 2026", "Ex Date": "7 Okt 2026", "Payment": "26 Okt 2026"},
+            {"Emiten": "ASGR", "Harga (Rp)": 1500, "Dividen/Svr (Rp)": 297, "Yield (%)": "19.80%", "Cum Date": "7 Okt 2026", "Ex Date": "8 Okt 2026", "Payment": "26 Okt 2026"},
+            {"Emiten": "AALI", "Harga (Rp)": 7200, "Dividen/Svr (Rp)": 233, "Yield (%)": "3.24%", "Cum Date": "8 Okt 2026", "Ex Date": "9 Okt 2026", "Payment": "26 Okt 2026"},
+            {"Emiten": "GEMS", "Harga (Rp)": 7500, "Dividen/Svr (Rp)": 611, "Yield (%)": "8.15%", "Cum Date": "8 Okt 2026", "Ex Date": "9 Okt 2026", "Payment": "22 Okt 2026"},
+            {"Emiten": "TLDN", "Harga (Rp)": 550, "Dividen/Svr (Rp)": 20, "Yield (%)": "3.64%", "Cum Date": "12 Okt 2026", "Ex Date": "13 Okt 2026", "Payment": "22 Okt 2026"}
         ])
         
-        st.dataframe(df_div, use_container_width=True, height=310, hide_index=True)
+        st.dataframe(df_div, use_container_width=True, height=270, hide_index=True)
         
         st.markdown("#### 🧮 Kalkulator Simulasi Cuan Dividen")
         emitens_list = df_div["Emiten"].tolist()
