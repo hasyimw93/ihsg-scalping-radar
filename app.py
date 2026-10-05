@@ -750,19 +750,48 @@ elif st.session_state.active_tab == "💎 Multi-Bagger Hunter":
         </div>
         """, unsafe_allow_html=True)
 
+    st.markdown("---")
+    st.markdown("### 📊 Multi-Bagger Growth Simulator")
+    
+    sim_col1, sim_col2, sim_col3 = st.columns(3)
+    with sim_col1:
+        harga_beli_sim = st.number_input("Harga Beli Saat Ini (Rp):", value=int(mb_data['Buy Zone']), step=10)
+    with sim_col2:
+        target_harga_sim = st.number_input("Target Harga Jangka Panjang (Rp):", value=int(mb_data['Target 3']), step=50)
+    with sim_col3:
+        jumlah_lot_sim = st.number_input("Jumlah Lot Disimpan:", value=100, step=10)
+        
+    modal_awal = harga_beli_sim * jumlah_lot_sim * 100
+    nilai_akhir = target_harga_sim * jumlah_lot_sim * 100
+    potensi_profit = nilai_akhir - modal_awal
+    persen_kenaikan = ((target_harga_sim - harga_beli_sim) / harga_beli_sim) * 100 if harga_beli_sim > 0 else 0
+    kelipatan = target_harga_sim / harga_beli_sim if harga_beli_sim > 0 else 1
+
+    st.markdown(f"""
+    <div style="background: #003366; border: 1px solid #0047ab; border-radius: 12px; padding: 16px; margin-top: 10px;">
+        <div style="font-size: 12px; font-weight: 700; color: #93c5fd; text-transform: uppercase; margin-bottom: 8px;">HASIL SIMULASI MULTI-BAGGER:</div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+            <span>Modal Awal: <b style="color: #ffffff;">Rp {modal_awal:,.0f}</b></span>
+            <span>Nilai Portofolio Akhir: <b style="color: #34d399;">Rp {nilai_akhir:,.0f}</b></span>
+        </div>
+        <hr style="border-color: rgba(255,255,255,0.1)">
+        <div style="font-size: 14px; color: #34d399; font-weight: 700;">Potensi Profit: Rp {potensi_profit:,.0f}</div>
+        <div style="font-size: 12px; color: #60a5fa; margin-top: 2px;">Potensi Kenaikan: +{persen_kenaikan:.2f}% ({kelipatan:.1f}x Lipat)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 # ------------------------------------------
-# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE (DENGAN FETCH HARGA LIVE)
+# TAB 4: DIVIDEND HUNTER & SCHEDULE MODULE (LIVE PRICE SYNC)
 # ------------------------------------------
 elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
-    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule (Real-Time Price Sync)")
-    st.markdown("Kalender dividen dengan harga saham yang disinkronkan secara *real-time* langsung dari bursa via yFinance.")
+    st.markdown("### 💰 Dividend Hunter & Golden Timeline Schedule (Live Market Price Sync)")
+    st.markdown("Kalender dividen real-time berdasarkan data keterbukaan informasi bursa terbaru dengan sinkronisasi harga pasar live via yFinance.")
     
     col_div1, col_div2 = st.columns([1.6, 1.4], gap="medium")
     
     with col_div1:
-        st.markdown("#### 📊 Kalender & Watchlist Dividen (Live Market Price)")
+        st.markdown("#### 📊 Kalender & Watchlist Dividen Terbaru (Live Price)")
         
-        # Daftar data dasar dividen (ticker, nominal dividen, jadwal)
         raw_div_list = [
             {"Emiten": "UNTR", "Div": 430, "Cum": "6 Okt 2026", "Ex": "7 Okt 2026", "Pay": "26 Okt 2026"},
             {"Emiten": "ASGR", "Div": 297, "Cum": "7 Okt 2026", "Ex": "8 Okt 2026", "Pay": "26 Okt 2026"},
@@ -771,25 +800,23 @@ elif st.session_state.active_tab == "💰 Dividend Hunter & Schedule":
             {"Emiten": "TLDN", "Div": 20, "Cum": "12 Okt 2026", "Ex": "13 Okt 2026", "Pay": "22 Okt 2026"}
         ]
         
-        # Ambil harga live secara otomatis
-        live_div_data = []
+        live_div_rows = []
         for item in raw_div_list:
             t_symbol = item["Emiten"]
-            live_p = fetch_single_ticker_data(t_symbol)
-            current_p = live_p["Price"] if live_p else 1000  # Fallback aman
-            yield_calc = (item["Div"] / current_p) * 100 if current_p > 0 else 0
-            
-            live_div_data.append({
+            t_info = fetch_single_ticker_data(t_symbol)
+            p_live = t_info["Price"]
+            y_calc = (item["Div"] / p_live) * 100 if p_live > 0 else 0
+            live_div_rows.append({
                 "Emiten": t_symbol,
-                "Harga (Rp)": current_p,
+                "Harga (Rp)": p_live,
                 "Dividen/Svr (Rp)": item["Div"],
-                "Yield (%)": f"{yield_calc:.2f}%",
+                "Yield (%)": f"{y_calc:.2f}%",
                 "Cum Date": item["Cum"],
                 "Ex Date": item["Ex"],
                 "Payment": item["Pay"]
             })
             
-        df_div = pd.DataFrame(live_div_data)
+        df_div = pd.DataFrame(live_div_rows)
         st.dataframe(df_div, use_container_width=True, height=270, hide_index=True)
         
         st.markdown("#### 🧮 Kalkulator Simulasi Cuan Dividen")
