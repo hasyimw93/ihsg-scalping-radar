@@ -1,273 +1,307 @@
-# ==================== HALAMAN: PORTFOLIO ====================
-elif menu == "💼 Portfolio":
-    st.title("💼 Portfolio Saya")
+import streamlit as st
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from datetime import datetime
+import ta
+import sqlite3
+
+st.set_page_config(page_title="Saham PRO", layout="wide")
+
+def init_db():
+    conn = sqlite3.connect('saham.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS watchlist (id INTEGER PRIMARY KEY AUTOINCREMENT, ticker TEXT UNIQUE, tanggal_ditambah TIMESTAMP DEFAULT CURRENT_TIMESTAMP)')
+    c.execute('CREATE TABLE IF NOT EXISTS portfolio (id INTEGER PRIMARY KEY AUTOINCREMENT, ticker TEXT, jumlah REAL, harga_beli REAL, tanggal_beli DATE)')
+    conn.commit()
+    return conn
+
+conn = init_db()
+
+def db_query(query, params=()):
+    return pd.read_sql_query(query, conn, params=params)
+
+def db_execute(query, params=()):
+    c = conn.cursor()
+    c.execute(query, params)
+    conn.commit()
+
+@st.cache_data(ttl=300)
+def ambil_data(ticker, periode):
+    try:
+        data = yf.download(ticker, period=periode, interval="1d", progress=False, auto_adjust=True)
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = data.columns.get_level_values(0)
+        return data
+    except:
+        return None
+
+@st.cache_data(ttl=3600)
+def ambil_info(ticker):
+    try:
+        return yf.Ticker(ticker).info
+    except:
+        return {}
+
+def format_angka(x):
+    if x is None or pd.isna(x):
+        return "N/A"
+    if abs(x) >= 1e12:
+        return str(round(x/1e12, 2)) + " T"
+    elif abs(x) >= 1e9:
+        return str(round(x/1e9, 2)) + " B"
+    elif abs(x) >= 1e6:
+        return str(round(x/1e6, 2)) + " M"
+    elif abs(x) >= 1e3:
+        return str(round(x/1e3, 2)) + " K"
+    return str(round(x, 2))
+
+st.sidebar.markdown("# Saham PRO")
+st.sidebar.markdown("---")
+menu = st.sidebar.radio("Menu", ["Analisis Saham", "Watchlist", "Portfolio"])
+st.sidebar.markdown("---")
+
+saham_populer = {
+    "BBCA.JK": "Bank Central Asia",
+    "BBRI.JK": "Bank Rakyat Indonesia",
+    "TLKM.JK": "Telkom Indonesia",
+    "ASII.JK": "Astra International",
+    "AAPL": "Apple Inc.",
+    "GOOGL": "Alphabet",
+    "MSFT": "Microsoft",
+    "TSLA": "Tesla",
+    "NVDA": "NVIDIA"
+}
+
+if menu == "Analisis Saham":
+    st.title("Analisis Saham PRO")
     
     with st.sidebar:
-        st.markdown("### ➕ Tambah Transaksi")
+        st.markdown("### Pengaturan")
+        pilihan = st.selectbox("Pilih Saham", options=["-- Manual --"] + list(saham_populer.keys()))
+        default_tk = pilihan if pilihan != "-- Manual --" else "BBCA.JK"
+        ticker = st.text_input("Kode Saham", value=default_tk).upper()
+        periode = st.selectbox("Periode", ["1mo", "3mo", "6mo", "1y", "2y", "5y"], index=3)
+        show_ma = st.checkbox("Moving Average", True)
+        show_rsi = st.checkbox("RSI", True)
+        show_macd = st.checkbox("MACD", False)
+        
+        if show_ma:
+            ma_short = st.slider("MA Pendek", 5, 50, 20)
+            ma_long = st.slider("MA Panjang", 20, 200, 50)
+        
+        if st.button("Tambah ke Watchlist"):
+            try:
+                db_execute("INSERT OR IGNORE INTO watchlist (ticker) VALUES (?)", (ticker,))
+                st.success(ticker + " ditambahkan ke watchlist!")
+            except Exception as e:
+                st.error("Error: " + str(e))
+    
+    with st.spinner("Mengambil data..."):
+        data = ambil_data(ticker, periode)
+        info = ambil_info(ticker)
+    
+    if data is None or data.empty:
+        st.error("Data " + ticker + " tidak ditemukan!")
+        st.stop()
+    
+    nama = info.get("longName", ticker)
+    harga_skrg = data['Close'].iloc[-1]
+    harga_lalu = data['Close'].iloc[-2] if len(data) > 1 else harga_skrg
+    perubahan = harga_skrg - harga_lalu
+    persen = (perubahan / harga_lalu) * 100
+    
+    st.markdown("## " + str(nama) + " (" + ticker + ")")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Harga", str(round(harga_skrg, 2)), str(round(perubahan, 2)) + " (" + str(round(persen, 2)) + "%)")
+    with col2:
+        st.metric("High 52W", str(round(data['High'].tail(252).max(), 2)))
+    with col3:
+        st.metric("Low 52W", str(round(data['Low'].tail(252).min(), 2)))
+    with col4:
+        st.metric("Volume", format_angka(data['Volume'].iloc[-1]))
+    
+    st.divider()
+    tab1, tab2, tab3 = st.tabs(["Chart", "Fundamental", "Data"])
+    
+    with tab1:
+        df = data.copy()
+        if show_ma:
+            df['MA_S'] = df['Close'].rolling(ma_short).mean()
+            df['MA_L'] = df['Close'].rolling(ma_long).mean()
+        if show_rsi:
+            df['RSI'] = ta.momentum.RSIIndicator(df['Close'], window=14).rsi()
+        if show_macd:
+            macd = ta.trend.MACD(df['Close'])
+            df['MACD'] = macd.macd()
+            df['MACD_Signal'] = macd.macd_signal()
+        
+        subplot_count = 1
+        row_heights = [0.6]
+        if show_rsi:
+            subplot_count += 1
+            row_heights.append(0.2)
+        if show_macd:
+            subplot_count += 1
+            row_heights.append(0.2)
+        
+        total = sum(row_heights)
+        row_heights = [h/total for h in row_heights]
+        
+        fig = make_subplots(rows=subplot_count, cols=1, shared_xaxes=True, vertical_spacing=0.03, row_heights=row_heights)
+        
+        fig.add_trace(go.Candlestick(x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name='Harga'), row=1, col=1)
+        
+        if show_ma:
+            fig.add_trace(go.Scatter(x=df.index, y=df['MA_S'], name='MA ' + str(ma_short), line=dict(color='orange')), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['MA_L'], name='MA ' + str(ma_long), line=dict(color='blue')), row=1, col=1)
+        
+        current_row = 2
+        if show_rsi:
+            fig.add_trace(go.Scatter(x=df.index, y=df['RSI'], name='RSI', line=dict(color='purple')), row=current_row, col=1)
+            fig.add_hline(y=70, line_dash="dash", line_color="red", row=current_row, col=1)
+            fig.add_hline(y=30, line_dash="dash", line_color="green", row=current_row, col=1)
+            current_row += 1
+        
+        if show_macd:
+            fig.add_trace(go.Scatter(x=df.index, y=df['MACD'], name='MACD', line=dict(color='blue')), row=current_row, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['MACD_Signal'], name='Signal', line=dict(color='red')), row=current_row, col=1)
+        
+        fig.update_layout(height=700, xaxis_rangeslider_visible=False, hovermode='x unified')
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with tab2:
+        st.subheader("Data Fundamental")
+        if info:
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Market Cap", format_angka(info.get("marketCap")))
+                pe = info.get('trailingPE')
+                st.metric("P/E Ratio", str(round(pe, 2)) if pe else "N/A")
+            with col2:
+                eps = info.get('trailingEps')
+                st.metric("EPS", str(round(eps, 2)) if eps else "N/A")
+                pb = info.get('priceToBook')
+                st.metric("P/B Ratio", str(round(pb, 2)) if pb else "N/A")
+            with col3:
+                st.write("**Sektor:** " + str(info.get('sector', 'N/A')))
+                st.write("**Industri:** " + str(info.get('industry', 'N/A')))
+        else:
+            st.warning("Data tidak tersedia")
+    
+    with tab3:
+        st.subheader("Data Historis")
+        st.dataframe(data.round(2).sort_index(ascending=False), use_container_width=True)
+        csv = data.to_csv().encode('utf-8')
+        st.download_button("Download CSV", csv, ticker + "_data.csv", "text/csv")
+
+elif menu == "Watchlist":
+    st.title("Watchlist Saya")
+    
+    with st.sidebar:
+        st.markdown("### Tambah Saham")
+        ticker_baru = st.text_input("Kode Saham").upper()
+        if st.button("Tambah"):
+            if ticker_baru:
+                try:
+                    db_execute("INSERT OR IGNORE INTO watchlist (ticker) VALUES (?)", (ticker_baru,))
+                    st.success(ticker_baru + " ditambahkan!")
+                    st.rerun()
+                except Exception as e:
+                    st.error("Error: " + str(e))
+    
+    df_watch = db_query("SELECT * FROM watchlist ORDER BY tanggal_ditambah DESC")
+    
+    if df_watch.empty:
+        st.info("Watchlist kosong. Tambahkan saham dari sidebar!")
+    else:
+        for _, row in df_watch.iterrows():
+            tk = row['ticker']
+            col1, col2, col3 = st.columns([3, 3, 1])
+            with col1:
+                st.markdown("### " + tk)
+            with col2:
+                try:
+                    d = ambil_data(tk, "5d")
+                    if d is not None and not d.empty:
+                        h = d['Close'].iloc[-1]
+                        h_lalu = d['Close'].iloc[-2] if len(d) > 1 else h
+                        delta = ((h - h_lalu) / h_lalu) * 100
+                        st.metric("Harga", str(round(h, 2)), str(round(delta, 2)) + "%")
+                except:
+                    st.write("N/A")
+            with col3:
+                if st.button("Hapus", key="del_" + tk):
+                    db_execute("DELETE FROM watchlist WHERE ticker = ?", (tk,))
+                    st.rerun()
+            st.divider()
+
+elif menu == "Portfolio":
+    st.title("Portfolio Saya")
+    
+    with st.sidebar:
+        st.markdown("### Tambah Transaksi")
         tk_p = st.text_input("Kode Saham").upper()
         jml = st.number_input("Jumlah Lembar", min_value=1.0, value=100.0)
         hrg = st.number_input("Harga Beli", min_value=0.01, value=1000.0)
         tgl = st.date_input("Tanggal Beli", datetime.now())
-        catatan = st.text_input("Catatan (opsional)")
         
         if st.button("Tambah ke Portfolio"):
             if tk_p:
-                db_execute(
-                    "INSERT INTO portfolio (ticker, jumlah, harga_beli, tanggal_beli, catatan) VALUES (?,?,?,?,?)",
-                    (tk_p, jml, hrg, tgl.strftime('%Y-%m-%d'), catatan)
-                )
-                st.success(f"✅ {tk_p} ditambahkan!")
+                db_execute("INSERT INTO portfolio (ticker, jumlah, harga_beli, tanggal_beli) VALUES (?,?,?,?)", (tk_p, jml, hrg, tgl.strftime('%Y-%m-%d')))
+                st.success(tk_p + " ditambahkan!")
                 st.rerun()
     
     df_pf = db_query("SELECT * FROM portfolio ORDER BY tanggal_beli DESC")
     
     if df_pf.empty:
-        st.info("Portfolio masih kosong. Tambahkan transaksi dari sidebar!")
+        st.info("Portfolio kosong. Tambahkan dari sidebar!")
     else:
-        # Hitung nilai portfolio
         hasil = []
         for _, row in df_pf.iterrows():
             try:
-                d = ambil_data(row['ticker'], "5d", "1d")
+                d = ambil_data(row['ticker'], "5d")
                 harga_skrg = d['Close'].iloc[-1] if d is not None and not d.empty else 0
                 nilai_beli = row['jumlah'] * row['harga_beli']
                 nilai_skrg = row['jumlah'] * harga_skrg
                 pnl = nilai_skrg - nilai_beli
-                pnl_pct = (pnl / nilai_beli * 100) if nilai_beli > 0 else 0
-                
-                hasil.append({
-                    'ID': row['id'],
-                    'Ticker': row['ticker'],
-                    'Jumlah': row['jumlah'],
-                    'Harga Beli': row['harga_beli'],
-                    'Harga Kini': round(harga_skrg, 2),
-                    'Nilai Beli': round(nilai_beli, 2),
-                    'Nilai Kini': round(nilai_skrg, 2),
-                    'PnL': round(pnl, 2),
-                    'PnL %': round(pnl_pct, 2),
-                    'Tanggal': row['tanggal_beli']
-                })
-            except Exception as e:
+                if nilai_beli > 0:
+                    pnl_pct = (pnl / nilai_beli) * 100
+                else:
+                    pnl_pct = 0
+                hasil.append({'ID': row['id'], 'Ticker': row['ticker'], 'Jumlah': row['jumlah'], 'Harga Beli': row['harga_beli'], 'Harga Kini': round(harga_skrg, 2), 'Nilai Beli': round(nilai_beli, 2), 'Nilai Kini': round(nilai_skrg, 2), 'PnL': round(pnl, 2), 'PnL %': round(pnl_pct, 2)})
+            except Exception:
                 continue
         
         if hasil:
             df_hasil = pd.DataFrame(hasil)
-            
-            # Ringkasan portfolio
             total_beli = df_hasil['Nilai Beli'].sum()
             total_kini = df_hasil['Nilai Kini'].sum()
             total_pnl = total_kini - total_beli
-            total_pnl_pct = (total_pnl / total_beli * 100) if total_beli > 0 else 0
+            if total_beli > 0:
+                total_pnl_pct = (total_pnl / total_beli) * 100
+            else:
+                total_pnl_pct = 0
             
-            st.subheader("📊 Ringkasan Portfolio")
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Total Modal", f"Rp {total_beli:,.0f}")
+                st.metric("Total Modal", "Rp " + format_angka(total_beli))
             with col2:
-                st.metric("Nilai Sekarang", f"Rp {total_kini:,.0f}")
+                st.metric("Nilai Sekarang", "Rp " + format_angka(total_kini))
             with col3:
-                st.metric("Total PnL", f"Rp {total_pnl:,.0f}",
-                         f"{total_pnl_pct:+.2f}%")
-            with col4:
-                st.metric("Jumlah Posisi", len(df_hasil))
+                st.metric("Total PnL", "Rp " + format_angka(total_pnl), str(round(total_pnl_pct, 2)) + "%")
             
             st.divider()
-            
-            # Pie chart alokasi
-            col_a, col_b = st.columns(2)
-            
-            with col_a:
-                fig_pie = go.Figure(data=[go.Pie(
-                    labels=df_hasil['Ticker'],
-                    values=df_hasil['Nilai Kini'],
-                    hole=0.4
-                )])
-                fig_pie.update_layout(title="Alokasi Portfolio", height=350)
-                st.plotly_chart(fig_pie, use_container_width=True)
-            
-            with col_b:
-                colors = ['#26a69a' if x >= 0 else '#ef5350' for x in df_hasil['PnL']]
-                fig_bar = go.Figure(data=[go.Bar(
-                    x=df_hasil['Ticker'],
-                    y=df_hasil['PnL'],
-                    marker_color=colors,
-                    text=df_hasil['PnL'].round(0),
-                    textposition='auto'
-                )])
-                fig_bar.update_layout(title="PnL per Saham", height=350)
-                st.plotly_chart(fig_bar, use_container_width=True)
-            
-            st.divider()
-            
-            # Tabel detail
-            st.subheader("📋 Detail Posisi")
             st.dataframe(df_hasil, use_container_width=True)
             
-            # Hapus posisi
-            st.subheader("🗑️ Hapus Posisi")
-            id_hapus = st.selectbox(
-                "Pilih ID untuk dihapus",
-                options=df_hasil['ID'].tolist()
-            )
-            if st.button("Hapus Posisi"):
+            id_hapus = st.selectbox("Hapus posisi (pilih ID)", options=df_hasil['ID'].tolist())
+            if st.button("Hapus"):
                 db_execute("DELETE FROM portfolio WHERE id = ?", (int(id_hapus),))
-                st.success("Posisi dihapus!")
                 st.rerun()
 
-
-# ==================== HALAMAN: ALERTS ====================
-elif menu == "🔔 Alerts":
-    st.title("🔔 Price Alerts")
-    
-    with st.sidebar:
-        st.markdown("### ➕ Buat Alert")
-        tk_a = st.text_input("Kode Saham").upper()
-        target = st.number_input("Harga Target", min_value=0.01, value=1000.0)
-        kondisi = st.selectbox("Kondisi", ["Di atas (≥)", "Di bawah (≤)"])
-        
-        if st.button("Buat Alert"):
-            if tk_a:
-                db_execute(
-                    "INSERT INTO alerts (ticker, harga_target, kondisi) VALUES (?,?,?)",
-                    (tk_a, target, kondisi)
-                )
-                st.success(f"✅ Alert untuk {tk_a} dibuat!")
-                st.rerun()
-    
-    df_alerts = db_query("SELECT * FROM alerts WHERE aktif = 1 ORDER BY dibuat DESC")
-    
-    if df_alerts.empty:
-        st.info("Belum ada alert aktif. Buat dari sidebar!")
-    else:
-        st.subheader("📋 Daftar Alert Aktif")
-        
-        for _, row in df_alerts.iterrows():
-            tk = row['ticker']
-            target = row['harga_target']
-            kondisi = row['kondisi']
-            
-            col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 3, 1])
-            
-            with col1:
-                st.markdown(f"**{tk}**")
-            with col2:
-                st.write(f"Target: {target:,.2f}")
-            with col3:
-                st.write(kondisi)
-            with col4:
-                try:
-                    d = ambil_data(tk, "5d", "1d")
-                    if d is not None and not d.empty:
-                        harga_now = d['Close'].iloc[-1]
-                        st.write(f"Kini: {harga_now:,.2f}")
-                        
-                        # Cek kondisi
-                        terpenuhi = False
-                        if "atas" in kondisi and harga_now >= target:
-                            terpenuhi = True
-                        elif "bawah" in kondisi and harga_now <= target:
-                            terpenuhi = True
-                        
-                        if terpenuhi:
-                            st.success("🎯 TERCAPAI!")
-                        else:
-                            st.info("⏳ Menunggu")
-                except:
-                    st.write("N/A")
-            with col5:
-                if st.button("🗑️", key=f"del_alert_{row['id']}"):
-                    db_execute("DELETE FROM alerts WHERE id = ?", (int(row['id']),))
-                    st.rerun()
-            
-            st.divider()
-
-
-# ==================== HALAMAN: BANDINGKAN ====================
-elif menu == "📊 Bandingkan":
-    st.title("📊 Bandingkan Saham")
-    
-    with st.sidebar:
-        st.markdown("### Pilih Saham")
-        daftar = st.multiselect(
-            "Pilih 2-5 saham untuk dibandingkan",
-            options=list(saham_populer.keys()),
-            default=["BBCA.JK", "BBRI.JK"]
-        )
-        periode_cmp = st.selectbox("Periode", 
-                                   ["1mo", "3mo", "6mo", "1y", "2y", "5y"],
-                                   index=3)
-    
-    if len(daftar) < 2:
-        st.warning("Pilih minimal 2 saham untuk dibandingkan.")
-    else:
-        # Ambil data
-        data_dict = {}
-        for tk in daftar:
-            d = ambil_data(tk, periode_cmp, "1d")
-            if d is not None and not d.empty:
-                data_dict[tk] = d
-        
-        if not data_dict:
-            st.error("Tidak ada data yang bisa dibandingkan.")
-            st.stop()
-        
-        # Chart perbandingan (normalized)
-        st.subheader("📈 Perbandingan Performa (Normalized)")
-        
-        fig = go.Figure()
-        for tk, d in data_dict.items():
-            normalized = (d['Close'] / d['Close'].iloc[0] - 1) * 100
-            fig.add_trace(go.Scatter(
-                x=d.index, y=normalized,
-                name=tk, mode='lines'
-            ))
-        
-        fig.update_layout(
-            title="Performa Relatif (% perubahan dari awal periode)",
-            xaxis_title="Tanggal",
-            yaxis_title="Return (%)",
-            hovermode='x unified',
-            height=500
-        )
-        fig.add_hline(y=0, line_dash="dash", line_color="gray")
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Tabel perbandingan
-        st.subheader("📋 Tabel Perbandingan")
-        
-        rows = []
-        for tk, d in data_dict.items():
-            if len(d) < 2:
-                continue
-            return_total = (d['Close'].iloc[-1] / d['Close'].iloc[0] - 1) * 100
-            volatilitas = d['Close'].pct_change().std() * 100
-            max_drawdown = ((d['Close'] / d['Close'].cummax()) - 1).min() * 100
-            
-            rows.append({
-                'Ticker': tk,
-                'Harga Awal': round(d['Close'].iloc[0], 2),
-                'Harga Akhir': round(d['Close'].iloc[-1], 2),
-                'Return %': round(return_total, 2),
-                'Volatilitas %': round(volatilitas, 2),
-                'Max Drawdown %': round(max_drawdown, 2)
-            })
-        
-        df_cmp = pd.DataFrame(rows).sort_values('Return %', ascending=False)
-        st.dataframe(df_cmp, use_container_width=True)
-        
-        # Bar chart return
-        fig_bar = go.Figure(data=[go.Bar(
-            x=df_cmp['Ticker'],
-            y=df_cmp['Return %'],
-            marker_color=['#26a69a' if x >= 0 else '#ef5350' for x in df_cmp['Return %']],
-            text=df_cmp['Return %'].round(2),
-            textposition='auto'
-        )])
-        fig_bar.update_layout(title="Total Return per Saham", height=400)
-        st.plotly_chart(fig_bar, use_container_width=True)
-
-
-# ==================== FOOTER ====================
 st.divider()
-st.caption(f"📅 Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-           f"Sumber: Yahoo Finance | ⚠️ Bukan rekomendasi investasi")
+st.caption("Update: " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " | Bukan rekomendasi investasi")
